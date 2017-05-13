@@ -1,0 +1,47 @@
+{% extends "caretaking.html" %}
+
+{% block object_style %}
+var object_style = new ol.style.Style({
+    image: new ol.style.Circle({
+      radius: width * 2,
+      fill: new ol.style.Fill({
+        color: white
+      }),
+      stroke: new ol.style.Stroke({
+        color: red,
+        width: width/2
+      })
+    })
+})
+{% endblock object_style %}
+
+{% block editing %}
+      var features = new ol.Collection();
+      features.extend([feature]);
+      var featureOverlay = new ol.layer.Vector({
+        source: new ol.source.Vector({features: features}),
+        style: object_style,
+      });
+      featureOverlay.setMap(map);
+
+      var modify = new ol.interaction.Modify({
+        features: features,
+        deleteCondition: function(event) {
+          return ol.events.condition.shiftKeyOnly(event) &&
+              ol.events.condition.singleClick(event);
+        }
+      });
+      map.addInteraction(modify);
+
+      var draw; // global so we can remove it later
+
+      function addInteraction() {
+        draw = new ol.interaction.Draw({
+          features: features,
+          type: ('Point')
+        });
+        map.addInteraction(draw);
+      }
+
+      addInteraction();
+{% endblock editing %}

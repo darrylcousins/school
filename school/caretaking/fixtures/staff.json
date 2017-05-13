@@ -1,0 +1,29 @@
+﻿[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$30000$QWjU5xzhgqCV$X0NpIcxJEdUKU+nT2YjcbAbfiG2g9UMsqVCG4ZHIlUc=",
+            "last_login": null,
+            "is_superuser": true,
+            "username": "cousinsd",
+            "first_name": "Darryl",
+            "last_name": "Cousins",
+            "email": "cousind@ellesmere.school.nz",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2017-04-25T07:43:35Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "caretaking.staff",
+        "pk": 1,
+        "fields": {
+            "title": "Caretaker",
+            "comment": null,
+            "user": 1
+        }
+    }
+]

@@ -1,0 +1,88 @@
+<style type="text/css">
+	#{{ attrs.id }}_map {
+        width: {{ map_width }}px;
+        height: {{ map_height }}px; 
+        border: 1px solid #bbb;    
+        border-radius: 1px;
+    }
+	#{{ attrs.id }}_map .aligned label { float: inherit; }
+	#{{ attrs.id }}_span_map { position: relative; vertical-align: top; float: left; }
+	{% if not display_wkt %}#{{ attrs.id }} { display: none; }{% endif %}
+    label[for={{ attrs.id }}]: { color: lighter; }
+</style>
+<p>{{ attrs.widget }}</p>
+
+<span id="{{ attrs.id }}_span_map">
+	<div id="{{ attrs.id }}_map"></div>
+	{% include "floppyforms/textarea.html" %}
+	<script type="text/javascript">
+      var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
+      });
+
+      var white = [255, 255, 255, 1];
+      var blue = [0, 153, 255, 1];
+      var red = [255, 0, 153, 1];
+      var width = 3;
+
+      // generate background college view
+      var college_wkt = '{{ college_wkt }}';
+      var college_format = new ol.format.WKT();
+      var college_feature = college_format.readFeature(college_wkt);
+      var college_style = new ol.style.Style({
+        fill: new ol.style.Fill({
+          color: white
+        }),
+        stroke: new ol.style.Stroke({
+          color: blue,
+          width: width/3
+        })
+      });
+      var college_vector = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: [college_feature],
+        }),
+        style: college_style
+      });
+      // end generate background college view
+
+      // generate view of this object
+      var wkt = '{{ value }}';
+      var format = new ol.format.WKT();
+      var feature = format.readFeature(wkt);
+
+      {% block object_style %}{% endblock object_style %}
+
+      var object_vector = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: [feature],
+        }),
+        style: object_style
+      });
+      // end generate view of this object
+
+      var select = new ol.interaction.Select({
+        style: object_style
+      });
+
+      var modify = new ol.interaction.Modify({
+        features: select.getFeatures(),
+        style: object_style
+      });
+       
+      // build map
+      var map = new ol.Map({
+        interactions: ol.interaction.defaults().extend([select, modify]),
+        layers: [raster, college_vector, object_vector],
+        target: '{{ attrs.id }}_map',
+        view: new ol.View({
+            center: ol.proj.fromLonLat([172.292576,-43.757829]),
+            zoom: 18
+        })
+      });
+
+      {% block editing %}{% endblock editing %}
+
+    </script>
+
+

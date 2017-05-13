@@ -1,0 +1,13 @@
+{% extends "caretaking.html" %}
+
+{% block object_style %}
+    var object_style = new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: white
+      }),
+      stroke: new ol.style.Stroke({
+        color: '#f00',
+        width: width/2
+      })
+    });
+{% endblock object_style %}
