@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
 from caretaking.models import Staff, Diary, Task, Location
-from caretaking.management.re_locate import ReLocate
+from caretaking.management.locate_task import LocateTask
 
 class Command(BaseCommand):
     """
@@ -65,7 +65,7 @@ class Command(BaseCommand):
             tasklist = [t for t in tasklist if t]
             for t in tasklist:
                 # use regex to identify if possible a point
-                point = ReLocate(t).get_points()
+                point = LocateTask(t).points()
                 task = Task.objects.create(description=t, urgency='high',
                     point=point, completed=day)
                 task.save()
@@ -91,7 +91,7 @@ class Command(BaseCommand):
             tasklist = [s.strip() for s in row[2].split('*')]
             tasklist = [t for t in tasklist if t]
             for t in tasklist:
-                point = ReLocate(t).get_points()
+                point = LocateTask(t).points()
                 task = Task.objects.create(description=t, urgency='high',
                     point=point, completed=day)
                 task.save()

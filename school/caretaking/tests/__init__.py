@@ -1,8 +1,6 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import doctest
-from django.test import TestCase
-
 
 # Create your tests here.
 

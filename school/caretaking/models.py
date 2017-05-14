@@ -1,6 +1,6 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
-from django.db import models
+from django.db import models, connection
 from django.contrib.gis.db.models.fields import GeometryField
 
 
@@ -99,21 +99,25 @@ class Location(models.Model):
         >>> print(library.polygon)
         SRID=4326;POLYGON ((1 1, 3 3, 3 1, 1 1))
 
-Locate the centre of the polygon using ``STCentroid()``.
+    Locate the centre of the polygon using ``STCentroid()``.
 
-        >>> sql = "select polygon.MakeValid().STCentroid().STAsText() from caretaking_location where "
-        >>> sql += "name = %s"
-        >>> from django.db import connection
-        >>> with connection.cursor() as cursor:
-        ...     result = cursor.execute(sql, [library.name])
-        ...     print(result.fetchone())
-        ('POINT (2.3333333333333357 1.6666666666666714)', )
+        >>> print(library.centroid())
+        POINT (2.3333333333333357 1.6666666666666714)
 
     """
     # TODO constrain polygon to polygon geometry
     locationid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     polygon = GeometryField()
+
+    def centroid(self):
+        sql = "select polygon.MakeValid().STCentroid().STAsText() "
+        sql += "from caretaking_location "
+        sql += "where name = %s"
+        with connection.cursor() as cursor:
+            result = cursor.execute(sql, [self.name])
+            centroid = result.fetchone()
+        return centroid[0]
 
     def __str__(self):
         "Returns the location's name."
@@ -195,7 +199,6 @@ class Task(models.Model):
         2017-03-10
 
     """
-    # TODO constrain point to point geometry
     URGENCY = (
             ('low', 'Low'),
             ('med', 'Medium'),

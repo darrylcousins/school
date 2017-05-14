@@ -8,14 +8,15 @@ USE ellesmere;
 SET IDENTITY_INSERT dbo.caretaking_location ON;
 DECLARE @geom geometry;
 SET @geom = geometry::Parse('MULTIPOLYGON(%s)');
-INSERT INTO dbo.caretaking_location(locationid, name, polygon) VALUES(57, 'CollegePlan', @geom);
+DELETE FROM dbo.caretaking_location WHERE locationid=88;
+INSERT INTO dbo.caretaking_location(locationid, name, polygon) VALUES(88, 'CollegePlan', @geom);
 SET IDENTITY_INSERT dbo.caretaking_location OFF;
 """
 
 class Command(BaseCommand):
     help = "Creates sql. Gather map polygons into single MULTIPOLYGON"
     help += " representing full school plan.\n\n"
-    help += "Usage: django manage.py mkcollege > college.sql"
+    help += "Usage: django manage.py mkcollege > caretaking/sql/college.sql"
 
     requires_migrations_checks = True
 
