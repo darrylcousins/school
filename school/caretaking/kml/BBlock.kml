@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>KmlFile</name>
+	<Style id="sn_ylw-pushpin">
+		<IconStyle>
+			<scale>1.1</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<LineStyle>
+			<color>ff0000aa</color>
+		</LineStyle>
+	</Style>
+	<StyleMap id="msn_ylw-pushpin">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_ylw-pushpin</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_ylw-pushpin</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Style id="sh_ylw-pushpin">
+		<IconStyle>
+			<scale>1.3</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+			</Icon>
+			<hotSpot x="20" y="2" xunits="pixels" yunits="pixels"/>
+		</IconStyle>
+		<LineStyle>
+			<color>ff0000aa</color>
+		</LineStyle>
+	</Style>
+	<Placemark>
+		<name>B Block</name>
+		<LookAt>
+			<longitude>172.292573626892</longitude>
+			<latitude>-43.75814766100212</latitude>
+			<altitude>0</altitude>
+			<heading>2.999980090605799</heading>
+			<tilt>0</tilt>
+			<range>99.60532540321547</range>
+			<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+		</LookAt>
+		<styleUrl>#msn_ylw-pushpin</styleUrl>
+		<Polygon>
+			<tessellate>1</tessellate>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						172.2923469825761,-43.75799729796832,0 172.2923329702677,-43.75799717373704,0 172.292326267018,-43.75810724090974,0 172.2922854399403,-43.75810384130431,0 172.2922830972972,-43.7581538142264,0 172.2923241256157,-43.75815444024899,0 172.2923133137199,-43.75826806018925,0 172.2923248340797,-43.75826849628583,0 172.2923154309381,-43.75836270124366,0 172.2926648156004,-43.75837685331525,0 172.2926704449827,-43.75828157850991,0 172.2927073301092,-43.75828355171706,0 172.2927255660513,-43.75801341085977,0 172.2926874728497,-43.75801151971427,0 172.292693308946,-43.75793108579008,0 172.2923221521516,-43.75791721034381,0 172.2923170741846,-43.75798003625953,0 172.2923486404909,-43.75798160621614,0 172.2923469825761,-43.75799729796832,0 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
+</Document>
+</kml>
