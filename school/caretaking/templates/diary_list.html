@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{% block list_title %}Diaries{% endblock %}</h2>
+    <ul>
+        {% for diary in object_list %}
+            <li><a href="{{ diary.get_absolute_url }}">{{ diary.day }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

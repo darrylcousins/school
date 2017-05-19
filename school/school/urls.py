@@ -5,13 +5,14 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import TemplateView
 
-# Uncomment the next two lines to enable the admin:
+# enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 admin.site.site_header = 'caretaking@ellesmere'
 
 urlpatterns = (
     url(r'^$', TemplateView.as_view(template_name='base.html')),
+    url(r'^caretaking/', include('caretaking.urls')),
 
     # Examples:
     # url(r'^$', 'school.views.home', name='home'),

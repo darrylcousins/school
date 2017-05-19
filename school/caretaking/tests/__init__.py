@@ -8,7 +8,7 @@ DOCFILES = [
     ]
 DOCTESTS = [
         'caretaking.models',
-        'caretaking.management.re_locate',
+        'caretaking.management.locate_task',
         'caretaking.management.commands.importdiary',
     ]
 

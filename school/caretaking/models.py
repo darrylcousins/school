@@ -2,6 +2,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 from django.db import models, connection
 from django.contrib.gis.db.models.fields import GeometryField
+from django.urls import reverse
 
 
 class Staff(models.Model):
@@ -67,7 +68,7 @@ class Diary(models.Model):
         >>> diary = Diary.objects.create(day=date(2017, 3, 10), hours=10.5, staff=caretaker, comment=None)
         >>> diary.save()
         >>> print(diary)
-        2017-03-10 Darryl Cousins (Caretaker)
+        Fri 10 Mar 2017 Darryl Cousins (Caretaker)
 
     """
     diaryid = models.AutoField(primary_key=True)
@@ -80,7 +81,10 @@ class Diary(models.Model):
 
     def __str__(self):
         "Returns the day and staff member name."
-        return '%s %s' % (self.day, self.staff)
+        return '%s %s' % (self.day.strftime("%a %d %b %Y"), self.staff)
+
+    def get_absolute_url(self):
+        return reverse('diary-detail', args=[str(self.diaryid)])
 
     class Meta:
         verbose_name = 'Diary'
@@ -197,6 +201,8 @@ class Task(models.Model):
         >>> todo.save()
         >>> print(todo.completed)
         2017-03-10
+        >>> print(todo)
+        Fri 10 Mar 2017 Clear downpipe at library
 
     """
     URGENCY = (
@@ -222,5 +228,9 @@ class Task(models.Model):
     comment = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        "Returns a truncated line of the tasks description."
-        return '{:.100}'.format(self.description)
+        "Returns completed date and a truncated line of the tasks description."
+        day = self.completed.strftime("%a %d %b %Y") if self.completed else None
+        if day:
+            return '{0} {1:.100}'.format(day, self.description)
+        else:
+            return '{:.100}'.format(self.description)
