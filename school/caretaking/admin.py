@@ -54,7 +54,7 @@ class PolygonWidget(BaseGeometryWidget):
     Does not allow editing of the polygon.
     """
     map_srid = 3857
-    template_name = 'polygon.html'
+    template_name = 'polygon_widget.html'
     is_polygon = True
 
     def __init__(self, *args, **kwargs):
@@ -84,7 +84,7 @@ class PointWidget(BaseGeometryWidget):
 
     """
     map_srid = 3857
-    template_name = 'point.html'
+    template_name = 'point_widget.html'
     is_point = True
     is_collection = True
 

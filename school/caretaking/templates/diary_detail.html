@@ -1,6 +1,106 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link href="https://openlayers.org/en/v4.1.0/css/ol.css" rel="stylesheet">
+    <style type="text/css">
+        #diary_map {
+            width: 600px;
+            border: 1px solid #bbb;    
+            border-radius: 1px;
+            margin: 1em 0 1em 0;    
+        }
+        #diary_map .aligned label { float: inherit; }
+        #diary_span_map { position: relative; vertical-align: top; float: left; }
+    </style>
+{% endblock extra_css %}
+
 {% block content %}
-  {{ object }}
+<h2>{% block list_title %}{{ diary.day }}: {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }}){% endblock %}</h2>
+<span id="diary_span_map">
+    <div id="diary_map"></div>
+    <script type="text/javascript">
+
+    window.onload = function() {
+      var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
+      });
+
+      var white = [255, 255, 255, 1];
+      var blue = [0, 153, 255, 1];
+      var red = [255, 0, 153, 1];
+      var width = 3;
+
+      // generate background college view
+      var college_wkt = '{{ college_wkt }}';
+      var college_format = new ol.format.WKT();
+      var college_feature = college_format.readFeature(college_wkt);
+      var college_style = new ol.style.Style({
+        fill: new ol.style.Fill({
+          color: white
+        }),
+        stroke: new ol.style.Stroke({
+          color: blue,
+          width: width/3
+        })
+      });
+      var college_vector = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: [college_feature],
+        }),
+        style: college_style
+      });
+      // end generate background college view
+
+      // generate view of this object
+      var wkt = '{{ diary_wkt }}';
+      var format = new ol.format.WKT();
+      var feature = format.readFeature(wkt);
+
+      var object_style = new ol.style.Style({
+            image: new ol.style.Circle({
+              radius: width * 2,
+              fill: new ol.style.Fill({
+                color: white
+              }),
+              stroke: new ol.style.Stroke({
+                color: red,
+                width: width/2
+              })
+            })
+      })
+
+      var object_vector = new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: [feature],
+        }),
+        style: object_style
+      });
+      // end generate view of this object
+
+      // build map
+      var map = new ol.Map({
+        layers: [raster, college_vector, object_vector],
+        target: 'diary_map',
+        view: new ol.View({
+            center: ol.proj.fromLonLat([172.292576,-43.757829]),
+            zoom: 18
+        })
+      });
+    };
+
+    </script>
+
+    <div class="tasklist">
+        <ul class="tasklist list-unstyled">
+        {% for task in diary.tasks %}
+            <li>
+                <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
 
+{% block extra_js %}
+    <script src="https://openlayers.org/en/v4.1.0/build/ol.js"></script>
+{% endblock extra_js %}

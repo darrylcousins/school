@@ -1,1 +1,22 @@
 /*! project specific CSS goes here. */
+body {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.7rem;
+    padding-top: 20px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+div.container {
+    width: 800px;
+}
+ul.diarylist>li>a {
+    font-weight: bold;
+}
+ul.diarylist li a {
+    color: inherit;
+}
+ul.tasklist {
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid #aaa;
+}
+ul.tasklist>li>a {
+    color: inherit;
+}

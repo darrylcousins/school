@@ -46,51 +46,6 @@ class Staff(models.Model):
         verbose_name_plural = 'Staff'
 
 
-class Diary(models.Model):
-    """
-    A day to day record of tasks completed.
-
-    A diary needs a staff member::
-
-        >>> from django.contrib.auth.models import User
-        >>> darryl, created = User.objects.get_or_create(username='cousinsd', first_name='Darryl',
-        ...     last_name='Cousins')
-        >>> if created:
-        ...     darryl.save()
-        >>> caretaker, created = Staff.objects.get_or_create(user=darryl, title='Caretaker')
-        >>> if created:
-        ...     caretaker.save()
-
-    Using the date field we can list all the tasks performed by the staff member that day. It is my
-    expectation that the staff member will provide his or her comments about the day.::
-
-        >>> from datetime import date
-        >>> diary = Diary.objects.create(day=date(2017, 3, 10), hours=10.5, staff=caretaker, comment=None)
-        >>> diary.save()
-        >>> print(diary)
-        Fri 10 Mar 2017 Darryl Cousins (Caretaker)
-
-    """
-    diaryid = models.AutoField(primary_key=True)
-    day = models.DateField()
-    hours = models.FloatField()
-    staff = models.ForeignKey(
-        'Staff',
-        on_delete=models.DO_NOTHING)
-    comment = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        "Returns the day and staff member name."
-        return '%s %s' % (self.day.strftime("%a %d %b %Y"), self.staff)
-
-    def get_absolute_url(self):
-        return reverse('diary-detail', args=[str(self.diaryid)])
-
-    class Meta:
-        verbose_name = 'Diary'
-        verbose_name_plural = 'Diaries'
-
-
 class Location(models.Model):
     """
     Provide a location, a geospatial polygon describing a part of the school::
@@ -234,3 +189,62 @@ class Task(models.Model):
             return '{0} {1:.100}'.format(day, self.description)
         else:
             return '{:.100}'.format(self.description)
+
+    #def get_absolute_url(self):
+    #    return reverse('task-detail', args=[str(self.taskid)])
+
+
+class Diary(models.Model):
+    """
+    A day to day record of tasks completed.
+
+    A diary needs a staff member::
+
+        >>> from django.contrib.auth.models import User
+        >>> darryl, created = User.objects.get_or_create(username='cousinsd', first_name='Darryl',
+        ...     last_name='Cousins')
+        >>> if created:
+        ...     darryl.save()
+        >>> caretaker, created = Staff.objects.get_or_create(user=darryl, title='Caretaker')
+        >>> if created:
+        ...     caretaker.save()
+
+    Using the date field we can list all the tasks performed by the staff member that day. It is my
+    expectation that the staff member will provide his or her comments about the day.::
+
+        >>> from datetime import date
+        >>> diary = Diary.objects.create(day=date(2017, 3, 10), hours=10.5, staff=caretaker, comment=None)
+        >>> diary.save()
+        >>> print(diary)
+        Fri 10 Mar 2017 Darryl Cousins (Caretaker)
+
+    Getting tasks completed on this diary day::
+
+        >>> diary.tasks
+        <QuerySet []>
+
+    """
+    diaryid = models.AutoField(primary_key=True)
+    day = models.DateField()
+    hours = models.FloatField()
+    staff = models.ForeignKey(
+        'Staff',
+        on_delete=models.DO_NOTHING)
+    comment = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        "Returns the day and staff member name."
+        return '%s %s' % (self.day.strftime("%a %d %b %Y"), self.staff)
+
+    def get_absolute_url(self):
+        return reverse('diary-detail', args=[str(self.diaryid)])
+
+    @property
+    def tasks(self):
+        return Task.objects.filter(completed=self.day)
+
+    class Meta:
+        verbose_name = 'Diary'
+        verbose_name_plural = 'Diaries'
+
+

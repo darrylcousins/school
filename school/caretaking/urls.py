@@ -5,12 +5,12 @@ from django.views.generic import TemplateView
 
 from .views import DiaryList
 from .views import StaffDiaryList
-from .views import DiaryDetailView
+from .views import DiaryDetail
 
 urlpatterns = (
     url(r'^diaries/$', DiaryList.as_view()),
     url(r'^diaries/([\w-]+)/$', StaffDiaryList.as_view()),
-    url(r'^diaries/diary/(?P<pk>[0-9]+)/$', DiaryDetailView.as_view(), name="diary-detail"),
+    url(r'^diaries/diary/(?P<pk>[0-9]+)/$', DiaryDetail.as_view(), name="diary-detail"),
 
     # Examples:
     # url(r'^$', 'school.views.home', name='home'),
