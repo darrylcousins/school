@@ -60,19 +60,9 @@
         style: object_style
       });
       // end generate view of this object
-
-      var select = new ol.interaction.Select({
-        style: object_style
-      });
-
-      var modify = new ol.interaction.Modify({
-        features: select.getFeatures(),
-        style: object_style
-      });
        
       // build map
       var map = new ol.Map({
-        interactions: ol.interaction.defaults().extend([select, modify]),
         layers: [raster, college_vector, object_vector],
         target: '{{ attrs.id }}_map',
         view: new ol.View({

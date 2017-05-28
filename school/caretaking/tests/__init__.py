@@ -6,10 +6,13 @@ import doctest
 
 DOCFILES = [
     ]
+# order does matter because of fixture loading
+# TODO load fixture in setUp
 DOCTESTS = [
         'caretaking.models',
         'caretaking.management.locate_task',
         'caretaking.management.commands.importdiary',
+        'caretaking.views',
     ]
 
 def setUp(test):

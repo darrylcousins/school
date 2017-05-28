@@ -2,6 +2,8 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import re
 
+from django.contrib.gis import gdal, geos
+
 from caretaking.models import Location
 
 
@@ -17,12 +19,12 @@ class LocateTask:
     If no match is found the default college centroid is returned::
 
         >>> gp = LocateTask('change bulb')
-        >>> assert(gp.points() == gp.college)
+        >>> assert gp.points() == gp.college
 
     If a single match is found the WKT representation of a point is returned::
 
         >>> gp = LocateTask('change bulb in A block')
-        >>> assert(gp.points() == Location.objects.get(name='ABlock').centroid())
+        >>> assert gp.points() == Location.objects.get(name='ABlock').centroid()
 
     If multiple matches are found the WKT representation of a multipoint is returned::
 
@@ -33,6 +35,7 @@ class LocateTask:
     """
     # centre point of school building extent - used if no other location point defined
     college = 'POINT (172.292576 -43.757829)'
+    srid = 3587
     location_dict = {
             'ABlock': 'a( |-)(and b )?block',
             'BBlock': 'b( |-)block',
@@ -103,9 +106,9 @@ class LocateTask:
     def search(self, pattern):
         """Use python regex to search the text"""
         return re.search(self.compile(pattern), self.text)
-
     def points(self):
         """Get the centroid of the locations indicated in the text"""
+        value = None
         points = []
         for loc, pattern in self.location_dict.items():
             match = self.search(pattern)
@@ -122,5 +125,6 @@ class LocateTask:
             # multiple matches, combine points into a WKT multipoint representation
             wkt = 'MULTIPOINT (%s)'
             return wkt % ', '.join([p[p.index('('):p.index(')')+1] for p in points])
+
 
 

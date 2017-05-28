@@ -237,7 +237,13 @@ class Diary(models.Model):
         return '%s %s' % (self.day.strftime("%a %d %b %Y"), self.staff)
 
     def get_absolute_url(self):
-        return reverse('diary-detail', args=[str(self.diaryid)])
+        kwargs = {
+                'pk': str(self.diaryid),
+                'year': self.day.strftime('%Y'),
+                'month': self.day.strftime('%b'),
+                'day': self.day.strftime('%d'),
+        }
+        return reverse('diary-detail', kwargs=kwargs)
 
     @property
     def tasks(self):
