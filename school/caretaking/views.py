@@ -1,5 +1,7 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
+import random
+
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -8,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
 
 from caretaking.models import Diary, Staff, Location
+
 
 class DiaryList(ListView):
     queryset = Diary.objects.order_by('-day')
@@ -41,17 +44,47 @@ class DiaryDetail(DateDetailView):
 
         >>> from caretaking.models import Task
         >>> task = Task.objects.all()[0]
-        >>> point = task.point.clone()
-        >>> print(point[0])
-        >>> print(point[0][0])
-        >>> print(point[0][1])
-        >>> point[0].set_x(point[0][0] + 0.1)
-        >>> point[1].set_y(point[0][1] + 0.1)
-        >>> print(point[0][0])
-        >>> print(point[0][1])
-        >>> print(dir(point[0]))
-        >>> print(type(point[0]))
-        >>> print(type(point))
+        >>> point = task.point[0].clone()
+        >>> print(point.wkt)
+        POINT (172.29307 -43.75858)
+        >>> point.x += 0.00001
+        >>> point.y += 0.00001
+        >>> print(point.wkt)
+        POINT (172.29308 -43.75857)
+
+    Keep all tasks to same completed date and point::
+
+        >>> thisday = task.completed
+        >>> thispoint = task.point
+
+    Create a bunch of tasks::
+
+        >>> for i in range(10):
+        ...     t = Task.objects.create(description=str(i),
+        ...         completed=thisday,
+        ...         point=thispoint)
+        ...     t.save()
+        ...     t.staff.add(task.staff.first())
+
+    Set up test client::
+
+        >>> from django.test import Client
+        >>> from django.core.urlresolvers import reverse
+        >>> client = Client()
+
+    Find our diary day for this set of tasks::
+
+        >>> diary = Diary.objects.get(day=thisday)
+        >>> print(diary.get_absolute_url())
+        /caretaking/diaries/2017/Mar/10/1/
+        >>> response = client.get(diary.get_absolute_url())
+        >>> print(response.status_code)
+        200
+        >>> print(len(response.context['object'].tasks))
+        21
+        >>> print(response.context['diary_wkt'])
+        MULTIPOINT (...)
+
 
     """
     date_field = 'day'
@@ -59,16 +92,7 @@ class DiaryDetail(DateDetailView):
     template_name = 'diary_detail.html'
     context_object_name = 'diary'
     points = []
-
-    def get_next_point(self, point):
-        if point in self.points:
-            # here we want to shift the point to create a visual cluster
-            value = geos.GEOSGeometry(point)
-            self.points.append(value)
-        else:
-            value = geos.GEOSGeometry(point)
-            self.points.append(value)
-        return value
+    targets = [t*0.00001 for t in (0, 1, 2, -1, -2)]
 
     def get_object(self):
         obj = super(DiaryDetail, self).get_object()
@@ -87,13 +111,14 @@ class DiaryDetail(DateDetailView):
 
         # initialize value
         value = None
-        for task in self.object.tasks:
+        for point in self.object.points():
             if value is None:
                 # initialize geosgeometry object
-                value = self.get_next_point(task.point)
+                value = geos.GEOSGeometry(point)
             else:
                 # union of geosgeometry object is a multipoint
-                value = value.union(self.get_next_point(task.point))
+                # here need to group the tasks by task type
+                value = value.union(geos.GEOSGeometry(point))
 
         # create a wkt value suitable to pass to openmaps javascript
         # TODO place this routine somewhere

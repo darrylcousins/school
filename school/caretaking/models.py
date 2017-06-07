@@ -1,8 +1,11 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
+import random
+
 from django.db import models, connection
-from django.contrib.gis.db.models.fields import GeometryField
 from django.urls import reverse
+from django.contrib.gis import geos
+from django.contrib.gis.db.models.fields import GeometryField
 
 
 class Staff(models.Model):
@@ -218,10 +221,20 @@ class Diary(models.Model):
         >>> print(diary)
         Fri 10 Mar 2017 Darryl Cousins (Caretaker)
 
+    Create a bunch of tasks::
+
+        >>> thispoint = 'MULTIPOINT ((172.29307 -43.75858), (172.30 -43.76))'
+        >>> for i in range(10):
+        ...     t = Task.objects.create(description=str(i),
+        ...         completed=diary.day,
+        ...         point=thispoint)
+        ...     t.save()
+        ...     t.staff.add(caretaker)
+
     Getting tasks completed on this diary day::
 
         >>> diary.tasks
-        <QuerySet []>
+        <QuerySet [...]>
 
     """
     diaryid = models.AutoField(primary_key=True)
@@ -247,7 +260,49 @@ class Diary(models.Model):
 
     @property
     def tasks(self):
+        """Return iterable of tasks completed on this day"""
         return Task.objects.filter(completed=self.day)
+
+    def points(self, spread=True):
+        """Return iterable of points of work on this day using points from tasks
+
+        spread:
+            If true then eliminate duplicates by creating clusters
+
+        # TODO group into task type collections
+        """
+        point_collection = []
+        for task in self.tasks:
+            if isinstance(task.point, geos.MultiPoint):
+                for point in task.point:
+                    point_collection.append(point)
+            elif isinstance(task.point, geos.Point):
+                point_collection.append(task.point)
+        if spread:
+            return self.spread(point_collection)
+        return point_collection
+
+    def spread(self, point_collection):
+        """Take an iterable of points and eliminate duplicates by creating clusters"""
+        targets = (0, 1, 2, -1, -2)
+        targets = [t*0.00001 for t in targets]
+        points = []
+        for p in point_collection:
+            point = p.clone()
+            while p in points:
+                # change point
+                p.x += targets[random.randrange(len(targets))]
+                p.y += targets[random.randrange(len(targets))]
+                p.x = round(p.x, 6)
+                p.y = round(p.y, 6)
+                if p in points:
+                    continue
+                else:
+                    points.append(p)
+                    break
+            else:
+                points.append(p)
+        return points                
 
     class Meta:
         verbose_name = 'Diary'
