@@ -8,8 +8,8 @@ from .views import StaffDiaryList
 from .views import DiaryDetail
 
 urlpatterns = (
-    url(r'^diaries/$', DiaryList.as_view()),
-    url(r'^diaries/([\w-]+)/$', StaffDiaryList.as_view()),
+    url(r'^diaries/$', DiaryList.as_view(), name="diary-list"),
+    url(r'^diaries/([\w-]+)/$', StaffDiaryList.as_view(), name="staff-diary-list"),
 
     url(r'^diaries/(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
         DiaryDetail.as_view(),

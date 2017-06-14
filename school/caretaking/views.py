@@ -135,5 +135,13 @@ class DiaryDetail(DateDetailView):
             else:
                 wkt = value.wkt
         context['diary_wkt'] = wkt
+        try:
+            context['next'] = self.object.get_next_by_day()
+        except Diary.DoesNotExist:
+            context['next'] = None
+        try:
+            context['previous'] = self.object.get_previous_by_day()
+        except Diary.DoesNotExist:
+            context['previous'] = None
 
         return context

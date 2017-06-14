@@ -5,7 +5,7 @@
     <ul class="diarylist list-unstyled">
         {% for diary in diaries %}
             <li>
-                <a href="{{ diary.get_absolute_url }}">{{ diary.day }}</a> 
+                <a href="{{ diary.get_absolute_url }}">{{ diary.day|date:"D j N Y" }}</a> 
                 <span>({{ diary.hours }} hrs)</span>
                 <p><em>{{ diary.comment }}</em></p>
                 <div class="tasklist">

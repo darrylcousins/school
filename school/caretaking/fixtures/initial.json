@@ -3924,14 +3924,6 @@
         }
     },
     {
-        "model": "caretaking.tasktype",
-        "pk": 1,
-        "fields": {
-            "name": "Maintenance",
-            "comment": null
-        }
-    },
-    {
         "model": "caretaking.task",
         "pk": 1,
         "fields": {

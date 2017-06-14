@@ -2,10 +2,11 @@ import csv
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
-from caretaking.models import Staff, Diary, Task, Location
+from caretaking.models import Staff, Diary, Task, TaskType, Location
 from caretaking.management.locate_task import LocateTask
 
 class Command(BaseCommand):
@@ -38,6 +39,9 @@ class Command(BaseCommand):
         if created:
             caretaker.save()
 
+        # create task types from fixtures/tasktype.json
+        call_command('loaddata', 'tasktype.json', verbosity=0)
+
         # delete all rows
         sql ="DELETE FROM caretaking_%s;"
         pksql = "DBCC CHECKIDENT(caretaking_%s, RESEED, 0);"
@@ -54,8 +58,8 @@ class Command(BaseCommand):
         # older data has different column format
         reader = csv.reader(open('caretaking/data/jan_oct.csv'), delimiter='\t')
         for row in reader:
-            day = row[0][4:]
-            day = datetime.strptime(day, '%d %b %Y').date()
+            day = row[0]
+            day = datetime.strptime(day, '%a %d %b %Y').date()
             try:
                 hours = float(row[9])
             except:
@@ -78,9 +82,10 @@ class Command(BaseCommand):
 
         # and the newer data
         reader = csv.reader(open('caretaking/data/oct_current.csv'), delimiter='\t')
+        count = 0
         for row in reader:
-            day = row[0][4:]
-            day = datetime.strptime(day, '%d %b %Y').date()
+            day = row[0]
+            day = datetime.strptime(day, '%a %d %b %Y').date()
             try:
                 hours = float(row[1])
             except:
@@ -88,11 +93,11 @@ class Command(BaseCommand):
             try:
                 comment = row[4]
             except IndexError:
-                print(row)
                 comment = ''
             diary, created = Diary.objects.get_or_create(day=day, hours=hours, staff=caretaker, comment=comment)
             if created:
                 diary.save()
+            count += 1
             tasklist = [s.strip() for s in row[2].split('*')]
             tasklist = [t for t in tasklist if t]
             for t in tasklist:

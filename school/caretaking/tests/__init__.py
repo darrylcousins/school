@@ -11,6 +11,7 @@ DOCFILES = [
 DOCTESTS = [
         'caretaking.models',
         'caretaking.management.locate_task',
+        'caretaking.management.type_task',
         'caretaking.management.commands.importdiary',
         'caretaking.views',
     ]

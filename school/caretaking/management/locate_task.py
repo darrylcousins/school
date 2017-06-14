@@ -106,6 +106,7 @@ class LocateTask:
     def search(self, pattern):
         """Use python regex to search the text"""
         return re.search(self.compile(pattern), self.text)
+
     def points(self):
         """Get the centroid of the locations indicated in the text"""
         value = None
@@ -117,14 +118,16 @@ class LocateTask:
         count = len(points)
         if count == 0:
             # no matches, return college centroid
-            return self.college
+            value = self.college
         elif count == 1:
             # one match, return point only
-            return points[0]
+            value = points[0]
         else:
             # multiple matches, combine points into a WKT multipoint representation
             wkt = 'MULTIPOINT (%s)'
-            return wkt % ', '.join([p[p.index('('):p.index(')')+1] for p in points])
+            value = wkt % ', '.join([p[p.index('('):p.index(')')+1] for p in points])
+
+        return value
 
 
 

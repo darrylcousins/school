@@ -1,0 +1,74 @@
+[
+{
+    "model": "caretaking.tasktype",
+    "pk": 1,
+    "fields": {
+        "name": "Duties",
+        "comment": "Daily caretaking duties."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 2,
+    "fields": {
+        "name": "Maintenance",
+        "comment": "General maintenance on buildings - gutters, electrical, plumbing, etc."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 3,
+    "fields": {
+        "name": "Repairs",
+        "comment": "Property repairs assumed to be accidental or normal wear and tear."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 4,
+    "fields": {
+        "name": "Willful damage",
+        "comment": "Damage caused by willful actions."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 5,
+    "fields": {
+        "name": "Improvements and requests",
+        "comment": "Building or grounds improvements or requests by staff. E.g. painting, building, shelving, installations, etc."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 6,
+    "fields": {
+        "name": "Health and Safety",
+        "comment": "Any work, repairs or improvements that can be related to health and safety requirements."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 7,
+    "fields": {
+        "name": "Fields",
+        "comment": "Any work on fields, mowing, repair, fertilising, seeding, line-marking."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 8,
+    "fields": {
+        "name": "Gardens",
+        "comment": "Any work on gardens, weeding, planting, pruning, edging, etc."
+    }
+},
+{
+    "model": "caretaking.tasktype",
+    "pk": 9,
+    "fields": {
+        "name": "Lawns",
+        "comment": "Lawn mowing or maintenance."
+    }
+}
+]

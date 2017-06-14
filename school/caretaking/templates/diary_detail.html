@@ -12,11 +12,36 @@
         }
         #diary_map .aligned label { float: inherit; }
         #diary_span_map { position: relative; vertical-align: top; float: left; }
+        a.no-underline:hover { text-decoration: none; }
+        ul.pager { 
+            width: 600px;
+                margin-quo;bottom: 0px;
+        }
     </style>
 {% endblock extra_css %}
 
 {% block content %}
-<h2>{% block list_title %}{{ diary.day }}: {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }}){% endblock %}</h2>
+<h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
+    <a class="no-underline" href="{% url 'staff-diary-list' staff.user.username %}">
+        {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }})
+    </a>
+    {% endblock %}</h2>
+<p class="comment"><strong>{{ diary.hours }}&nbsp;hrs:</strong>&nbsp;<em>{{ diary.comment }}</em></p>
+
+<ul class="pager">
+{% if previous %}
+    <li class="previous">
+        <a href="{{ previous.get_absolute_url }}">
+            <span>&laquo;&nbsp;</span>{{ previous.day|date:"D j N Y" }}</a>
+    </li>
+{% endif %}
+{% if next %}
+    <li class="next">
+        <a href="{{ next.get_absolute_url }}">
+            {{ next.day|date:"D j N Y" }}<span>&nbsp;&raquo;</span></a>
+    </li>
+{% endif %}
+</ul>
 <span id="diary_span_map">
     <div id="diary_map"></div>
     <script type="text/javascript">
@@ -99,7 +124,7 @@
     </script>
 
     <div class="tasklist">
-        <ul class="tasklist list-unstyled">
+        <ul class="tasklist">
         {% for task in diary.tasks %}
             <li>
                 <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>

@@ -283,8 +283,13 @@ class Diary(models.Model):
         return point_collection
 
     def spread(self, point_collection):
-        """Take an iterable of points and eliminate duplicates by creating clusters"""
-        targets = (0, 1, 2, -1, -2)
+        """Take an iterable of points and eliminate duplicates by creating clusters.
+        
+        What do to with this algorithm?
+        
+        """
+        #targets = (0, 1, 2, -1, -2)
+        targets = (0, 2, -2)
         targets = [t*0.00001 for t in targets]
         points = []
         for p in point_collection:
@@ -293,8 +298,8 @@ class Diary(models.Model):
                 # change point
                 p.x += targets[random.randrange(len(targets))]
                 p.y += targets[random.randrange(len(targets))]
-                p.x = round(p.x, 6)
-                p.y = round(p.y, 6)
+                #p.x = round(p.x, 6)
+                #p.y = round(p.y, 6)
                 if p in points:
                     continue
                 else:
