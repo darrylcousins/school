@@ -13,7 +13,6 @@ class Activities(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'Activities'
         verbose_name = 'Activity'
         verbose_name_plural = 'Activities'
@@ -25,7 +24,6 @@ class Appinfo(models.Model):
     value = models.CharField(db_column='Value', max_length=255)
 
     class Meta:
-        managed = False
         db_table = 'AppInfo'
 
 
@@ -35,7 +33,6 @@ class ApplianceProperties(models.Model):
         primary_key=True)
     applianceid = models.ForeignKey(
         'Appliances',
-        models.DO_NOTHING,
         db_column='ApplianceId')
     name = models.CharField(db_column='Name', max_length=20)
     value = models.CharField(
@@ -48,7 +45,6 @@ class ApplianceProperties(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'ApplianceProperties'
         verbose_name = 'Appliance Property'
         verbose_name_plural = 'Appliance Properties'
@@ -125,11 +121,19 @@ class Appliances(models.Model):
     attachments = models.TextField(
         db_column='Attachments', blank=True, null=True)
 
+    def make(self):
+        try:
+            prop = ApplianceProperties.objects.get(applianceid=self.applianceid, name='Make')
+        except ApplianceProperties.DoesNotExist:
+            prop = None
+        if prop:
+            return prop.value
+        return None
+
     def __str__(self):
-        return self.appliancename
+        return self.appliancetag
 
     class Meta:
-        managed = False
         db_table = 'Appliances'
         verbose_name = 'Appliance'
         verbose_name_plural = 'Appliances'
@@ -146,7 +150,6 @@ class AutoTestGroups(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'AutoTestGroups'
 
 
@@ -171,7 +174,6 @@ class AutoTests(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'AutoTests'
         verbose_name = 'Auto Test'
         verbose_name_plural = 'Auto Tests'
@@ -195,7 +197,6 @@ class BusinessSubjects(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'BusinessSubjects'
         verbose_name = 'Business Subject'
         verbose_name_plural = 'Business Subjects'
@@ -235,7 +236,6 @@ class Checkbox(models.Model):
         null=True)
 
     class Meta:
-        managed = False
         db_table = 'CheckBox'
 
 
@@ -297,7 +297,6 @@ class Customers(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'Customers'
 
 
@@ -315,7 +314,6 @@ class DataListGroups(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'DataListGroups'
 
 
@@ -336,7 +334,6 @@ class DataListItems(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'DataListItems'
 
 
@@ -348,7 +345,6 @@ class DataListTypes(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'DataListTypes'
 
 
@@ -360,7 +356,6 @@ class FunctionTypes(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'FunctionTypes'
 
 
@@ -383,7 +378,6 @@ class Functions(models.Model):
     status = models.SmallIntegerField(db_column='Status')
 
     class Meta:
-        managed = False
         db_table = 'Functions'
         verbose_name = 'Function'
         verbose_name_plural = 'Functions'
@@ -407,8 +401,10 @@ class Limits(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        managed = False
         db_table = 'Limits'
 
 
@@ -434,8 +430,10 @@ class Pats(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        managed = False
         db_table = 'PATS'
 
 
@@ -452,8 +450,10 @@ class Parameters(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        managed = False
         db_table = 'Parameters'
 
 
@@ -475,8 +475,10 @@ class Premises(models.Model):
     archived = models.SmallIntegerField(
         db_column='Archived', blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        managed = False
         db_table = 'Premises'
         verbose_name = 'Premise'
         verbose_name_plural = 'Premises'
@@ -502,8 +504,10 @@ class Projects(models.Model):
     archived = models.SmallIntegerField(
         db_column='Archived', blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        managed = False
         db_table = 'Projects'
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
@@ -519,8 +523,10 @@ class RepairCodes(models.Model):
         null=True)
     price = models.FloatField(db_column='Price', blank=True, null=True)
 
+    def __str__(self):
+        return self.description
+
     class Meta:
-        managed = False
         db_table = 'RepairCodes'
 
 
@@ -539,8 +545,10 @@ class Results(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return self.value
+
     class Meta:
-        managed = False
         db_table = 'Results'
         verbose_name = 'Results'
         verbose_name_plural = 'Results'
@@ -554,8 +562,10 @@ class Translations(models.Model):
     instrumentname = models.CharField(
         db_column='InstrumentName', max_length=50)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
-        managed = False
         db_table = 'Translations'
 
 
@@ -588,8 +598,10 @@ class Users(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return self.firstname
+
     class Meta:
-        managed = False
         db_table = 'Users'
 
 
@@ -623,8 +635,10 @@ class Validators(models.Model):
         blank=True,
         null=True)
 
+    def __str__(self):
+        return self.firstname
+
     class Meta:
-        managed = False
         db_table = 'Validators'
 
 
@@ -634,6 +648,9 @@ class SysDiagrams(models.Model):
     diagram_id = models.AutoField(primary_key=True)
     version = models.IntegerField(blank=True, null=True)
     definition = models.BinaryField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         managed = False

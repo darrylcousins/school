@@ -8,6 +8,7 @@ from django.db import connection
 
 from caretaking.models import Staff, Diary, Task, TaskType, Location
 from caretaking.management.locate_task import LocateTask
+from caretaking.management.type_task import TypeTask
 
 class Command(BaseCommand):
     """
@@ -106,4 +107,6 @@ class Command(BaseCommand):
                     point=point, completed=day)
                 task.save()
                 task.staff.add(caretaker)
+                for task_type in TypeTask(t).types():
+                    task.tasktype.add(task_type)
 

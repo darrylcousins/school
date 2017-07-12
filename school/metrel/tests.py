@@ -10,6 +10,7 @@ DOCFILES = [
     ]
 DOCTESTS = [
         'metrel.models',
+        'metrel.views',
     ]
 
 def setUp(test):

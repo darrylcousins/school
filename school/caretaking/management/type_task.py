@@ -16,14 +16,18 @@ class TypeTask:
 
         >>> gp = TypeTask('open, heating, etc')
         >>> gp.types()
-        >>> gp = TypeTask('open the library and lock up')
-        >>> gp.types()
-        []
+        [<TaskType: Duties>]
         >>> gp = TypeTask('clear rubbish from canteen concourse')
         >>> gp.types()
+        [<TaskType: Duties>]
+        >>> gp = TypeTask('remove and repair shelving from')
+        >>> gp.types()
+        [<TaskType: Duties>]
+
     """
     types_dict = {
-            'Duties': '(^open,)|(^lock up)|(rubbish)',
+            'Duties': '(^open,)|(^lock up)|(rubbish)|(boiler)',
+            'Repairs': '(repair)',
             }
 
     def __init__(self, text):
@@ -41,8 +45,8 @@ class TypeTask:
     def types(self):
         """Get the task types indicated in the text"""
         types = []
-        for loc, pattern in self.types_dict.items():
+        for task_type, pattern in self.types_dict.items():
             match = self.search(pattern)
             if match:
-                types.append(TaskType.objects.get(name=loc))
+                types.append(TaskType.objects.get(name=task_type))
         return types

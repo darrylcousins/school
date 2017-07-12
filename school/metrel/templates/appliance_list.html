@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_js %}
+    <script src="{% static 'js/bs_pagination/jquery.bs_pagination.js' %}"></script>
+    <script src="{% static 'js/bs_pagination/localization/en.min.js' %}"></script>
+    <script src="{% static 'js/jui_filter_rules/jquery.jui_filter_rules.js' %}"></script>
+    <script src="{% static 'js/jui_filter_rules/localization/en.min.js' %}"></script>
+    <script src="{% static 'js/bs_grid/jquery.bs_grid.js' %}"></script>
+    <script src="{% static 'js/bs_grid/localization/en.min.js' %}"></script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+    <link href="{% static 'css/bs_pagination/jquery.bs_pagination.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/jui_filter_rules/jquery.jui_filter_rules.bs.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bs_grid/jquery.bs_grid.min.css' %}" rel="stylesheet">
+{% endblock extra_css %}
+
+{% block content %}
+    <h2>{% block list_title %}Appliances{% endblock %}</h2>
+    <div id="grid"></div>
+
+    {% csrf_token %}
+    <script type="text/javascript">
+
+    // using django cross site forgery protection we need to add the token to the headers request
+    // csrftoken is included using hidden input field {% csrf_token %}
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    // hook to jquery to add csrftoken to header
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    $(function() {
+     
+        $("#grid").bs_grid({
+     
+            ajaxFetchDataURL: "/metrel/appliances/ajax",
+            row_primary_key: "appliancetag",
+     
+            columns: [
+                {field: "appliancetag", header: "Tag", visible: "yes", "sortable": "yes"},
+                {field: "location", header: "Location"},
+                {field: "comment", header: "Appliance"},
+            ],
+     
+            sorting: [
+                {sortingName: "Tag", field: "appliancetag", order: "ascending"},
+            ]
+        })
+    })
+    </script>
+
+    <!--
+    <ul class="appliancelist list-unstyled">
+        {% for appliance in appliances %}
+            <li>
+                <a href="{{ appliance.get_absolute_url }}">{{ appliance.appliancetag }}</a> 
+                {{ appliance.location }} {{ appliance.make }} {{ appliance.comment }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if is_paginated %}
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
+    -->
+{% endblock %}
+

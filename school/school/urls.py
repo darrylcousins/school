@@ -13,6 +13,7 @@ admin.site.site_header = 'caretaking@ellesmere'
 urlpatterns = (
     url(r'^$', TemplateView.as_view(template_name='base.html')),
     url(r'^caretaking/', include('caretaking.urls')),
+    url(r'^metrel/', include('metrel.urls')),
 
     # Examples:
     # url(r'^$', 'school.views.home', name='home'),

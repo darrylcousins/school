@@ -13,6 +13,15 @@ Using conda to set up a new environment::
 
 Note that it was required to explicitly include ``pywin32``.
 
+Activate the environment for local python::
+
+        $ activate ellesemere
+        (ellesmere)$
+
+Deactivate with::
+
+        $ deactivate
+
 Install pyodbc and django-pyodbc-azure for odbc bindings::
 
         (ellesemere) $ pip install pyodbc
@@ -72,3 +81,39 @@ Now we can start the server without connection errors::
 ``USER`` defines the name of the user to use when authenticating to the server. When empty, a trusted
 connection (SSPI) will be used. But for full write permissions I used my computer user name and
 password (only for development).
+
+Stop/stop sql servers
+---------------------
+
+The server Ellesmere for example::
+
+    $ net start|stop 'SQL Server (ELLESMERE)'
+    $ net start|stop 'SQL Server (METREL)'
+
+Grepping the powershell way
+---------------------------
+
+In current directory::
+
+    $ ls * -filter *.py | sls 'string to search'
+
+Recursively::
+
+    $ ls * -r -filter *.py | sls 'string to search'
+
+Using Django Extensions
+-----------------------
+
+To use django model to uml then graphviz is required. ``http://www.graphviz.org``. MSI installer worked fine. 
+
+But quickly then noted that pygraphviz only works to python-2.7 so gave up.
+
+May still install the extensions for the ``shell_plus`` command.
+
+Get test fixture for Metrel database
+------------------------------------
+
+::
+        $ python manage.py dumpdata --database=metrel -e contenttypes -e auth.permission -e auth.group -e auth.user -e sessions -e sites -e admin -e caretaking -e metrel.appinfo -e metrel.translations --indent 4 > metrel\fixtures\initial.json
+
+Skip ``translations`` and ``appinfo`` because ``id`` not allowed (in migrations?).

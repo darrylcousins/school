@@ -1,0 +1,321 @@
+[
+{
+    "model": "metrel.applianceproperties",
+    "pk": 1,
+    "fields": {
+        "applianceid": 1,
+        "name": "Make",
+        "value": "Hitachi"
+    }
+},
+{
+    "model": "metrel.applianceproperties",
+    "pk": 2,
+    "fields": {
+        "applianceid": 2,
+        "name": "Make",
+        "value": "Hitachi"
+    }
+},
+{
+    "model": "metrel.appliances",
+    "pk": 1,
+    "fields": {
+        "appliancetag": "00001",
+        "testdate": "2017-06-28T00:00:00Z",
+        "retestdate": "2018-06-28T00:00:00Z",
+        "location": "Metalshop",
+        "userid": 1,
+        "comment": "Grinder",
+        "activityid": null,
+        "status": 1,
+        "premisesid": 1,
+        "nextapplianceid": null,
+        "patid": 1,
+        "archived": 0,
+        "appliancename": null,
+        "appliance2tag": null,
+        "appliance2name": null,
+        "repaircodeid": null,
+        "site": "Ellesmere",
+        "patid2": null,
+        "attachments": null
+    }
+},
+{
+    "model": "metrel.appliances",
+    "pk": 2,
+    "fields": {
+        "appliancetag": "00002",
+        "testdate": "2017-06-28T00:00:00Z",
+        "retestdate": "2018-06-28T00:00:00Z",
+        "location": "Metalshop",
+        "userid": 1,
+        "comment": "Grinder",
+        "activityid": null,
+        "status": 1,
+        "premisesid": 1,
+        "nextapplianceid": null,
+        "patid": 1,
+        "archived": 0,
+        "appliancename": null,
+        "appliance2tag": null,
+        "appliance2name": null,
+        "repaircodeid": null,
+        "site": "Ellesmere",
+        "patid2": null,
+        "attachments": null
+    }
+},
+{
+    "model": "metrel.autotests",
+    "pk": 3,
+    "fields": {
+        "testcode": "I0H8000033Q1110100000A10",
+        "instrumentname": "AlphaPAT-NZ",
+        "name": "(new test)",
+        "autotestgroupid": null
+    }
+},
+{
+    "model": "metrel.businesssubjects",
+    "pk": 1,
+    "fields": {
+        "nametype": 1,
+        "name": "Ellesmere College",
+        "description": "Leeston-Dunsandel Road\r\nLeeston"
+    }
+},
+{
+    "model": "metrel.datalisttypes",
+    "pk": 1,
+    "fields": {
+        "name": "CheckBoxes"
+    }
+},
+{
+    "model": "metrel.functiontypes",
+    "pk": 1,
+    "fields": {
+        "name": "VisualInspection"
+    }
+},
+{
+    "model": "metrel.functiontypes",
+    "pk": 2,
+    "fields": {
+        "name": "EarthBond"
+    }
+},
+{
+    "model": "metrel.functiontypes",
+    "pk": 3,
+    "fields": {
+        "name": "Insulation"
+    }
+},
+{
+    "model": "metrel.functiontypes",
+    "pk": 4,
+    "fields": {
+        "name": "Polarity"
+    }
+},
+{
+    "model": "metrel.functions",
+    "pk": 21,
+    "fields": {
+        "applianceid": 1,
+        "functiontypeid": 1,
+        "autotestid": 3,
+        "status": 1
+    }
+},
+{
+    "model": "metrel.functions",
+    "pk": 22,
+    "fields": {
+        "applianceid": 1,
+        "functiontypeid": 3,
+        "autotestid": 3,
+        "status": 1
+    }
+},
+{
+    "model": "metrel.functions",
+    "pk": 23,
+    "fields": {
+        "applianceid": 2,
+        "functiontypeid": 1,
+        "autotestid": 3,
+        "status": 1
+    }
+},
+{
+    "model": "metrel.functions",
+    "pk": 24,
+    "fields": {
+        "applianceid": 2,
+        "functiontypeid": 3,
+        "autotestid": 3,
+        "status": 1
+    }
+},
+{
+    "model": "metrel.limits",
+    "pk": 11,
+    "fields": {
+        "functionid": 22,
+        "name": "Limit1",
+        "value1": "1.0MOhm",
+        "value2": null
+    }
+},
+{
+    "model": "metrel.limits",
+    "pk": 12,
+    "fields": {
+        "functionid": 24,
+        "name": "Limit1",
+        "value1": "1.0MOhm",
+        "value2": null
+    }
+},
+{
+    "model": "metrel.pats",
+    "pk": 1,
+    "fields": {
+        "name": "AlphaPAT-NZ",
+        "mi": " MI 2142",
+        "swversion": "1.41NZ",
+        "serialnumber": "15104966",
+        "lastcalibration": null,
+        "type": ""
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 37,
+    "fields": {
+        "functionid": 21,
+        "name": "Voltage",
+        "value": "230V"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 38,
+    "fields": {
+        "functionid": 22,
+        "name": "Voltage",
+        "value": "500V"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 39,
+    "fields": {
+        "functionid": 22,
+        "name": "TestTime",
+        "value": "5s"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 40,
+    "fields": {
+        "functionid": 22,
+        "name": "TestCount",
+        "value": "single"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 41,
+    "fields": {
+        "functionid": 23,
+        "name": "Voltage",
+        "value": "230V"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 42,
+    "fields": {
+        "functionid": 24,
+        "name": "Voltage",
+        "value": "500V"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 43,
+    "fields": {
+        "functionid": 24,
+        "name": "TestTime",
+        "value": "5s"
+    }
+},
+{
+    "model": "metrel.parameters",
+    "pk": 44,
+    "fields": {
+        "functionid": 24,
+        "name": "TestCount",
+        "value": "single"
+    }
+},
+{
+    "model": "metrel.premises",
+    "pk": 1,
+    "fields": {
+        "name": "Metalshop",
+        "projectid": 5,
+        "nextpremisesid": null,
+        "parentid": null,
+        "archived": 0
+    }
+},
+{
+    "model": "metrel.projects",
+    "pk": 5,
+    "fields": {
+        "name": "Ellesmere",
+        "validatorid": null,
+        "customerid": null,
+        "archived": 0
+    }
+},
+{
+    "model": "metrel.results",
+    "pk": 11,
+    "fields": {
+        "limitid": 11,
+        "status": 1,
+        "value": ">20.0MOhm",
+        "quantity": null
+    }
+},
+{
+    "model": "metrel.results",
+    "pk": 12,
+    "fields": {
+        "limitid": 12,
+        "status": 1,
+        "value": ">20.0MOhm",
+        "quantity": null
+    }
+},
+{
+    "model": "metrel.users",
+    "pk": 1,
+    "fields": {
+        "firstname": "Darryl",
+        "lastname": "Cousins",
+        "department": "Caretaker",
+        "phone": "0274225693",
+        "fax": null,
+        "email": "cousinsd@ellesmere.school.nz"
+    }
+}
+]
