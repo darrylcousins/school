@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{% block list_title %}Staff{% endblock %}</h2>
+    <ul class="stafflist list-unstyled">
+        {% for staff in object_list %}
+            <li>
+                <a href="{{ staff.get_diary_url }}">{{ staff }}</a> 
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+
