@@ -55,7 +55,30 @@
      
             sorting: [
                 {sortingName: "Tag", field: "appliancetag", order: "ascending"},
-            ]
+            ],
+     
+            filterOptions: {
+                filters: [{
+                    filterName: "Tag",
+                    filterType: "text",
+                    field: "appliancetag",
+                    filterLabel: "Tag",
+                    excluded_operators: ["in", "not_in"],
+                    filter_interface: [{
+                        filter_element: "input",
+                        filter_element_attributes: {"type": "text"}
+                    }]
+                }],
+                filter_rules: [{
+                    condition: {
+                        filterType: "text",
+                        field: "appliancetag",
+                        operator: "contains",
+                        filterValue: []
+                    },
+                    logical_operator: "AND"
+                }]
+            }
         })
     })
     </script>

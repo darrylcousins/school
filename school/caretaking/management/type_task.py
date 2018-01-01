@@ -22,7 +22,7 @@ class TypeTask:
         [<TaskType: Duties>]
         >>> gp = TypeTask('remove and repair shelving from')
         >>> gp.types()
-        [<TaskType: Duties>]
+        [<TaskType: Repairs>]
 
     """
     types_dict = {

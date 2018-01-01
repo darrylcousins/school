@@ -117,3 +117,9 @@ Get test fixture for Metrel database
         $ python manage.py dumpdata --database=metrel -e contenttypes -e auth.permission -e auth.group -e auth.user -e sessions -e sites -e admin -e caretaking -e metrel.appinfo -e metrel.translations --indent 4 > metrel\fixtures\initial.json
 
 Skip ``translations`` and ``appinfo`` because ``id`` not allowed (in migrations?).
+
+Django 2
+--------
+
+Upgrade failed due to sql_server.pydboc - pin Django==1.10.8 for now. Without Metrel perhaps
+consider migration to postgres.

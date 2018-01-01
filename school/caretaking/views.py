@@ -1,7 +1,9 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
+import datetime
 import random
 
+from django.db.models import Sum, Count
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -9,29 +11,86 @@ from django.views.generic.dates import DateDetailView
 from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
 
-from caretaking.models import Diary, Staff, Location
+from caretaking.models import Diary, Staff, Location, Task
+from caretaking.forms import DiaryForm
+
+
+class StaffList(ListView):
+    model = Staff
+    template_name = 'staff_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StaffList, self).get_context_data(**kwargs)
+        return context
 
 
 class DiaryList(ListView):
-    queryset = Diary.objects.order_by('-day')
     template_name = 'diary_list.html'
-    context_object_name = 'diaries'
-    paginate_by = 10
+    context_object_name = 'diary'
+    paginate_by = 30
+    end_date = None
+    start_date = None
+    default_range = 7 # 7 days
+    search_term = ''
 
+    def get(self, request, *args, **kwargs):
+        """Insert logic here before ``get_queryset`` and ``get_context_data are called.
 
-class StaffDiaryList(ListView):
-    template_name = 'staff_diary_list.html'
-    context_object_name = 'diaries'
-    paginate_by = 10
+        Figure out number of days and start date based on user input.
+
+        Default is to make a range of the past 7 days.
+        """
+        start_date = self.request.GET.get('start-date', None)
+        end_date = self.request.GET.get('end-date', None)
+
+        if start_date is not None and end_date is not None:
+            self.start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            self.end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+        else:
+            self.end_date = datetime.datetime.today()
+            self.start_date = self.end_date - datetime.timedelta(days=self.default_range)
+
+        self.search_term = self.request.GET.get('q', '')
+
+        return super(DiaryList, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
+        """Collect diary entries for this user.
+
+        Show particular date ranges: past week, past month, past year.
+
+        Also filter by a search term which will highlight tasks containing the search term.
+        """
         self.user = get_object_or_404(User, username=self.args[0])
         self.staff = get_object_or_404(Staff, user=self.user)
-        return Diary.objects.filter(staff=self.staff).order_by('-day')
+
+        # filter by the staff member
+        qs = Diary.objects.filter(staff=self.staff)
+
+        # filter for past range
+        qs = qs.filter(day__lte=self.end_date, day__gt=self.start_date)
+
+        # order by day
+        qs = qs.order_by('-day')
+        self.queryset = qs
+        return qs
 
     def get_context_data(self, **kwargs):
-        context = super(StaffDiaryList, self).get_context_data(**kwargs)
+        context = super(DiaryList, self).get_context_data(**kwargs)
         context['staff'] = self.staff
+        context['start_date'] = self.start_date
+        context['end_date'] = self.end_date
+        context['today'] = datetime.datetime.today()
+
+        # get some useful summary data about the queryset
+        context['days_worked'] = self.queryset.filter(hours__gt=0.0).count()
+        context['total_hours'] = self.queryset.aggregate(total_hours=Sum('hours'))['total_hours']
+        task_qs = Task.objects.filter(completed__in=self.queryset.values_list('day', flat=True))
+        context['total_tasks'] = task_qs.count()
+        if self.search_term != '':
+            context['search_count'] = task_qs.filter(
+                    description__contains=self.search_term).count()
+            context['search_term'] = self.search_term
         return context
 
 
@@ -76,12 +135,12 @@ class DiaryDetail(DateDetailView):
 
         >>> diary = Diary.objects.get(day=thisday)
         >>> print(diary.get_absolute_url())
-        /caretaking/diaries/2017/Mar/10/1/
+        /caretaking/diary/2017/Mar/10/1/
         >>> response = client.get(diary.get_absolute_url())
         >>> print(response.status_code)
         200
         >>> print(len(response.context['object'].tasks))
-        21
+        20
         >>> print(response.context['diary_wkt'])
         MULTIPOINT (...)
 

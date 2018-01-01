@@ -66,7 +66,7 @@ METREL_DB = {
 }
 DATABASES = {
     'default': DEFAULT_DB,
-    'metrel': METREL_DB,
+    # 'metrel': METREL_DB,
 }
 
 DATABASE_ROUTERS = ['metrel.routers.MetrelRouter']
@@ -225,7 +225,7 @@ LOCAL_APPS = (
     # ellesmere.school apps
     'pyodbc_gis',
     'caretaking',
-    'metrel',
+    #'metrel',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

@@ -13,7 +13,8 @@ Open ``conemu`` with 'Powershell'. Run `vi :Proj` and find code and docs.
 
 To run the server and tests open ``cmd`` shell and move to conda env.::
 
-        $ chdir C:\Users\cousinsd\AppData\Local\Continuum\Miniconda3\envs\ellesmere
+        $ chdir C:\Users\cousinsd\AppData\Local\Continuum\Miniconda3\envs\ellesmere\school\school
+        $ chdir schoool\school
 
 Activate the environment::
 
@@ -25,5 +26,11 @@ Start server::
 
 Run tests::
 
-        (ellesmere) $ python manage.py test
+        (ellesmere) $ python manage.py test caretaking
+
+Metrel
+------
+
+Metrel is the only reason for pushing on with MSSql. Mostly I'm now developing ``caretaking`` app
+only.
 

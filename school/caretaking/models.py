@@ -25,6 +25,8 @@ class Staff(models.Model):
         ...     caretaker.save()
         >>> print(caretaker)
         Darryl Cousins (Caretaker)
+        >>> print(caretaker.get_diary_url())
+        /caretaking/diary/cousinsd/
 
     """
     staffid = models.AutoField(primary_key=True)
@@ -47,6 +49,9 @@ class Staff(models.Model):
     class Meta:
         verbose_name = 'Staff'
         verbose_name_plural = 'Staff'
+
+    def get_diary_url(self):
+        return reverse('diary-list', args=[self.user.username])
 
 
 class Location(models.Model):
@@ -155,12 +160,37 @@ class Task(models.Model):
     Maybe the job got done too::
 
         >>> from datetime import date
-        >>> todo.completed = date(2017, 3, 10)
+        >>> todo.completed = date(2017, 3, 17)
         >>> todo.save()
         >>> print(todo.completed)
-        2017-03-10
+        2017-03-17
         >>> print(todo)
-        Fri 10 Mar 2017 Clear downpipe at library
+        Fri 17 Mar 2017 Clear downpipe at library
+
+    To select tasks for the caretaker::
+
+        >>> Task.objects.filter(staff=caretaker).count()
+        11
+    
+    Accordingly we expect none from the assistant::
+
+        >>> maria, created = User.objects.get_or_create(username='halloumism', first_name='Maria',
+        ...     last_name='Halloumis')
+        >>> if created:
+        ...     maria.save()
+        >>> assistant, created = Staff.objects.get_or_create(user=maria, title='Assistant')
+        >>> Task.objects.filter(staff=assistant).count()
+        0
+
+    We can select earliest and latest Tasks by completed date::
+
+        >>> Task.objects.filter(staff=caretaker).earliest()
+        <Task: Fri 10 Mar ...>
+
+    Or a count of tasks completed for the year::
+
+        >>> Task.objects.filter(staff=caretaker).filter(completed__year=2017).count()
+        11
 
     """
     URGENCY = (
@@ -184,6 +214,9 @@ class Task(models.Model):
         blank=True)
     point = GeometryField()
     comment = models.TextField(blank=True, null=True)
+
+    class Meta:
+        get_latest_by = 'completed'
 
     def __str__(self):
         "Returns completed date and a truncated line of the tasks description."
@@ -245,6 +278,10 @@ class Diary(models.Model):
         on_delete=models.DO_NOTHING)
     comment = models.TextField(blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Diary'
+        verbose_name_plural = 'Diaries'
+
     def __str__(self):
         "Returns the day and staff member name."
         return '%s %s' % (self.day.strftime("%a %d %b %Y"), self.staff)
@@ -285,7 +322,7 @@ class Diary(models.Model):
     def spread(self, point_collection):
         """Take an iterable of points and eliminate duplicates by creating clusters.
         
-        What do to with this algorithm?
+        Where to put this algorithm?
         
         """
         #targets = (0, 1, 2, -1, -2)
@@ -308,9 +345,5 @@ class Diary(models.Model):
             else:
                 points.append(p)
         return points                
-
-    class Meta:
-        verbose_name = 'Diary'
-        verbose_name_plural = 'Diaries'
 
 

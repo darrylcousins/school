@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 2
 
    ellesmere_dango
+   ellesmere_quickstart
+   loaddata
    install
    deploy
    tests

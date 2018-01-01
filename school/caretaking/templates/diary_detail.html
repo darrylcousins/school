@@ -22,22 +22,25 @@
 
 {% block content %}
 <h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
-    <a class="no-underline" href="{% url 'staff-diary-list' staff.user.username %}">
+    <a class="no-underline" href="{% url 'diary-list' staff.user.username %}">
         {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }})
     </a>
     {% endblock %}</h2>
 <p class="comment"><strong>{{ diary.hours }}&nbsp;hrs:</strong>&nbsp;<em>{{ diary.comment }}</em></p>
 
-<ul class="pager">
+<ul class="pagination">
 {% if previous %}
-    <li class="previous">
-        <a href="{{ previous.get_absolute_url }}">
+    <li class="page-item">
+        <a href="{{ previous.get_absolute_url }}" class="page-link">
             <span>&laquo;&nbsp;</span>{{ previous.day|date:"D j N Y" }}</a>
     </li>
 {% endif %}
+    <li class="page-item disabled">
+        <a href="#" class="page-link">{{ diary.day|date:"D j N Y" }}</a>
+    </li>
 {% if next %}
-    <li class="next">
-        <a href="{{ next.get_absolute_url }}">
+    <li class="page-item">
+        <a href="{{ next.get_absolute_url }}" class="page-link">
             {{ next.day|date:"D j N Y" }}<span>&nbsp;&raquo;</span></a>
     </li>
 {% endif %}
