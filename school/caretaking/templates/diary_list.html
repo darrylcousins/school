@@ -1,5 +1,24 @@
 {% extends "base.html" %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item active">
+          <a href="{% url 'staff' staff.user.username %}">{{ staff.user.username }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          diary
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
     <h2>Diary: {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }})</h2>
     <!-- info box -->
@@ -33,8 +52,13 @@
         Search in the selected range:
             <div class="input-group" style="width: 75%">
                 <input class="form-control" type="text" placeholder="Search"
+                    onclick="$('#clear-button').removeClass('d-none');"
                     id="search-term" name="q" value="{{ search_term }}">
                 <div class="input-group-append">
+                    <button class="btn btn-outline{% if not search_term %} d-none{% endif %}"
+                        type="button" id="clear-button"
+                        onclick="$('#search-term').val('');"
+                        >Clear</button>
                     <button class="btn btn-secondary" type="submit">Go</button>
                 </div>
             </div>

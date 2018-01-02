@@ -34,24 +34,14 @@ class Staff(models.Model):
     comment = models.TextField(blank=True, null=True)
     user = models.ForeignKey('auth.User')
 
-    @property
-    def firstname(self):
-        return self.user.first_name
-
-    @property
-    def lastname(self):
-        return self.user.last_name
-
     def __str__(self):
         "Returns the person's full name."
-        return '%s %s (%s)' % (self.firstname, self.lastname, self.title)
+        return '%s %s (%s)' % (
+                self.user.first_name, self.user.last_name, self.title)
 
     class Meta:
         verbose_name = 'Staff'
         verbose_name_plural = 'Staff'
-
-    def get_diary_url(self):
-        return reverse('diary-list', args=[self.user.username])
 
 
 class Location(models.Model):

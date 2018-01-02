@@ -20,6 +20,25 @@
     </style>
 {% endblock extra_css %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-list' %}">diaries</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'diary-list' staff.user.username %}">{{ staff.user.username }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          {{ diary.day|date:"D j N Y" }}
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
     <a class="no-underline" href="{% url 'diary-list' staff.user.username %}">

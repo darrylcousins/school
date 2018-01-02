@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          {{ staff.user.username }}
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <h2>{{ staff }}</h2>
+
+    <p>
+    Recording since {{ earliest_record.completed|date:"j N Y" }}.
+    </p>
+    <p>
+    {{ staff.comment }}
+    </p>
+
+    <h3>Summary</h3>
+    <table class="table">
+        <tr>
+            <th>Year</th>
+            <th>Days worked</th>
+            <th>Total hours</th>
+            <th>Tasks completed</th>
+        </tr>
+    {% for year in years %}
+        <tr>
+            <td>{{ year.year }}</td>
+            <td>{{ year.days_worked }}</td>
+            <td>{{ year.total_hours }}</td>
+            <td>{{ year.total_tasks }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    </p>
+    <h3>Links</h3>
+    <ul class="stafflist list-unstyled">
+        <li>
+            <a href="{% url 'staff-diary-list' staff.user.username %}">Diary</a> 
+        </li>
+        <li>
+            <a href="{% url 'staff-task-list' staff.user.username %}">Tasks</a> 
+        </li>
+    </ul>
+{% endblock %}
+
+

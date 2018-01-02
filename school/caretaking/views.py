@@ -19,8 +19,62 @@ class StaffList(ListView):
     model = Staff
     template_name = 'staff_list.html'
 
+
+class TaskList(ListView):
+    model = Task
+    template_name = 'task_list.html'
+
+    def get_queryset(self):
+        """Collect task entries for this user.
+
+        Show particular date ranges: past week, past month, past year.
+
+        Also filter by a search term which will highlight tasks containing the search term.
+        """
+        self.user = get_object_or_404(User, username=self.kwargs.get('username'))
+        self.staff = get_object_or_404(Staff, user=self.user)
+
+        # filter by the staff member
+        qs = Task.objects.filter(staff=self.staff)
+
+        # filter for past range
+        #qs = qs.filter(day__lte=self.end_date, day__gt=self.start_date)
+
+        # order by day
+        qs = qs.order_by('-completed')
+        self.queryset = qs
+        return qs
+
     def get_context_data(self, **kwargs):
-        context = super(StaffList, self).get_context_data(**kwargs)
+        context = super(TaskList, self).get_context_data(**kwargs)
+        context['staff'] = self.staff
+        return context
+
+
+class StaffDetail(DetailView):
+    model = Staff
+    slug_field = 'user__username'
+    slug_url_kwarg = 'username'
+    template_name = 'staff_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StaffDetail, self).get_context_data(**kwargs)
+        context['earliest_record'] = Task.objects.filter(staff=self.object).earliest()
+
+        context['years'] = []
+        for year in ('2016', '2017'):
+            start_date = datetime.datetime.strptime(year + "-01-01", "%Y-%m-%d")
+            end_date = datetime.datetime.strptime(year + "-12-31", "%Y-%m-%d")
+            # filter by the staff member and date range
+            qs = Diary.objects.filter(staff=self.object).filter(
+                    day__lte=end_date, day__gt=start_date)
+            d = {}
+            d['days_worked'] = qs.filter(hours__gt=0.0).count()
+            d['total_hours'] = qs.aggregate(total_hours=Sum('hours'))['total_hours']
+            d['total_tasks'] = Task.objects.filter(
+                    completed__in=qs.values_list('day', flat=True)).count()
+            d['year'] = year
+            context['years'].append(d)
         return context
 
 
@@ -61,7 +115,7 @@ class DiaryList(ListView):
 
         Also filter by a search term which will highlight tasks containing the search term.
         """
-        self.user = get_object_or_404(User, username=self.args[0])
+        self.user = get_object_or_404(User, username=self.kwargs.get('username'))
         self.staff = get_object_or_404(Staff, user=self.user)
 
         # filter by the staff member
