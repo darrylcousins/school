@@ -13,6 +13,9 @@ Using conda to set up a new environment::
 
 Note that it was required to explicitly include ``pywin32``.
 
+I'm using `conemu` for shell sessions. While `Powershell` is more useful and powerful for command
+line work the simple `cmd` session is required to work with the activated environment.
+
 Activate the environment for local python::
 
         $ activate ellesemere
@@ -20,12 +23,7 @@ Activate the environment for local python::
 
 Deactivate with::
 
-        $ deactivate
-
-Install pyodbc and django-pyodbc-azure for odbc bindings::
-
-        (ellesemere) $ pip install pyodbc
-        (ellesemere) $ pip install django-pyodbc-azure
+        (ellesmere)$ deactivate
 
 GeoDjango
 ---------
@@ -41,9 +39,34 @@ I used `https://docs.djangoproject.com/en/2.0/ref/contrib/gis/install/#windows` 
 
 Django supports PostgreSQL 10 with Psycopg 2.7.3.2 but I struggled with the installer when installing `PostGIS` extensions so instead I went of `9.6` and was able to install the extension.
 
+Create Database
+---------------
+
+Create the database and user using `postgres` superuser and set some defaults::
+
+        $ psql -U postgres -W 'password'
+        postgres=# CREATE USER ellesmere PASSWORD 'ellesmere';
+        postgres=# CREATE DATABASE ellesmere OWNER ellesmere;
+        postgres=# ALTER ROLE ellesmere SET client_encoding TO 'utf8';
+        postgres=# ALTER ROLE ellesmere SET default_transaction_isolation TO 'read committed';
+        postgres=# ALTER ROLE ellesmere SET timezone TO 'Pacific/Auckland';
+        postgres=# GRANT ALL PRIVILEGES ON DATABASE ellesmere TO ellesmere;
+
+Superuser status is required to run `CREATE EXTENSION`::
+
+        postgres=# ALTER ROLE ellesmere WITH SUPERUSER;
+        postgres=# \q
+
+Log in to psql with the new user and geo enable the new database::
+
+        $ psql -U ellesmere -W 'password'
+        ellesmere=# CREATE EXTENSION postgis;
+        ellesmere=# CREATE EXTENSION postgis_topology; # done but may be unnecessary
 
 Create Project
 --------------
+
+This getting started section applies to new projects only.
 
 Standard getting started with ``django``::
 
@@ -63,6 +86,18 @@ Now we can start the server without connection errors::
         March 19, 2017 - 10:39:07
         Django version 1.10.5, using settings 'school.settings'
         Starting development server at http://127.0.0.1:8000/
+
+Create tables
+-------------
+
+Use ``migrate`` to create the tables in new database::
+
+        (ellesmere) $ python manage.py migrate
+
+Install fixtures
+----------------
+
+With fixtures and sql some initial data can be imported into the database.
 
 Stop/stop Postgresql
 --------------------

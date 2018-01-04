@@ -31,45 +31,19 @@ DEBUG = True
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-# first try using django-mssql
-#db_engine = 'sqlserver_ado'
-#db_options = {'provider': 'sqlncli11'}
-
-# second try, this time to get geodjango working
-db_engine = 'sql_server.pyodbc'
-db_options = {'driver': 'ODBC Driver 13 for SQL Server'}
-
-# but this is failing for me, the package apparently is built to earlier django versions and
-# imports fail for django 1.11
-#db_engine = 'django_pyodbc_gis'
-
-# fall back to building my own
-db_engine = 'pyodbc_gis'
-
 # Assign to variable to make it easier to comment out during development
 DEFAULT_DB = {
-    'ENGINE': db_engine,
+    'ENGINE': 'django.contrib.gis.db.backends.postgis',
     'NAME': 'ellesmere',
-    'HOST':'R940_DARRYL\ELLESMERE',
-    'OPTIONS': db_options,
-}
-METREL_DB = {
-    'ENGINE': db_engine,
-    'NAME': 'newpatlink',
-    'HOST':'R940_DARRYL\METREL',
-    'USER': 'sa',
-    'PASSWORD': 'MeT123ReL',
-    'OPTIONS': db_options,
-    #'TEST': {
-    #    'MIRROR': 'default',
-    #},
+    'USER': 'ellesmere',
+    'PASSWORD': 'ellesmere',
+    'HOST':'127.0.0.1',
+    'PORT': 5432,
 }
 DATABASES = {
     'default': DEFAULT_DB,
-    # 'metrel': METREL_DB,
 }
 
-DATABASE_ROUTERS = ['metrel.routers.MetrelRouter']
 ########## END DATABASE CONFIGURATION
 
 
@@ -82,6 +56,24 @@ ADMINS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 ########## END MANAGER CONFIGURATION
+
+########## PASSWORD VALIDATION
+# https://docs.djangoproject.com/en/ref/settings/#auth-password-validators
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+########## END PASSWORD VALIDATION
 
 
 ########## GENERAL CONFIGURATION
@@ -181,15 +173,16 @@ TEMPLATES = [
 
 ########## MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     # Default Django middleware.
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 ########## END MIDDLEWARE CONFIGURATION
 
 
@@ -197,7 +190,6 @@ MIDDLEWARE_CLASSES = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = '%s.urls' % SITE_NAME
 ########## END URL CONFIGURATION
-
 
 ########## APP CONFIGURATION
 DJANGO_APPS = (
@@ -223,9 +215,7 @@ LOCAL_APPS = (
     'floppyforms',
 
     # ellesmere.school apps
-    'pyodbc_gis',
     'caretaking',
-    #'metrel',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

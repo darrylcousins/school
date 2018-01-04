@@ -30,7 +30,7 @@ class Staff(models.Model):
     staffid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=50)
     comment = models.TextField(blank=True, null=True)
-    user = models.ForeignKey('auth.User')
+    user = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         "Returns the person's full name."
