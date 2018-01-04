@@ -4,6 +4,7 @@ import datetime
 import random
 
 from django.db.models import Sum, Count
+from django.http.request import QueryDict
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -23,6 +24,32 @@ class StaffList(ListView):
 class TaskList(ListView):
     model = Task
     template_name = 'task_list.html'
+    paginate_by = 30
+    end_date = None
+    start_date = None
+    default_range = 7 # 7 days
+    search_term = ''
+
+    def get(self, request, *args, **kwargs):
+        """Insert logic here before ``get_queryset`` and ``get_context_data are called.
+
+        Figure out number of days and start date based on user input.
+
+        Default is to make a range of the past 7 days.
+        """
+        start_date = self.request.GET.get('start-date', None)
+        end_date = self.request.GET.get('end-date', None)
+
+        if start_date is not None and end_date is not None:
+            self.start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            self.end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+        else:
+            self.end_date = datetime.datetime.today()
+            self.start_date = self.end_date - datetime.timedelta(days=self.default_range)
+
+        self.search_term = self.request.GET.get('q', '')
+
+        return super(TaskList, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         """Collect task entries for this user.
@@ -38,7 +65,12 @@ class TaskList(ListView):
         qs = Task.objects.filter(staff=self.staff)
 
         # filter for past range
-        #qs = qs.filter(day__lte=self.end_date, day__gt=self.start_date)
+        qs = qs.filter(completed__lte=self.end_date, completed__gt=self.start_date)
+
+        # filter for search term
+        if self.search_term != '':
+            qs = qs.filter(
+                    description__contains=self.search_term)
 
         # order by day
         qs = qs.order_by('-completed')
@@ -48,6 +80,15 @@ class TaskList(ListView):
     def get_context_data(self, **kwargs):
         context = super(TaskList, self).get_context_data(**kwargs)
         context['staff'] = self.staff
+        context['start_date'] = self.start_date
+        context['end_date'] = self.end_date
+        context['today'] = datetime.datetime.today()
+        context['total_tasks'] = self.queryset.count()
+        if self.search_term != '':
+            context['search_count'] = self.queryset.count()
+            context['search_term'] = self.search_term
+        for task in self.queryset:
+            print(Location.objects.filter(polygon__contains=task.point))
         return context
 
 
@@ -137,6 +178,7 @@ class DiaryList(ListView):
         context['today'] = datetime.datetime.today()
 
         # get some useful summary data about the queryset
+        context['days'] = self.queryset.count()
         context['days_worked'] = self.queryset.filter(hours__gt=0.0).count()
         context['total_hours'] = self.queryset.aggregate(total_hours=Sum('hours'))['total_hours']
         task_qs = Task.objects.filter(completed__in=self.queryset.values_list('day', flat=True))
@@ -145,6 +187,13 @@ class DiaryList(ListView):
             context['search_count'] = task_qs.filter(
                     description__contains=self.search_term).count()
             context['search_term'] = self.search_term
+        # get query string to be included in pagination links
+        qd = QueryDict(self.request.GET.urlencode(), mutable=True)
+        try:
+            qd.pop('page')
+        except KeyError:
+            pass
+        context['query_string'] = '?' + qd.urlencode() + '&' if qd else '?'
         return context
 
 

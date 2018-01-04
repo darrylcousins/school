@@ -1,0 +1,16 @@
+    {% if search_count %}
+    <script>
+        $(document).ready(function() {
+            var search_term = "{{ search_term }}";
+            $('ul.tasklist>li').each(function() {
+                t = $(this).text();
+                if (t.indexOf(search_term) > -1) {
+                    res = t.replace(search_term, 
+                            '<strong class="bg-warning">' + search_term + '</strong>');
+                    $(this).html(res);
+                }
+            });
+        });
+    </script>
+    {% endif %}
+

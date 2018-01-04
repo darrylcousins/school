@@ -7,7 +7,9 @@ class DiaryForm(forms.Form):
     """Diary form to filter diary selection::
 
         >>> f = DiaryForm()
-        >>> print(f)
 
+    Unused - using simple template and logic in TaskList and DiaryList views.
+
+    TODO consider refractoring to use form and move logic here.
     """
     search = forms.CharField(label='Search', max_length=100)

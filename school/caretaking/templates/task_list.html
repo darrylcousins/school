@@ -21,14 +21,37 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{% block list_title %}Staff{% endblock %}</h2>
-    <ul class="stafflist list-unstyled">
+    <h2>Tasks: {{ staff }}</h2>
+
+    <div class="alert alert-info" role="alert">
+        <p>
+        Use the form below to change
+        the date range.
+        </p>
+
+        {% include 'snippet_form.html' %}
+
+    </div>
+
+    {% include 'snippet_pagination.html' %}
+
+    <table class="table">
+        <tr>
+            <th>Date</th><th>Description</th>
         {% for task in object_list %}
-            <li>
-                <a href="#">{{ task }}</a> 
-            </li>
+            <tr>
+                <td class="task-date">{{ task.completed|date:"j N Y" }}</td>
+                <td class="task-description">{{ task.description }}</td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tr>
+    </table>
+
+    {% include 'snippet_pagination.html' %}
+
+    {% block extra_js %}
+    {% include 'snippet_search_js.html' %}
+    {% endblock extra_js %}
 
 {% endblock %}
 

@@ -20,59 +20,31 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Diary: {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }})</h2>
+    <h2>Diary: {{ staff }}</h2>
     <!-- info box -->
     <div class="alert alert-info" role="alert">
-        <form action="." method="get">
         <p>
-        Showing the <strong>{{ days_worked }} days</strong> worked between 
+        Showing <strong>{{ days }}</strong> days between 
         <strong>{{ start_date|date:"j N Y" }}</strong> and 
         <strong>{{ end_date|date:"j N Y" }}</strong>.
         <br>
         Use the form below to change
         the date range.
         </p>
-        <!-- date range options -->
-        <div class="input-group" style="width: 75%">
-            <input class="form-control" type="date" required name="start-date"
-                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
-                min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control" type="date" required name="end-date"
-                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
-                min="" max="{{ today|date:"Y-m-d" }}">
-            <div class="input-group-append">
-                <button class="btn btn-secondary" type="submit">Go</button>
-            </div>
-        </div>
-        <br>
-        <p>
-        <strong>{{ total_hours }} hours</strong> worked and 
-        <strong>{{ total_tasks }} tasks</strong> completed.
+
+        {% include 'snippet_form.html' %}
+
+        <p> <strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
+        and <strong>{{ total_tasks }} tasks</strong> completed.
         </p>
-        Search in the selected range:
-            <div class="input-group" style="width: 75%">
-                <input class="form-control" type="text" placeholder="Search"
-                    onclick="$('#clear-button').removeClass('d-none');"
-                    id="search-term" name="q" value="{{ search_term }}">
-                <div class="input-group-append">
-                    <button class="btn btn-outline{% if not search_term %} d-none{% endif %}"
-                        type="button" id="clear-button"
-                        onclick="$('#search-term').val('');"
-                        >Clear</button>
-                    <button class="btn btn-secondary" type="submit">Go</button>
-                </div>
-            </div>
-            {% if search_count %}
-            <p><strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found containing search 
-            term <strong>{{ search_term }}</strong>.
-            </p>
-            {% endif %}
-        </form>
     </div>
+
+    {% include 'snippet_pagination.html' %}
+
     <!-- list of days -->
     <ul class="diarylist list-unstyled">
         {% for day in diary %}
-        <li{% if day.hours == 0 %} class="sr-only"{% endif %}>
+        <li{% if day.hours == -1 %} class="sr-only"{% endif %}>
             {{ day.total_hours }}
                 <a href="{{ day.get_absolute_url }}">{{ day.day|date:"D j N Y" }}</a> 
                 <span>({{ day.hours }} hrs)</span>
@@ -90,44 +62,9 @@
         {% endfor %}
     </ul>
 
-    {% if is_paginated %}
-      <ul class="pagination">
-        {% if page_obj.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
-        {% else %}
-          <li class="page-item disabled"><a class="page-link">&laquo;</a></li>
-        {% endif %}
-        {% for i in paginator.page_range %}
-          {% if page_obj.number == i %}
-            <li class="page-item active"><a class="page-link">{{ i }} <span
-                        class="sr-only">(current)</span></a></li>
-          {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-          {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
-        {% else %}
-          <li class="page-item disabled"><a class="page-link">&raquo;</a></li>
-        {% endif %}
-      </ul>
-    {% endif %}
+    {% include 'snippet_pagination.html' %}
 
     {% block extra_js %}
-    {% if search_count %}
-    <script>
-        $(document).ready(function() {
-            var search_term = "{{ search_term }}";
-            $('ul.tasklist>li').each(function() {
-                t = $(this).text();
-                if (t.indexOf(search_term) > -1) {
-                    res = t.replace(search_term, 
-                            '<strong class="bg-warning">' + search_term + '</strong>');
-                    $(this).html(res);
-                }
-            });
-        });
-    </script>
-    {% endif %}
+    {% include 'snippet_search_js.html' %}
     {% endblock extra_js %}
 {% endblock %}

@@ -1,0 +1,34 @@
+        <form action="." method="get">
+        <!-- date range options -->
+        <div class="input-group" style="width: 75%">
+            <input class="form-control" type="date" required name="start-date"
+                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <input class="form-control" type="date" required name="end-date"
+                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit">Go</button>
+            </div>
+        </div>
+        <br>
+        Search in the selected range:
+            <div class="input-group" style="width: 75%">
+                <input class="form-control" type="text" placeholder="Search"
+                    onclick="$('#clear-button').removeClass('d-none');"
+                    id="search-term" name="q" value="{{ search_term }}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline{% if not search_term %} d-none{% endif %}"
+                        type="button" id="clear-button"
+                        onclick="$('#search-term').val('');"
+                        >Clear</button>
+                    <button class="btn btn-secondary" type="submit">Go</button>
+                </div>
+            </div>
+            {% if search_count %}
+            <p><strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found containing search 
+            term <strong>{{ search_term }}</strong>.
+            </p>
+            {% endif %}
+        </form>
+

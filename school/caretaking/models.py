@@ -25,8 +25,6 @@ class Staff(models.Model):
         ...     caretaker.save()
         >>> print(caretaker)
         Darryl Cousins (Caretaker)
-        >>> print(caretaker.get_diary_url())
-        /caretaking/diary/cousinsd/
 
     """
     staffid = models.AutoField(primary_key=True)
@@ -130,6 +128,10 @@ class Task(models.Model):
         >>> todo.save()
         >>> print(todo)
         Clear downpipe at library
+
+    Can find a Location object for this task::
+
+        >>> Location.objects.filter(polygon__contains=todo.point)
 
     It can have more than one point of activity::
 
@@ -335,5 +337,24 @@ class Diary(models.Model):
             else:
                 points.append(p)
         return points                
+
+
+class Project(models.Model):
+    """
+    A project. Will be made up of a nuber of tasks.
+
+
+    """
+    projectid = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    description = models.TextField(blank=True, null=True)
+    comment = models.TextField(blank=True, null=True)
+    tasks = models.ManyToManyField(
+        'Task',
+        blank=True)
+
+    def __str__(self):
+        "Returns the project's name."
+        return self.name
 
 

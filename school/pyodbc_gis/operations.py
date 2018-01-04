@@ -1,9 +1,13 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
+from decimal import Decimal
+
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import GeometryField, aggregates
+from django.contrib.gis.measure import Distance
 from django.utils.functional import cached_property
+from django.utils import six
 
 from sql_server.pyodbc.operations import DatabaseOperations
 
@@ -12,7 +16,7 @@ class MSSqlBoolMethod(SpatialOperator):
     """SQL Server (non-static) spatial functions are treated as methods,
     for eg g.STContains(p)"""
 
-    sql_template = '%(geo_col)s.%(func)s(%(geometry)s) = 1'
+    sql_template = '%(rhs)s.%(func)s(%(lhs)s) = 1'
 
     def __init__(self, function, **kwargs):
         super(MSSqlBoolMethod, self).__init__(func=function, **kwargs)
@@ -21,7 +25,7 @@ class MSSqlBoolMethod(SpatialOperator):
 class MSSqlDistanceFunc(SpatialOperator):
     """Implements distance comparison lookups, eg distance_lte"""
 
-    sql_template = ('%(geo_col)s.%(func)s(%(geometry)s) '
+    sql_template = ('%(rhs)s.%(func)s(%(lhs)s) '
                     '%(op)s %(result)s')
 
     def __init__(self, op):
@@ -41,7 +45,7 @@ class MSSqlBBBoolMethod(MSSqlBoolMethod):
     where STEnvelope() first simplifies the geometries to their
     bounding rectangles."""
 
-    sql_template = '%(geo_col)s.STEnvelope().%(function)s(%(geometry)s.STEnvelope()) = 1'
+    sql_template = '%(rhs)s.STEnvelope().%(func)s(%(lhs)s.STEnvelope()) = 1'
 
     def __init__(self, func):
         super(MSSqlBoolMethod, self).__init__(func=func)
@@ -67,6 +71,10 @@ class MSSqlAdapter(str):
 
     def prepare_database_save(self, unused):
         return self
+
+
+# Valid distance types and substitutions
+dtypes = (Decimal, Distance, float) + six.integer_types
 
 
 class MSSqlOperations(BaseSpatialOperations, DatabaseOperations):
@@ -114,7 +122,7 @@ class MSSqlOperations(BaseSpatialOperations, DatabaseOperations):
             'distance_lt': (MSSqlDistanceFunc('<'), dtypes),
             'distance_lte': (MSSqlDistanceFunc('<='), dtypes),
         }
-        geometry_functions.update(distance_functions)
+        #geometry_functions.update(distance_functions)
 
         geography_functions = {
             'contains': MSSqlBoolMethod('STContains'),
@@ -124,9 +132,14 @@ class MSSqlOperations(BaseSpatialOperations, DatabaseOperations):
             'overlaps': MSSqlBoolMethod('STOverlaps'),
             'within': MSSqlBoolMethod('STWithin'),
         }
+
         geography_functions.update(distance_functions)
+        geography_functions.update(geometry_functions)
+
+        return geography_functions
 
         gis_terms = set(geometry_functions) | set(['isnull'])
+        print(gis_terms)
         return gis_terms
 
     @cached_property
