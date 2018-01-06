@@ -5,12 +5,8 @@ from caretaking.admin import get_wkt
 
 SQL = """
 USE ellesmere;
-SET IDENTITY_INSERT dbo.caretaking_location ON;
-DECLARE @geom geometry;
-SET @geom = geometry::Parse('MULTIPOLYGON(%s)');
-DELETE FROM dbo.caretaking_location WHERE locationid=88;
-INSERT INTO dbo.caretaking_location(locationid, name, polygon) VALUES(88, 'CollegePlan', @geom);
-SET IDENTITY_INSERT dbo.caretaking_location OFF;
+DELETE FROM caretaking_location WHERE locationid=88;
+INSERT INTO caretaking_location(locationid, name, polygon) VALUES(88, 'CollegePlan', ST_GeomFromText('MULTIPOLYGON(%s)', 4326));
 """
 
 class Command(BaseCommand):

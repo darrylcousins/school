@@ -9,7 +9,7 @@
             "username": "cousinsd",
             "first_name": "Darryl",
             "last_name": "Cousins",
-            "email": "cousind@ellesmere.school.nz",
+            "email": "cousinsd@ellesmere.school.nz",
             "is_staff": true,
             "is_active": true,
             "date_joined": "2017-04-25T07:43:35Z",
@@ -22,9 +22,7 @@
         "pk": 1,
         "fields": {
             "title": "Caretaker",
-            "comment": """
-            Darryl was employed at 25 hours per week as Assistant Caretaker in June 2015. In January 2016 he began keeping careful records of tasks performed each day, from which has developed this web application.  On the Adrian's notice of resignation he began working extra hours and on 4 Nov. 2016 he replaced Adrian as Caretaker and has since been employed at 40 hours per week.
-            """,
+            "comment": "",
             "user": 1
         }
     }

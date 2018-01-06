@@ -24,7 +24,7 @@ class LocateTask:
     If a single match is found the WKT representation of a point is returned::
 
         >>> gp = LocateTask('change bulb in A block')
-        >>> assert gp.points() == Location.objects.get(name='ABlock').centroid()
+        >>> assert gp.points() == Location.objects.get(name='ABlock').polygon.centroid.wkt
 
     If multiple matches are found the WKT representation of a multipoint is returned::
 
@@ -114,7 +114,7 @@ class LocateTask:
         for loc, pattern in self.location_dict.items():
             match = self.search(pattern)
             if match:
-                points.append(Location.objects.get(name=loc).centroid())
+                points.append(Location.objects.get(name=loc).polygon.centroid.wkt)
         count = len(points)
         if count == 0:
             # no matches, return college centroid

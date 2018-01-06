@@ -6,6 +6,7 @@ from django.db import models, connection
 from django.urls import reverse
 from django.contrib.gis import geos
 from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.functions import Centroid
 
 
 class Staff(models.Model):
@@ -56,23 +57,14 @@ class Location(models.Model):
 
     Locate the centre of the polygon using ``STCentroid()``.
 
-        >>> print(library.centroid())
-        POINT (2.3333333333333357 1.6666666666666714)
+        >>> print(library.polygon.centroid)
+        SRID=4326;POINT (2.333333333333334 1.666666666666667)
 
     """
     # TODO constrain polygon to polygon geometry
     locationid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     polygon = GeometryField()
-
-    def centroid(self):
-        sql = "select polygon.MakeValid().STCentroid().STAsText() "
-        sql += "from caretaking_location "
-        sql += "where name = %s"
-        with connection.cursor() as cursor:
-            result = cursor.execute(sql, [self.name])
-            centroid = result.fetchone()
-        return centroid[0]
 
     def __str__(self):
         "Returns the location's name."
@@ -128,10 +120,6 @@ class Task(models.Model):
         >>> todo.save()
         >>> print(todo)
         Clear downpipe at library
-
-    Can find a Location object for this task::
-
-        >>> Location.objects.filter(polygon__contains=todo.point)
 
     It can have more than one point of activity::
 
@@ -218,9 +206,9 @@ class Task(models.Model):
         else:
             return '{:.100}'.format(self.description)
 
-    #def get_absolute_url(self):
-    #    return reverse('task-detail', args=[str(self.taskid)])
-
+    def locations(self):
+        return Location.objects.filter(
+            polygon__contains=self.point).exclude(name='CollegeBoundary')
 
 class Diary(models.Model):
     """

@@ -7,14 +7,17 @@ from django.forms import ModelForm
 from django.utils import translation, six
 from django.contrib.gis import gdal, geos
 from django.contrib.gis.admin.options import GeoModelAdmin
+from django.template import loader
 
 from floppyforms.gis import BaseGeometryWidget
+from floppyforms.compat import flatten_contexts
 
 from .models import Staff
 from .models import Location
 from .models import Task
 from .models import TaskType
 from .models import Diary
+from .models import Project
 
 FORMFIELD_OVERRIDES = {
     models.CharField: {'widget': TextInput(attrs={'size': '40'})},
@@ -60,7 +63,7 @@ class PolygonWidget(BaseGeometryWidget):
     def __init__(self, *args, **kwargs):
         super(PolygonWidget, self).__init__(*args, **kwargs)
 
-    def get_context(self, name, value, attrs=None, extra_context={}):
+    def get_context(self, name, value, attrs=None, extra_context={}, renderer=None):
         """Get for display the college polygon"""
         context = super(PolygonWidget, self).get_context(name, value, attrs, extra_context)
         try:
@@ -91,7 +94,7 @@ class PointWidget(BaseGeometryWidget):
     def __init__(self, *args, **kwargs):
         super(PointWidget, self).__init__(*args, **kwargs)
 
-    def get_context(self, name, value, attrs=None, extra_context={}):
+    def get_context(self, name, value, attrs=None, extra_context={}, renderer=None):
         """Get for display the college polygon"""
         context = super(PointWidget, self).get_context(name, value, attrs, extra_context)
         try:
@@ -143,3 +146,4 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(TaskType)
 admin.site.register(Diary)
+admin.site.register(Project)

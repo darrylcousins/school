@@ -52,11 +52,11 @@ class Command(BaseCommand):
             cursor.execute(sql % 'task')
             cursor.execute(sql % 'diary')
             cursor.execute(sql % 'task')
-            cursor.execute(pksql % 'task_staff')
-            cursor.execute(pksql % 'task_tasktype')
-            cursor.execute(pksql % 'task')
-            cursor.execute(pksql % 'diary')
-            cursor.execute(pksql % 'task')
+            #cursor.execute(pksql % 'task_staff')
+            #cursor.execute(pksql % 'task_tasktype')
+            #cursor.execute(pksql % 'task')
+            #cursor.execute(pksql % 'diary')
+            #cursor.execute(pksql % 'task')
 
         # older data has different column format
         reader = csv.reader(open('caretaking/data/jan_oct.csv'), delimiter='\t')

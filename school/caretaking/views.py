@@ -87,12 +87,29 @@ class TaskList(ListView):
         if self.search_term != '':
             context['search_count'] = self.queryset.count()
             context['search_term'] = self.search_term
-        for task in self.queryset:
-            print(Location.objects.filter(polygon__contains=task.point))
         return context
 
 
 class StaffDetail(DetailView):
+    """
+        >>> staff = Staff.objects.first()
+
+    Set up test client::
+
+        >>> from django.test import Client
+        >>> client = Client()
+
+    Get url::
+
+        >>> from django.urls import reverse
+        >>> url = reverse('staff-detail', kwargs={'username':staff.user.username})
+        >>> response = client.get(url)
+        >>> print(response.status_code)
+        200
+        >>> print(response.context['object'])
+        Darryl Cousins (Caretaker)
+
+    """
     model = Staff
     slug_field = 'user__username'
     slug_url_kwarg = 'username'
@@ -231,7 +248,6 @@ class DiaryDetail(DateDetailView):
     Set up test client::
 
         >>> from django.test import Client
-        >>> from django.core.urlresolvers import reverse
         >>> client = Client()
 
     Find our diary day for this set of tasks::
@@ -255,10 +271,6 @@ class DiaryDetail(DateDetailView):
     context_object_name = 'diary'
     points = []
     targets = [t*0.00001 for t in (0, 1, 2, -1, -2)]
-
-    def get_object(self):
-        obj = super(DiaryDetail, self).get_object()
-        return obj
 
     def get_context_data(self, **kwargs):
         context = super(DiaryDetail, self).get_context_data(**kwargs)

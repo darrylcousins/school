@@ -10,7 +10,7 @@
           <a href="{% url 'caretaking' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item active">
-          <a href="{% url 'staff' staff.user.username %}">{{ staff.user.username }}</a>
+          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
           diary
@@ -34,7 +34,8 @@
 
         {% include 'snippet_form.html' %}
 
-        <p> <strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
+        <br>
+        <p><strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
         and <strong>{{ total_tasks }} tasks</strong> completed.
         </p>
     </div>
@@ -65,6 +66,20 @@
     {% include 'snippet_pagination.html' %}
 
     {% block extra_js %}
-    {% include 'snippet_search_js.html' %}
+    {% if search_count %}
+    <script>
+        $(document).ready(function() {
+            var search_term = "{{ search_term }}";
+            $('ul.tasklist>li').each(function() {
+                t = $(this).text();
+                if (t.indexOf(search_term) > -1) {
+                    res = t.replace(search_term, 
+                            '<strong class="bg-warning">' + search_term + '</strong>');
+                    $(this).html(res);
+                }
+            });
+        });
+    </script>
+    {% endif %}
     {% endblock extra_js %}
 {% endblock %}

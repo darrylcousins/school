@@ -42,7 +42,7 @@
 {% block content %}
 <h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
     <a class="no-underline" href="{% url 'staff-diary-list' staff.user.username %}">
-        {{ staff.firstname }} {{ staff.lastname }} ({{ staff.title }})
+        {{ staff.user.first_name }} {{ staff.user.last_name }} ({{ staff.title }})
     </a>
     {% endblock %}</h2>
 <p class="comment"><strong>{{ diary.hours }}&nbsp;hrs:</strong>&nbsp;<em>{{ diary.comment }}</em></p>

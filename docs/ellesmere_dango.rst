@@ -61,7 +61,6 @@ Log in to psql with the new user and geo enable the new database::
 
         $ psql -U ellesmere -W 'password'
         ellesmere=# CREATE EXTENSION postgis;
-        ellesmere=# CREATE EXTENSION postgis_topology; # done but may be unnecessary
 
 Create Project
 --------------
@@ -97,7 +96,23 @@ Use ``migrate`` to create the tables in new database::
 Install fixtures
 ----------------
 
-With fixtures and sql some initial data can be imported into the database.
+With fixtures and sql some initial data can be imported into the database.::
+
+        (ellesmere) $ python manage.py loaddata location
+        (ellesmere) $ python manage.py loaddata staff
+        (ellesmere) $ python manage.py loaddata tasktype
+
+Run ``mkcollege`` to construct sql for mulitpolygon college location::
+
+        (ellesmere) $ python manage.py mkcollege > caretaking/sql/college.sql
+
+And import::
+
+        $ psql -U ellesmere -d ellesmere -a -f college.sql
+
+Import spreadsheet records (uses csv file in caretaking/data/oct_current.csv)::
+
+        (ellesmere) $ python manage.py importdiary
 
 Stop/stop Postgresql
 --------------------
