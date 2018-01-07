@@ -208,7 +208,7 @@ class Task(models.Model):
 
     def locations(self):
         return Location.objects.filter(
-            polygon__contains=self.point).exclude(name='CollegeBoundary')
+            polygon__intersects=self.point).exclude(name='CollegeBoundary')
 
 class Diary(models.Model):
     """

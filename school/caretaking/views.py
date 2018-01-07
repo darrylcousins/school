@@ -3,7 +3,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 import datetime
 import random
 
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.http.request import QueryDict
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
@@ -48,6 +48,8 @@ class TaskList(ListView):
             self.start_date = self.end_date - datetime.timedelta(days=self.default_range)
 
         self.search_term = self.request.GET.get('q', '')
+        locations = self.request.GET.getlist('loc', [])
+        self.locations = Location.objects.filter(pk__in=locations)
 
         return super(TaskList, self).get(request, *args, **kwargs)
 
@@ -63,6 +65,13 @@ class TaskList(ListView):
 
         # filter by the staff member
         qs = Task.objects.filter(staff=self.staff)
+
+        # filter by selected locations using constructed OR query
+        queries = [Q(point__intersects=loc.polygon) for loc in self.locations]
+        query = queries.pop()
+        for q in queries:
+            query |= q
+        qs = Task.objects.filter(query)
 
         # filter for past range
         qs = qs.filter(completed__lte=self.end_date, completed__gt=self.start_date)
@@ -87,6 +96,10 @@ class TaskList(ListView):
         if self.search_term != '':
             context['search_count'] = self.queryset.count()
             context['search_term'] = self.search_term
+        # exclude CollegePlan and CollegeBoundary
+        context['locations'] = Location.objects.exclude(name__startswith='College')
+        context['selected_locations'] = self.locations
+        context['selected_location_pks'] = self.locations.values_list('pk', flat=True)
         return context
 
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load caretaking_extras %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
@@ -25,11 +26,65 @@
 
     <div class="alert alert-info" role="alert">
         <p>
+        Showing <strong>{{ total_tasks }}</strong> completed tasks between 
+        <strong>{{ start_date|date:"j N Y" }}</strong> and 
+        <strong>{{ end_date|date:"j N Y" }}</strong>.
+        <br>
+        <p>
         Use the form below to change
         the date range.
         </p>
 
-        {% include 'snippet_form.html' %}
+        <form action="." method="get">
+        <!-- date range options -->
+        <div class="input-group" style="width: 75%">
+            <input class="form-control" type="date" required name="start-date"
+                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <input class="form-control" type="date" required name="end-date"
+                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit">Go</button>
+            </div>
+        </div>
+        <br>
+            <label for="location-select">Filter by location:</label>
+            <div class="input-group" style="width: 75%">
+                <select class="form-control" multiple size="5"
+                    id="location-select" name="loc">
+            <option value="24"{% if not selected_location_pks or 24 in selected_location_pks %} selected{% endif %}>
+                        All
+                    </option>
+                    {% for loc in locations %}
+                        <option value="{{ loc.pk }}"{% if loc.pk in selected_location_pks %} selected{% endif %}>
+                            {{ loc.name|convert_camel_case }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        <br>
+            <label for="search-term">Search in the selected range:</label>
+            <div class="input-group" style="width: 75%">
+                <input class="form-control" type="text" placeholder="Search"
+                    onclick="$('#clear-button').removeClass('d-none');"
+                    id="search-term" name="q" value="{{ search_term }}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline{% if not search_term %} d-none{% endif %}"
+                        type="button" id="clear-button"
+                        onclick="$('#search-term').val('');"
+                        >Clear</button>
+                    <button class="btn btn-secondary" type="submit">Go</button>
+                </div>
+            </div>
+            {% if search_count %}
+            <br>
+            <p>
+                <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found containing search 
+            term <strong>{{ search_term }}</strong>.
+            </p>
+            {% endif %}
+        </form>
 
     </div>
 
