@@ -31,3 +31,7 @@ dt.rules_group_header {
     border-left: none !important;
     padding: 0;
 }
+
+td.task-locations > ul.list-unstyled {
+    margin: 0;
+}

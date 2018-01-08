@@ -13,7 +13,6 @@ from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
 
 from caretaking.models import Diary, Staff, Location, Task
-from caretaking.forms import DiaryForm
 
 
 class StaffList(ListView):
@@ -67,11 +66,12 @@ class TaskList(ListView):
         qs = Task.objects.filter(staff=self.staff)
 
         # filter by selected locations using constructed OR query
-        queries = [Q(point__intersects=loc.polygon) for loc in self.locations]
-        query = queries.pop()
-        for q in queries:
-            query |= q
-        qs = Task.objects.filter(query)
+        if self.locations:
+            queries = [Q(point__intersects=loc.polygon) for loc in self.locations]
+            query = queries.pop()
+            for q in queries:
+                query |= q
+            qs = Task.objects.filter(query)
 
         # filter for past range
         qs = qs.filter(completed__lte=self.end_date, completed__gt=self.start_date)

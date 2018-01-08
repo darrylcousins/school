@@ -14,7 +14,8 @@ DOCTESTS = [
         'caretaking.management.type_task',
         'caretaking.management.commands.importdiary',
         'caretaking.views',
-        'caretaking.forms',
+        'caretaking.utils',
+        'caretaking.templatetags.caretaking_extras',
     ]
 
 def setUp(test):
