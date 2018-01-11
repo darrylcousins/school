@@ -14,14 +14,17 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{% block list_title %}Staff{% endblock %}</h2>
-    <ul class="stafflist list-unstyled">
+    <h2>Staff</h2>
+    <ul class="staff-list list-unstyled">
         {% for staff in object_list %}
             <li>
                 <a href="{% url 'staff-detail' staff.user.username %}">{{ staff }}</a> 
             </li>
         {% endfor %}
     </ul>
+
+    <h2>Projects</h2>
+    <p><a href="{% url 'project-list' %}">Projects</a></p>
 
 {% endblock %}
 

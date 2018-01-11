@@ -10,7 +10,7 @@
       <li class="breadcrumb-item">
           <a href="{% url 'caretaking' %}">caretaking</a>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">
+      <li class="breadcrumb-item">
           <a href="{% url 'staff-detail' staff.user.username %}">
               {{ staff.user.username }}</a> 
       </li>
@@ -22,11 +22,18 @@
 {% endblock %}
 
 {% block content %}
+    <div class="float-right">
+        <a href="{% url 'task-add' staff.user.username %}" class="action">
+        <i class="fa fa-plus-circle"></i>
+        <span class="sr-only">Add a task<span>
+        </a>
+    </div>
+
     <h2>Tasks: {{ staff }}</h2>
 
     <div class="alert alert-info" role="alert">
         <p>
-        Showing <strong>{{ total_tasks }}</strong> completed tasks between 
+        Showing <strong>{{ total_tasks }}</strong> completed task{{ total_tasks|pluralize }} between 
         <strong>{{ start_date|date:"j N Y" }}</strong> and 
         <strong>{{ end_date|date:"j N Y" }}</strong>.
         <br>
@@ -49,9 +56,23 @@
             </div>
         </div>
         <br>
+            <label for="search-term">Search in the selected range:</label>
+            <div class="input-group" style="width: 75%">
+                <input class="form-control" type="text" placeholder="Search"
+                    onclick="$('#clear-button').removeClass('d-none');"
+                    id="search-term" name="q" value="{{ search_phrase }}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
+                        type="button" id="clear-button"
+                        onclick="$('#search-term').val('');"
+                        >Clear</button>
+                    <button class="btn btn-secondary" type="submit">Go</button>
+                </div>
+            </div>
+        <br>
             <label for="location-select">Filter by location:</label>
             <div class="input-group" style="width: 75%">
-                <select class="form-control" multiple size="5"
+                <select class="form-control" multiple size="3"
                     id="location-select" name="loc">
             <option value="24"{% if not selected_location_pks or 24 in selected_location_pks %} selected{% endif %}>
                         All
@@ -63,26 +84,12 @@
                     {% endfor %}
                 </select>
             </div>
-        <br>
-            <label for="search-term">Search in the selected range:</label>
-            <div class="input-group" style="width: 75%">
-                <input class="form-control" type="text" placeholder="Search"
-                    onclick="$('#clear-button').removeClass('d-none');"
-                    id="search-term" name="q" value="{{ search_term }}">
-                <div class="input-group-append">
-                    <button class="btn btn-outline{% if not search_term %} d-none{% endif %}"
-                        type="button" id="clear-button"
-                        onclick="$('#search-term').val('');"
-                        >Clear</button>
-                    <button class="btn btn-secondary" type="submit">Go</button>
-                </div>
-            </div>
-            {% if search_count %}
             <br>
-            <p>
-                <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found containing search 
-            term <strong>{{ search_term }}</strong>.
-            </p>
+            {% if search_count %}
+                <p>
+                    <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
+                phrase <strong>{{ search_phrase }}</strong>.
+                </p>
             {% endif %}
         </form>
 
@@ -97,7 +104,12 @@
         {% for task in object_list %}
             <tr>
                 <td class="task-date">{{ task.completed|date:"j N Y" }}</td>
-                <td class="task-description">{{ task.description }}</td>
+                <td class="task-description">
+                    {{ task.description }}
+                    {% if task.comment %}
+                    <br><span class="small text-muted">{{ task.comment }}</span>
+                    {% endif %}
+                </td>
                 <td class="task-locations">
                     <ul class="list-unstyled">
                     {% for loc in task.locations %}
@@ -116,14 +128,18 @@
     {% if search_count %}
     <script>
         $(document).ready(function() {
-            var search_term = "{{ search_term }}";
-            $('td.task-description').each(function() {
-                t = $(this).text();
-                if (t.indexOf(search_term) > -1) {
-                    res = t.replace(search_term, 
-                            '<strong class="bg-warning">' + search_term + '</strong>');
-                    $(this).html(res);
-                }
+            var search_terms = "{{ search_words }}".split(' ');
+            console.log(search_terms);
+            search_terms.forEach(function(search_term) {
+                $('td.task-description').each(function() {
+                    t = $(this).html();
+                    console.log(t + 'term: ' + search_term);
+                    if (t.indexOf(search_term) > -1) {
+                        res = t.replace(search_term, 
+                                '<strong class="bg-warning">' + search_term + '</strong>');
+                        $(this).html(res);
+                    }
+                });
             });
         });
     </script>

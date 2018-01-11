@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          projects
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <div class="float-right">
+        <a href="{% url 'project-add' %}" class="action">
+        <i class="fa fa-plus-circle"></i>
+        <span class="sr-only">Add project<span>
+        </a>
+    </div>
+    <h2>{% block list_title %}Projects{% endblock %}</h2>
+    <ul class="project-list list-unstyled">
+        {% for project in object_list %}
+            <li>
+                <a href="#">{{ project }}</a> 
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+
+

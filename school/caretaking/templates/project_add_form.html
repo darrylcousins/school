@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'project-list' %}">projects</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          add
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <h2>{% block list_title %}Add Project{% endblock %}</h2>
+
+
+    <form action="" method="post" novalidate>
+        {% include 'snippet_form_start.html' %}
+        {% for field in form.visible_fields %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endfor %}
+        <button class="btn btn-success" type="submit">
+        <i class="fa fa-check"></i> Save
+        </button>
+    </form>
+{% endblock %}
+
+
+

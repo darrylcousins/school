@@ -8,16 +8,57 @@ from django.http.request import QueryDict
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views.generic import DetailView
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import UpdateView
 from django.views.generic.dates import DateDetailView
 from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from caretaking.models import Diary, Staff, Location, Task
+from caretaking.models import Diary, Staff
+from caretaking.models import Location, Task, Project
+from caretaking.utils import QueryBuilder
+
+### Staff views
+class StaffRequiredMixin(LoginRequiredMixin):
+    """Mixin to provide staff user for view. TODO raise Unauthenticated or similar.
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super(LoginRequiredMixin, self).get_context_data(**kwargs)
+        self.user = self.request.user
+        self.staff = get_object_or_404(Staff, user=self.user)
+        context['staff'] = self.staff
+        return context
 
 
-class StaffList(ListView):
+class StaffList(StaffRequiredMixin, ListView):
     model = Staff
     template_name = 'staff_list.html'
+
+
+### Project views
+class ProjectList(StaffRequiredMixin, ListView):
+    model = Project
+    template_name = 'project_list.html'
+
+
+class ProjectAdd(StaffRequiredMixin, CreateView):
+    model = Project
+    template_name = 'project_add_form.html'
+    fields = ['name', 'description', 'comment', 'tasks']
+
+
+### Task views
+class TaskAdd(StaffRequiredMixin, CreateView):
+    model = Task
+    template_name = 'task_add_form.html'
+    fields = ['completed', 'urgency', 'staff', 'description', 'comment', 'point']
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskAdd, self).get_context_data(**kwargs)
+        context['today'] = datetime.datetime.today()
+        return context
 
 
 class TaskList(ListView):
@@ -27,7 +68,8 @@ class TaskList(ListView):
     end_date = None
     start_date = None
     default_range = 7 # 7 days
-    search_term = ''
+    search_phrase = ''
+    qb = None
 
     def get(self, request, *args, **kwargs):
         """Insert logic here before ``get_queryset`` and ``get_context_data are called.
@@ -46,7 +88,7 @@ class TaskList(ListView):
             self.end_date = datetime.datetime.today()
             self.start_date = self.end_date - datetime.timedelta(days=self.default_range)
 
-        self.search_term = self.request.GET.get('q', '')
+        self.search_phrase = self.request.GET.get('q', '')
         locations = self.request.GET.getlist('loc', [])
         self.locations = Location.objects.filter(pk__in=locations)
 
@@ -77,9 +119,12 @@ class TaskList(ListView):
         qs = qs.filter(completed__lte=self.end_date, completed__gt=self.start_date)
 
         # filter for search term
-        if self.search_term != '':
-            qs = qs.filter(
-                    description__contains=self.search_term)
+        if self.search_phrase != '':
+            self.qb = QueryBuilder(self.search_phrase, 'description')
+            self.qb.parse_parts()
+            #qs = qs.filter(
+            #        description__contains=self.search_phrase)
+            qs = qs.filter(self.qb.query)
 
         # order by day
         qs = qs.order_by('-completed')
@@ -93,9 +138,10 @@ class TaskList(ListView):
         context['end_date'] = self.end_date
         context['today'] = datetime.datetime.today()
         context['total_tasks'] = self.queryset.count()
-        if self.search_term != '':
+        if self.search_phrase != '':
             context['search_count'] = self.queryset.count()
-            context['search_term'] = self.search_term
+            context['search_phrase'] = self.search_phrase
+            context['search_words'] = ' '.join(self.qb.words)
         # exclude CollegePlan and CollegeBoundary
         context['locations'] = Location.objects.exclude(name__startswith='College')
         context['selected_locations'] = self.locations
@@ -133,7 +179,7 @@ class StaffDetail(DetailView):
         context['earliest_record'] = Task.objects.filter(staff=self.object).earliest()
 
         context['years'] = []
-        for year in ('2016', '2017'):
+        for year in ('2016', '2017', '2018'):
             start_date = datetime.datetime.strptime(year + "-01-01", "%Y-%m-%d")
             end_date = datetime.datetime.strptime(year + "-12-31", "%Y-%m-%d")
             # filter by the staff member and date range
@@ -149,6 +195,26 @@ class StaffDetail(DetailView):
         return context
 
 
+### Diary views
+class DiaryAdd(StaffRequiredMixin, CreateView):
+    model = Diary
+    template_name = 'diary_add_form.html'
+    fields = ['day', 'hours', 'staff', 'comment']
+
+    def get_context_data(self, **kwargs):
+        context = super(DiaryAdd, self).get_context_data(**kwargs)
+        context['today'] = datetime.datetime.today()
+        latest = Diary.objects.filter(staff=self.staff).latest('day').day
+        context['next_day'] = latest + datetime.timedelta(days=1)
+        return context
+
+
+class DiaryEdit(StaffRequiredMixin, UpdateView):
+    model = Diary
+    template_name = 'diary_edit_form.html'
+    fields = ['day', 'hours', 'staff', 'comment']
+
+
 class DiaryList(ListView):
     template_name = 'diary_list.html'
     context_object_name = 'diary'
@@ -156,7 +222,7 @@ class DiaryList(ListView):
     end_date = None
     start_date = None
     default_range = 7 # 7 days
-    search_term = ''
+    search_phrase = ''
 
     def get(self, request, *args, **kwargs):
         """Insert logic here before ``get_queryset`` and ``get_context_data are called.
@@ -175,7 +241,7 @@ class DiaryList(ListView):
             self.end_date = datetime.datetime.today()
             self.start_date = self.end_date - datetime.timedelta(days=self.default_range)
 
-        self.search_term = self.request.GET.get('q', '')
+        self.search_phrase = self.request.GET.get('q', '')
 
         return super(DiaryList, self).get(request, *args, **kwargs)
 
@@ -213,10 +279,15 @@ class DiaryList(ListView):
         context['total_hours'] = self.queryset.aggregate(total_hours=Sum('hours'))['total_hours']
         task_qs = Task.objects.filter(completed__in=self.queryset.values_list('day', flat=True))
         context['total_tasks'] = task_qs.count()
-        if self.search_term != '':
-            context['search_count'] = task_qs.filter(
-                    description__contains=self.search_term).count()
-            context['search_term'] = self.search_term
+
+        # filter for search term
+        if self.search_phrase != '':
+            qb = QueryBuilder(self.search_phrase, 'description')
+            qb.parse_parts()
+            context['search_count'] = task_qs.filter(qb.query).count()
+            context['search_phrase'] = self.search_phrase
+            context['search_words'] = ' '.join(qb.words)
+
         # get query string to be included in pagination links
         qd = QueryDict(self.request.GET.urlencode(), mutable=True)
         try:

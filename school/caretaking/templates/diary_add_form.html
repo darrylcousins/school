@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'diary-list' staff.user.username %}">diary</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          add
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <h2>{% block list_title %}Add Diary Entry{% endblock %}</h2>
+
+
+    <form action="" method="post" novalidate>
+        {% include 'snippet_form_start.html' %}
+
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <label for="{{ form.day.id_for_label }}">{{ form.day.label }}</label>
+                {% if form.is_bound %}
+                  {% if form.day.errors %}
+                    <input class="form-control is-invalid" type="date" required name="{{ form.day.name }}"
+                         value="{{ form.cleaned_data.day|date:"Y-m-d"}}" id="{{ form.day.id_for_label }}"
+                         min="{{ next_day|date:"Y-m-d"}}" max="">
+                    {% for error in form.day.errors %}
+                      <div class="invalid-feedback">
+                        {{ error }}
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <input class="form-control is-valid" type="date" required name="{{ form.day.name }}"
+                         value="{{ form.cleaned_data.day|date:"Y-m-d"}}" id="{{ form.day.id_for_label }}"
+                         min="{{ next_day|date:"Y-m-d"}}" max="">
+                  {% endif %}
+                {% else %}
+                    <input class="form-control" type="date" required name="{{ form.day.name }}"
+                         value="{% if form.initial.day %}{{ form.initial.day|date:"Y-m-d"}}{% else %}{{ next_day|date:"Y-m-d"}}{% endif %}"
+                         id="{{ form.day.id_for_label }}"
+                         min="{{ next_day|date:"Y-m-d"}}" max="">
+                {% endif %}
+                {% if form.day.help_text %}
+                  <small class="form-text text-muted">
+                    {{ form.day.help_text }}
+                  </small>
+                {% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="{{ form.hours.id_for_label }}">{{ form.hours.label }}</label>
+                {% if form.is_bound %}
+                  {% if form.hours.errors %}
+                    {{ form.hours|add_class:'form-control is-invalid'|attr:'step:0.25' }}
+                    {% for error in form.hours.errors %}
+                      <div class="invalid-feedback">
+                        {{ error }}
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    {{ form.hours|add_class:'form-control is-valid'|attr:'step:0.25' }}
+                  {% endif %}
+                {% else %}
+                    {{ form.hours|add_class:'form-control'|attr:'step:0.25' }}
+                {% endif %}
+                {% if form.hours.help_text %}
+                  <small class="form-text text-muted">
+                    {{ form.hours.help_text }}
+                  </small>
+                {% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {% with field=form.staff %}
+                  <div class="form-group">
+                    {% include 'snippet_form_field.html' %}
+                  </div>
+                {% endwith %}
+            </div>
+        </div>
+
+        {% with field=form.comment %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endwith %}
+
+        {% block tasks %}
+        {% endblock %}
+
+        <div class="btn-group">
+            <button class="btn btn-success" type="submit">
+                <i class="fa fa-check"></i> Save
+            </button>
+            {% block extra_button %}
+                <a role="button" class="btn btn-secondary"
+                     href="{% url 'diary-list' staff.user.username %}">
+                    <i class="fa fa-reply"></i> Cancel
+                </a>
+            {% endblock %}
+        </div>
+    </form>
+{% endblock %}
+
+
+
+

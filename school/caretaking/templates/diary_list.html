@@ -20,6 +20,12 @@
 {% endblock %}
 
 {% block content %}
+    <div class="float-right">
+        <a href="{% url 'diary-add' staff.user.username %}" class="action">
+        <i class="fa fa-plus-circle"></i>
+        <span class="sr-only">Add day to dairy<span>
+        </a>
+    </div>
     <h2>Diary: {{ staff }}</h2>
     <!-- info box -->
     <div class="alert alert-info" role="alert">
@@ -27,7 +33,8 @@
         Showing <strong>{{ days }}</strong> days between 
         <strong>{{ start_date|date:"j N Y" }}</strong> and 
         <strong>{{ end_date|date:"j N Y" }}</strong>.
-        <br>
+        </p>
+        <p>
         Use the form below to change
         the date range.
         </p>
@@ -45,29 +52,33 @@
                 <button class="btn btn-secondary" type="submit">Go</button>
             </div>
         </div>
-        <br>
+
+        <p class="mt-2">
         Search in the selected range:
-            <div class="input-group" style="width: 75%">
-                <input class="form-control" type="text" placeholder="Search"
-                    onclick="$('#clear-button').removeClass('d-none');"
-                    id="search-term" name="q" value="{{ search_term }}">
-                <div class="input-group-append">
-                    <button class="btn btn-outline{% if not search_term %} d-none{% endif %}"
-                        type="button" id="clear-button"
-                        onclick="$('#search-term').val('');"
-                        >Clear</button>
-                    <button class="btn btn-secondary" type="submit">Go</button>
-                </div>
+        </p>
+
+        <div class="input-group" style="width: 75%">
+            <input class="form-control" type="text" placeholder="Search"
+                onclick="$('#clear-button').removeClass('d-none');"
+                id="search-term" name="q" value="{{ search_phrase }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
+                    type="button" id="clear-button"
+                    onclick="$('#search-term').val('');"
+                    >Clear</button>
+                <button class="btn btn-secondary" type="submit">Go</button>
             </div>
-            {% if search_count %}
-            <p><strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found containing search 
-            term <strong>{{ search_term }}</strong>.
+        </div>
+        {% if search_count %}
+            <p>
+                <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
+            phrase <strong>{{ search_phrase }}</strong>.
             </p>
-            {% endif %}
+        {% endif %}
+            
         </form>
 
-        <br>
-        <p><strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
+        <p class="mb-0 mt-1"><strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
         and <strong>{{ total_tasks }} tasks</strong> completed.
         </p>
     </div>
@@ -75,22 +86,26 @@
     {% include 'snippet_pagination.html' %}
 
     <!-- list of days -->
-    <ul class="diarylist list-unstyled">
+    <ul class="diary-list list-unstyled">
         {% for day in diary %}
         <li{% if day.hours == -1 %} class="sr-only"{% endif %}>
             {{ day.total_hours }}
                 <a href="{{ day.get_absolute_url }}">{{ day.day|date:"D j N Y" }}</a> 
                 <span>({{ day.hours }} hrs)</span>
-                <p><em>{{ day.comment }}</em></p>
-                <div class="tasklist">
-                    <ul class="tasklist">
-                    {% for task in day.tasks %}
-                        <li>
-                            <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
-                        </li>
-                    {% endfor %}
-                    </ul>
-                </div>
+                {% if day.comment %}
+                    <p><em>{{ day.comment }}</em></p>
+                {% endif %}
+                {% if day.tasks.count %}
+                    <div class="task-list">
+                        <ul class="task-list">
+                        {% for task in day.tasks %}
+                            <li>
+                                <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
@@ -101,14 +116,18 @@
     {% if search_count %}
     <script>
         $(document).ready(function() {
-            var search_term = "{{ search_term }}";
-            $('ul.tasklist>li').each(function() {
-                t = $(this).text();
-                if (t.indexOf(search_term) > -1) {
-                    res = t.replace(search_term, 
-                            '<strong class="bg-warning">' + search_term + '</strong>');
-                    $(this).html(res);
-                }
+            var search_terms = "{{ search_words }}".split(' ');
+            console.log(search_terms);
+            search_terms.forEach(function(search_term) {
+                $('ul.task-list>li').each(function() {
+                    t = $(this).html();
+                    console.log(t + 'term: ' + search_term);
+                    if (t.indexOf(search_term) > -1) {
+                        res = t.replace(search_term, 
+                                '<strong class="bg-warning">' + search_term + '</strong>');
+                        $(this).html(res);
+                    }
+                });
             });
         });
     </script>

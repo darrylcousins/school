@@ -47,10 +47,10 @@
     <h3>Links</h3>
     <ul class="stafflist list-unstyled">
         <li>
-            <a href="{% url 'staff-diary-list' staff.user.username %}">Diary</a> 
+            <a href="{% url 'diary-list' staff.user.username %}">Diary</a> 
         </li>
         <li>
-            <a href="{% url 'staff-task-list' staff.user.username %}">Tasks</a> 
+            <a href="{% url 'task-list' staff.user.username %}">Tasks</a> 
         </li>
     </ul>
 {% endblock %}

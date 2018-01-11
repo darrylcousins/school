@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% comment %}
+{% block extra_js %}{{ form.media }}{% endblock extra_js %}
+{% endcomment %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-detail' staff.user.username %}">
+              {{ staff.user.username }}</a> 
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'task-list' staff.user.username %}">tasks</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          add
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <h2>{% block list_title %}Add Task{% endblock %}</h2>
+
+
+    <form action="" method="post" novalidate>
+        {% include 'snippet_form_start.html' %}
+
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+              {% with field=form.staff %}
+                {% include 'snippet_form_field.html' %}
+              {% endwith %}
+            </div>
+            <div class="col-md-4 mb-3">
+              {% with field=form.urgency %}
+                {% include 'snippet_form_field.html' %}
+              {% endwith %}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="{{ form.completed.id_for_label }}">{{ form.completed.label }}</label>
+                {% if form.is_bound %}
+                  {% if form.completed.errors %}
+                    <input class="form-control is-invalid" type="date" name="{{ form.completed.name }}"
+                         value="{{ form.cleaned_data.completed|date:"Y-m-d"}}" 
+                         id="{{ form.completed.id_for_label }}">
+                    {% for error in form.completed.errors %}
+                      <div class="invalid-feedback">
+                        {{ error }}
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <input class="form-control is-valid" type="date" name="{{ form.completed.name }}"
+                         value="{{ form.cleaned_data.completed|date:"Y-m-d"}}" 
+                         id="{{ form.completed.id_for_label }}">
+                  {% endif %}
+                {% else %}
+                    <input class="form-control" type="date" name="{{ form.completed.name }}"
+                         value="{{ today|date:"Y-m-d"}}" 
+                         id="{{ form.completed.id_for_label }}">
+                {% endif %}
+                {% if form.completed.help_text %}
+                  <small class="form-text text-muted">
+                    {{ form.completed.help_text }}
+                  </small>
+                {% endif %}
+            </div>
+        </div>
+
+        {% with field=form.description %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endwith %}
+
+        {% with field=form.comment %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endwith %}
+
+{% comment %}
+        {% with field=form.point %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endwith %}
+{% endcomment %}
+
+        <button class="btn btn-success" type="submit">
+        <i class="fa fa-check"></i> Save
+        </button>
+
+    </form>
+{% endblock %}
+
+
+
+

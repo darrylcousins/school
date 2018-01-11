@@ -212,7 +212,7 @@ DJANGO_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    'floppyforms',
+    'widget_tweaks',
 
     # ellesmere.school apps
     'caretaking',

@@ -261,19 +261,25 @@ class Diary(models.Model):
     class Meta:
         verbose_name = 'Diary'
         verbose_name_plural = 'Diaries'
+        unique_together = ('day', 'staff')
 
     def __str__(self):
         "Returns the day and staff member name."
         return '%s %s' % (self.day.strftime("%a %d %b %Y"), self.staff)
 
-    def get_absolute_url(self):
-        kwargs = {
+    def get_url_kwargs(self):
+        return {
                 'pk': str(self.diaryid),
                 'year': self.day.strftime('%Y'),
                 'month': self.day.strftime('%b'),
                 'day': self.day.strftime('%d'),
         }
-        return reverse('diary-detail', kwargs=kwargs)
+
+    def get_absolute_url(self):
+        return reverse('diary-detail', kwargs=self.get_url_kwargs())
+
+    def get_edit_url(self):
+        return reverse('diary-edit', kwargs=self.get_url_kwargs())
 
     @property
     def tasks(self):
@@ -336,6 +342,12 @@ class Project(models.Model):
     projectid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
+    #created_by = models.ForeignKey(
+    #    'Staff',
+    #    on_delete=models.DO_NOTHING)
+    #assigned_to = models.ForeignKey(
+    #    'Staff',
+    #    on_delete=models.DO_NOTHING)
     comment = models.TextField(blank=True, null=True)
     tasks = models.ManyToManyField(
         'Task',

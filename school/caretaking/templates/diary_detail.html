@@ -27,10 +27,13 @@
           <a href="/">home</a>
       </li>
       <li class="breadcrumb-item">
-          <a href="{% url 'staff-list' %}">diaries</a>
+          <a href="{% url 'staff-list' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item">
-          <a href="{% url 'staff-diary-list' staff.user.username %}">{{ staff.user.username }}</a>
+          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'diary-list' staff.user.username %}">diary</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
           {{ diary.day|date:"D j N Y" }}
@@ -40,18 +43,27 @@
 {% endblock %}
 
 {% block content %}
-<h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
-    <a class="no-underline" href="{% url 'staff-diary-list' staff.user.username %}">
+
+    <div class="float-right">
+        <a href="{{ diary.get_edit_url}}" class="action">
+        <i class="fa fa-edit"></i>
+        <span class="sr-only">Edit diary entry<span>
+        </a>
+    </div>
+
+    <h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
         {{ staff.user.first_name }} {{ staff.user.last_name }} ({{ staff.title }})
-    </a>
-    {% endblock %}</h2>
+    {% endblock %}
+    </h2>
+
 <p class="comment"><strong>{{ diary.hours }}&nbsp;hrs:</strong>&nbsp;<em>{{ diary.comment }}</em></p>
 
 <ul class="pagination">
 {% if previous %}
     <li class="page-item">
         <a href="{{ previous.get_absolute_url }}" class="page-link">
-            <span>&laquo;&nbsp;</span>{{ previous.day|date:"D j N Y" }}</a>
+        <i class="fas fa-caret-square-left mr-2"></i>
+            {{ previous.day|date:"D j N Y" }}</a>
     </li>
 {% endif %}
     <li class="page-item disabled">
@@ -60,10 +72,13 @@
 {% if next %}
     <li class="page-item">
         <a href="{{ next.get_absolute_url }}" class="page-link">
-            {{ next.day|date:"D j N Y" }}<span>&nbsp;&raquo;</span></a>
+            {{ next.day|date:"D j N Y" }}
+            <i class="fas fa-caret-square-right ml-2"></i>
+        </a>
     </li>
 {% endif %}
 </ul>
+
 <span id="diary_span_map">
     <div id="diary_map"></div>
     <script type="text/javascript">
@@ -145,8 +160,8 @@
     }; // end onload
     </script>
 
-    <div class="tasklist">
-        <ul class="tasklist">
+    <div class="task-list">
+        <ul class="task-list">
         {% for task in diary.tasks %}
             <li>
                 <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>

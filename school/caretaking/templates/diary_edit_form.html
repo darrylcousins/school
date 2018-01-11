@@ -1,0 +1,55 @@
+{% extends "diary_add_form.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'diary-list' staff.user.username %}">diary</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{{ object.get_absolute_url }}">{{ object.day|date:"D j N Y" }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          edit
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block actions %}
+    <div class="float-right">
+        <a href="{{ object.get_absolute_url }}" class="action">
+        <i class="fa fa-reply"></i>
+        <span class="sr-only">Back to diary entry<span>
+        </a>
+    </div>
+{% endblock %}
+
+{% block list_title %}Edit Diary Entry{% endblock %}
+
+{% block tasks %}
+    <div class="task-list">
+        <ul class="task-list">
+        {% for task in object.tasks %}
+            <li>
+                <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block extra_button %}
+    <button class="btn btn-secondary" type="cancel">
+        <i class="fa fa-reply"></i> Cancel
+    </button>
+{% endblock %}

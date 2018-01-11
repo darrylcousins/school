@@ -1,37 +1,39 @@
 /*! project specific CSS goes here. */
 body {
     font-family: 'Raleway', sans-serif;
-    padding-top: 40px; /* 60px to make the container go all the way to the bottom of the topbar */
+    padding-top: 10px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 h1, h2 {
     margin-bottom: 1rem;
 }
+textarea {
+    height: 5rem;
+}
+ul.diary-list > li > a {
+    font-weight: bold;
+}
+ul.diary-list > li {
+    padding-bottom: 1em;
+    border-bottom: 1px solid #aaa;
+}
+ul.diary-list li a {
+    color: inherit;
+}
+ul.task-list {
+}
+ul.task-list li a {
+    color: inherit;
+}
 div.container {
     width: 960px;
 }
-ul.diarylist>li>a {
-    font-weight: bold;
+a.action > i.fa {
+    color:#ac0000;
+    font-size:1.5rem;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.5);
+    padding: 0 5px;
 }
-ul.diarylist li a {
-    color: inherit;
-}
-ul.tasklist {
-    padding-bottom: 1.5em;
-    border-bottom: 1px solid #aaa;
-}
-ul.tasklist>li>a {
-    color: inherit;
-}
-
-/* Over rides to bs_grid and jui_filter_rules */
-dt.rules_group_header {
-    display: none;
-}
-.rules_list {
-    border-left: none !important;
-    padding: 0;
-}
-
-td.task-locations > ul.list-unstyled {
-    margin: 0;
+a.page-link > i.fas {
+    color:#4444ee;
+    text-shadow:1px 1px 2px rgba(0,0,0,0.5);
 }
