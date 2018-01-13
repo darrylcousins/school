@@ -16,6 +16,9 @@ from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from wordcloud import WordCloud, STOPWORDS
+from matplotlib import pyplot
+
 from caretaking.models import Diary, Staff
 from caretaking.models import Location, Task, Project
 from caretaking.utils import QueryBuilder
@@ -319,6 +322,37 @@ class DiaryList(ListView):
             context['search_count'] = task_qs.filter(qb.query).count()
             context['search_phrase'] = self.search_phrase
             context['search_words'] = ' '.join(qb.words)
+
+        # create word cloud from task descriptions
+        words = ' '.join(task_qs.values_list('description', flat=True)).lower()
+        stopwords = set(STOPWORDS)
+        stopwords.add('block')
+
+        # fonts and colours
+        from palettable.colorbrewer import sequential
+        def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+            return tuple(sequential.PuBuGn_9.colors[random.randint(2,8)])
+        font_path = 'C:\Windows\Fonts\Candara.ttf'
+
+        cloud = WordCloud(background_color='white', stopwords=stopwords,
+                width=960, height=100, max_font_size=50, min_font_size=2,
+                font_path=font_path, max_words=300)
+        cloud.generate(words)
+        cloud.recolor(color_func=color_func, random_state=3)
+        img = cloud.to_image()
+
+        import base64
+        from io import BytesIO
+
+        in_mem_file = BytesIO()
+        img.save(in_mem_file, format="PNG")
+        img_bytes = in_mem_file.getvalue()
+        result_bytes = base64.b64encode(img_bytes)
+        result_str = result_bytes.decode('ascii')
+        context['wordcloud'] = 'data:image/png;base64,' + result_str
+
+        #pyplot.imshow(cloud, interpolation='bilinear')
+        #pyplot.axis('off')
 
         # get query string to be included in pagination links
         qd = QueryDict(self.request.GET.urlencode(), mutable=True)

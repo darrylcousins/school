@@ -32,6 +32,7 @@ Install packages::
 
         (ellesmere)$ pip install -U django
         (ellesmere)$ pip install -U matplotlib
+        (ellesmere)$ pip install -U palettable
 
 Note that packages can also be installed using conda e.g.::
 
