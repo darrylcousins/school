@@ -4,6 +4,7 @@ import datetime
 import random
 
 from django.db.models import Sum, Count, Q
+from django.http import JsonResponse
 from django.http.request import QueryDict
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
@@ -19,7 +20,34 @@ from caretaking.models import Diary, Staff
 from caretaking.models import Location, Task, Project
 from caretaking.utils import QueryBuilder
 
-### Staff views
+
+### Mixins
+class AjaxableResponseMixin:
+    """
+    Mixin to add AJAX support to a form.
+    Must be used with an object-based FormView (e.g. CreateView)
+    """
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        if self.request.is_ajax():
+            return JsonResponse(form.errors, status=400)
+        else:
+            return response
+
+    def form_valid(self, form):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).
+        response = super().form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return JsonResponse(data)
+        else:
+            return response
+
+
 class StaffRequiredMixin(LoginRequiredMixin):
     """Mixin to provide staff user for view. TODO raise Unauthenticated or similar.
     """
@@ -32,6 +60,7 @@ class StaffRequiredMixin(LoginRequiredMixin):
         return context
 
 
+### Staff views
 class StaffList(StaffRequiredMixin, ListView):
     model = Staff
     template_name = 'staff_list.html'
@@ -176,7 +205,10 @@ class StaffDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(StaffDetail, self).get_context_data(**kwargs)
-        context['earliest_record'] = Task.objects.filter(staff=self.object).earliest()
+        try:
+            context['earliest_record'] = Task.objects.filter(staff=self.object).earliest()
+        except Task.DoesNotExist:
+            pass
 
         context['years'] = []
         for year in ('2016', '2017', '2018'):

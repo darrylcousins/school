@@ -4,7 +4,6 @@ from caretaking.models import Location
 from caretaking.admin import get_wkt
 
 SQL = """
-USE ellesmere;
 DELETE FROM caretaking_location WHERE locationid=88;
 INSERT INTO caretaking_location(locationid, name, polygon) VALUES(88, 'CollegePlan', ST_GeomFromText('MULTIPOLYGON(%s)', 4326));
 """

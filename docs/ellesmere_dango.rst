@@ -25,6 +25,22 @@ Deactivate with::
 
         (ellesmere)$ deactivate
 
+Packages
+--------
+
+Install packages::
+
+        (ellesmere)$ pip install -U django
+        (ellesmere)$ pip install -U matplotlib
+
+Note that packages can also be installed using conda e.g.::
+
+        (ellesmere)$ conda install -c conda-forge wordcloud
+
+Note: I had a fair bit of trouble installing ``wordcloud`` because win32/python3.6 conda package
+not available. Finally managed with a pip install which then meant installing C++ build tools and
+copying files to make it all come together.
+
 GeoDjango
 ---------
 
@@ -89,6 +105,10 @@ Now we can start the server without connection errors::
 Create tables
 -------------
 
+If we have changed model definitions then new migrations need to be created::
+
+        (ellesmere) $ python manage.py makemigrations caretaking
+
 Use ``migrate`` to create the tables in new database::
 
         (ellesmere) $ python manage.py migrate
@@ -102,7 +122,18 @@ With fixtures and sql some initial data can be imported into the database.::
         (ellesmere) $ python manage.py loaddata staff
         (ellesmere) $ python manage.py loaddata tasktype
 
-Run ``mkcollege`` to construct sql for mulitpolygon college location::
+Or create superuser a staff member::
+
+        (ellesmere) $ python manage.py createsuperuser
+
+College Multipolygon
+--------------------
+
+This is the multipolygon mapped onto maps to identify school. If the location fixture is up to date
+then the following steps will not be necessary.
+
+Run ``mkcollege`` to construct sql for mulitpolygon college location (only necessary if the polygon
+locations have changed)::
 
         (ellesmere) $ python manage.py mkcollege > caretaking/sql/college.sql
 
@@ -119,8 +150,7 @@ Stop/stop Postgresql
 
 The server Ellesmere for example::
 
-    $ net start|stop 'SQL Server (ELLESMERE)'
-    $ net start|stop 'SQL Server (METREL)'
+    $ TODO
 
 Grepping the powershell way
 ---------------------------

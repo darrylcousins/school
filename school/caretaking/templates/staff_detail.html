@@ -20,7 +20,11 @@
     <h2>{{ staff }}</h2>
 
     <p>
+    {% if earliest_record %}
     Recording since {{ earliest_record.completed|date:"j N Y" }}.
+    {% else %}
+    No diary entries recorded for {{ staff }}.
+    {% endif %}
     </p>
     <p>
     {{ staff.comment }}

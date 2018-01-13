@@ -34,17 +34,18 @@
     </div>
 {% endblock %}
 
-{% block list_title %}Edit Diary Entry{% endblock %}
+{% block list_title %}Edit Diary Entry: {{ object.day|date:"D j N Y" }}{% endblock %}
 
 {% block tasks %}
     <div class="task-list">
         <ul class="task-list">
         {% for task in object.tasks %}
-            <li>
-                <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+        <li contenteditable="true" data-id="{{ task.pk }}">
+                {{ task.description }}
             </li>
         {% endfor %}
         </ul>
+        <div id="debug"></div>
     </div>
 {% endblock %}
 
@@ -53,3 +54,43 @@
         <i class="fa fa-reply"></i> Cancel
     </button>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('keydown', function (event) {
+  var esc = event.which == 27,
+      nl = event.which == 13,
+      el = event.target,
+      input = el.nodeName != 'INPUT' && el.nodeName != 'TEXTAREA',
+      data = {};
+
+  if (input) {
+    if (esc) {
+      // restore state
+      document.execCommand('undo');
+      el.blur();
+    } else if (nl) {
+      // save
+      data[el.getAttribute('data-id')] = el.innerHTML;
+
+      // we could send an ajax request to update the field
+      /*
+      $.ajax({
+        url: window.location.toString(),
+        data: data,
+        type: 'post'
+      });
+      */
+      log(JSON.stringify(data));
+
+      el.blur();
+      event.preventDefault();
+    }
+  }
+}, true);
+
+function log(s) {
+  document.getElementById('debug').innerHTML = 'value changed to: ' + s;
+}
+</script>
+{% endblock extra_js %}

@@ -61,7 +61,6 @@ class Location(models.Model):
         SRID=4326;POINT (2.333333333333334 1.666666666666667)
 
     """
-    # TODO constrain polygon to polygon geometry
     locationid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     polygon = GeometryField()
@@ -251,8 +250,8 @@ class Diary(models.Model):
 
     """
     diaryid = models.AutoField(primary_key=True)
-    day = models.DateField()
-    hours = models.FloatField()
+    day = models.DateField() # the day of this diary entry
+    hours = models.FloatField() # number of hours worked
     staff = models.ForeignKey(
         'Staff',
         on_delete=models.DO_NOTHING)
@@ -261,7 +260,7 @@ class Diary(models.Model):
     class Meta:
         verbose_name = 'Diary'
         verbose_name_plural = 'Diaries'
-        unique_together = ('day', 'staff')
+        unique_together = ('day', 'staff') # one diary entry per staff member
 
     def __str__(self):
         "Returns the day and staff member name."
@@ -283,8 +282,9 @@ class Diary(models.Model):
 
     @property
     def tasks(self):
-        """Return iterable of tasks completed on this day"""
-        return Task.objects.filter(completed=self.day)
+        """Return iterable of tasks completed on this day by this staff
+        """
+        return Task.objects.filter(completed=self.day).filter(staff__in=[self.staff])
 
     def points(self, spread=True):
         """Return iterable of points of work on this day using points from tasks
@@ -335,19 +335,20 @@ class Diary(models.Model):
 
 class Project(models.Model):
     """
-    A project. Will be made up of a nuber of tasks.
+    A project. Will be made up of a number of tasks.
 
 
     """
     projectid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
-    #created_by = models.ForeignKey(
-    #    'Staff',
-    #    on_delete=models.DO_NOTHING)
-    #assigned_to = models.ForeignKey(
-    #    'Staff',
-    #    on_delete=models.DO_NOTHING)
+    created_by = models.ForeignKey(
+        'Staff',
+        related_name='+', # don't create a backwards set
+        on_delete=models.CASCADE)
+    assigned_to = models.ForeignKey(
+        'Staff',
+        on_delete=models.CASCADE)
     comment = models.TextField(blank=True, null=True)
     tasks = models.ManyToManyField(
         'Task',
