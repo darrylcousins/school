@@ -1,0 +1,40 @@
+{% extends "task_add_form.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'caretaking' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'task-list' staff.user.username %}">tasks</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          edit
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block actions %}
+    <div class="float-right">
+        <a href="{% url 'task-list' staff.user.username %}" class="action">
+        <i class="fa fa-reply"></i>
+        <span class="sr-only">Back to task list<span>
+        </a>
+    </div>
+{% endblock %}
+
+{% block list_title %}Edit Task{% endblock %}
+
+{% block extra_button %}
+    <button class="btn btn-secondary" type="cancel">
+        <i class="fa fa-reply"></i> Cancel
+    </button>
+{% endblock %}

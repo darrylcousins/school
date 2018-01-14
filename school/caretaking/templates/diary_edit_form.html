@@ -37,12 +37,28 @@
 {% block list_title %}Edit Diary Entry: {{ object.day|date:"D j N Y" }}{% endblock %}
 
 {% block tasks %}
+    <hr>
     <div class="task-list">
+        <div class="float-right">
+            <a href="{% url 'task-add' staff.user.username %}" class="action small">
+            <i class="fa fa-plus-circle"></i>
+            <span class="sr-only">Add task to dairy entry<span>
+            </a>
+        </div>
+        <h4>Edit task descriptions:</h4>
         <ul class="task-list">
         {% for task in object.tasks %}
-        <li contenteditable="true" data-id="{{ task.pk }}">
-                {{ task.description }}
-            </li>
+        <li>
+        <span contenteditable="true" 
+            data-pk="{{ task.pk }}"
+            data-url="{% url 'task-edit' staff.user.username task.pk %}"
+            data-staff="{{ task.staff.first.pk }}"
+            data-completed="{{ task.completed|date:'Y-m-d' }}"
+            data-urgency="{{ task.urgency }}"
+            >
+            {{ task.description }}
+            </span>
+          </li>
         {% endfor %}
         </ul>
         <div id="debug"></div>
@@ -70,18 +86,27 @@ document.addEventListener('keydown', function (event) {
       document.execCommand('undo');
       el.blur();
     } else if (nl) {
-      // save
-      data[el.getAttribute('data-id')] = el.innerHTML;
+      data['pk'] = el.getAttribute('data-pk');
+      data['description'] = $.trim(el.innerHTML);
+      data['staff'] = el.getAttribute('data-staff');
+      data['urgency'] = el.getAttribute('data-urgency');
+      data['completed'] = el.getAttribute('data-completed');
+      url = el.getAttribute('data-url');
+      data['csrfmiddlewaretoken'] = $( "input[name='csrfmiddlewaretoken']" ).val();
 
-      // we could send an ajax request to update the field
-      /*
+      // send an ajax request to update the field
       $.ajax({
-        url: window.location.toString(),
+        url: url,
         data: data,
-        type: 'post'
+        type: 'post',
+        success: function(data) {
+          changed_el = $("span[data-pk='" + data['pk'] + "']").first();
+          changed_el.append('<i class="fa fa-check ml-3 text-success"></i>');
+        },
+        error: function(e) {
+	      log(e);
+        }
       });
-      */
-      log(JSON.stringify(data));
 
       el.blur();
       event.preventDefault();
@@ -90,7 +115,7 @@ document.addEventListener('keydown', function (event) {
 }, true);
 
 function log(s) {
-  document.getElementById('debug').innerHTML = 'value changed to: ' + s;
+  document.getElementById('debug').innerHTML = s;
 }
 </script>
 {% endblock extra_js %}

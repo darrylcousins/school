@@ -2,6 +2,8 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import datetime
 import random
+import base64
+from io import BytesIO
 
 from django.db.models import Sum, Count, Q
 from django.http import JsonResponse
@@ -18,36 +20,45 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from wordcloud import WordCloud, STOPWORDS
 from matplotlib import pyplot
+from palettable.colorbrewer import sequential
 
 from caretaking.models import Diary, Staff
 from caretaking.models import Location, Task, Project
 from caretaking.utils import QueryBuilder
 
+FONT_PATH = 'C:\Windows\Fonts\Candara.ttf'
+
+### Utils
+def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+    """fonts and colours for wordcloud"""
+    return tuple(sequential.PuBuGn_9.colors[random.randint(2,8)])
 
 ### Mixins
-class AjaxableResponseMixin:
+class AjaxResponseMixin:
     """
     Mixin to add AJAX support to a form.
     Must be used with an object-based FormView (e.g. CreateView)
     """
     def form_invalid(self, form):
-        response = super().form_invalid(form)
         if self.request.is_ajax():
             return JsonResponse(form.errors, status=400)
         else:
+            response = super().form_invalid(form)
             return response
 
     def form_valid(self, form):
         # We make sure to call the parent's form_valid() method because
         # it might do some processing (in the case of CreateView, it will
         # call form.save() for example).
-        response = super().form_valid(form)
+        self.object = form.save()
         if self.request.is_ajax():
             data = {
                 'pk': self.object.pk,
             }
+            print('SUCCESS', data)
             return JsonResponse(data)
         else:
+            response = super().form_valid(form)
             return response
 
 
@@ -85,12 +96,18 @@ class ProjectAdd(StaffRequiredMixin, CreateView):
 class TaskAdd(StaffRequiredMixin, CreateView):
     model = Task
     template_name = 'task_add_form.html'
-    fields = ['completed', 'urgency', 'staff', 'description', 'comment', 'point']
+    fields = ['completed', 'urgency', 'staff', 'description']
 
     def get_context_data(self, **kwargs):
         context = super(TaskAdd, self).get_context_data(**kwargs)
         context['today'] = datetime.datetime.today()
         return context
+
+
+class TaskEdit(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
+    model = Task
+    template_name = 'task_edit_form.html'
+    fields = ['completed', 'urgency', 'staff', 'description']
 
 
 class TaskList(ListView):
@@ -328,21 +345,12 @@ class DiaryList(ListView):
         stopwords = set(STOPWORDS)
         stopwords.add('block')
 
-        # fonts and colours
-        from palettable.colorbrewer import sequential
-        def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
-            return tuple(sequential.PuBuGn_9.colors[random.randint(2,8)])
-        font_path = 'C:\Windows\Fonts\Candara.ttf'
-
         cloud = WordCloud(background_color='white', stopwords=stopwords,
                 width=960, height=100, max_font_size=50, min_font_size=2,
-                font_path=font_path, max_words=300)
+                font_path=FONT_PATH, max_words=300, prefer_horizontal=0.8)
         cloud.generate(words)
         cloud.recolor(color_func=color_func, random_state=3)
         img = cloud.to_image()
-
-        import base64
-        from io import BytesIO
 
         in_mem_file = BytesIO()
         img.save(in_mem_file, format="PNG")
@@ -351,10 +359,7 @@ class DiaryList(ListView):
         result_str = result_bytes.decode('ascii')
         context['wordcloud'] = 'data:image/png;base64,' + result_str
 
-        #pyplot.imshow(cloud, interpolation='bilinear')
-        #pyplot.axis('off')
-
-        # get query string to be included in pagination links
+        # query string to be included in pagination links
         qd = QueryDict(self.request.GET.urlencode(), mutable=True)
         try:
             qd.pop('page')

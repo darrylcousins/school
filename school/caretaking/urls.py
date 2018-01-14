@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 
 from .views import StaffList, StaffDetail
 from .views import DiaryList, DiaryDetail, DiaryAdd, DiaryEdit
-from .views import TaskList, TaskAdd
+from .views import TaskList, TaskAdd, TaskEdit
 from .views import ProjectList, ProjectAdd
 
 urlpatterns = (
@@ -34,6 +34,9 @@ urlpatterns = (
     path('<str:username>/tasks/add',
         TaskAdd.as_view(),
         name="task-add"),
+    path('<str:username>/tasks/<int:pk>/edit',
+        TaskEdit.as_view(),
+        name="task-edit"),
     path('<str:username>/tasks/',
         TaskList.as_view(),
         name="task-list"),

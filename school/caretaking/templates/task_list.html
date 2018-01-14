@@ -103,7 +103,7 @@
             <th>Locations</th>
         {% for task in object_list %}
             <tr>
-                <td class="task-date">{{ task.completed|date:"j N Y" }}</td>
+                <td class="task-date" nowrap>{{ task.completed|date:"j N Y" }}</td>
                 <td class="task-description">
                     {{ task.description }}
                     {% if task.comment %}
@@ -116,6 +116,12 @@
                     <li class="small">{{ loc}}</li>
                     {% endfor %} 
                     </ul>
+                </td>
+                <td>
+                    <a href="{% url 'task-edit' staff.user.username task.pk %}" class="action small">
+                    <i class="fa fa-edit"></i>
+                    <span class="sr-only">Edit task<span>
+                    </a>
                 </td>
             </tr>
         {% endfor %}

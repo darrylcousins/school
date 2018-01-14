@@ -188,10 +188,12 @@ class Task(models.Model):
     tasktype = models.ManyToManyField(
         'TaskType',
         blank=True)
+    # make FK
     staff = models.ManyToManyField(
         'Staff',
         blank=True)
     point = GeometryField()
+    # remove, not necessary
     comment = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -208,6 +210,7 @@ class Task(models.Model):
     def locations(self):
         return Location.objects.filter(
             polygon__intersects=self.point).exclude(name='CollegeBoundary')
+
 
 class Diary(models.Model):
     """
@@ -284,7 +287,8 @@ class Diary(models.Model):
     def tasks(self):
         """Return iterable of tasks completed on this day by this staff
         """
-        return Task.objects.filter(completed=self.day).filter(staff__in=[self.staff])
+        return Task.objects.filter(completed=self.day).filter(
+            staff__in=[self.staff]).order_by('pk')
 
     def points(self, spread=True):
         """Return iterable of points of work on this day using points from tasks

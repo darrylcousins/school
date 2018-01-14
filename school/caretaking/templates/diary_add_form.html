@@ -97,10 +97,7 @@
           </div>
         {% endwith %}
 
-        {% block tasks %}
-        {% endblock %}
-
-        <div class="btn-group">
+        <div class="btn-group mb-2">
             <button class="btn btn-success" type="submit">
                 <i class="fa fa-check"></i> Save
             </button>
@@ -112,5 +109,9 @@
             {% endblock %}
         </div>
     </form>
+
+        {% block tasks %}
+        {% endblock %}
+
 {% endblock %}
 
