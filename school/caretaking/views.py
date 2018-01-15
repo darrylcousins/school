@@ -3,6 +3,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 import datetime
 import random
 import base64
+import json
 from io import BytesIO
 
 from django.db.models import Sum, Count, Q
@@ -17,6 +18,7 @@ from django.views.generic.dates import DateDetailView
 from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core import serializers
 
 from wordcloud import WordCloud, STOPWORDS
 from matplotlib import pyplot
@@ -25,7 +27,9 @@ from palettable.colorbrewer import sequential
 from caretaking.models import Diary, Staff
 from caretaking.models import Location, Task, Project
 from caretaking.utils import QueryBuilder
+from caretaking.management.locate_task import LocateTask
 
+# path to fonts for wordcloud - TODO move to settings or similar
 FONT_PATH = 'C:\Windows\Fonts\Candara.ttf'
 
 ### Utils
@@ -41,20 +45,22 @@ class AjaxResponseMixin:
     """
     def form_invalid(self, form):
         if self.request.is_ajax():
+            print(form.errors)
             return JsonResponse(form.errors, status=400)
         else:
             response = super().form_invalid(form)
             return response
 
     def form_valid(self, form):
-        # We make sure to call the parent's form_valid() method because
-        # it might do some processing (in the case of CreateView, it will
-        # call form.save() for example).
+        """Serialize object to return as json response"""
         self.object = form.save()
         if self.request.is_ajax():
-            data = {
-                'pk': self.object.pk,
-            }
+            fields = list(form.cleaned_data.keys())
+            if 'pk' not in fields:
+                fields.append('pk')
+            data = json.loads(serializers.serialize('json', 
+                    [self.object],
+                    fields=fields))[0]
             print('SUCCESS', data)
             return JsonResponse(data)
         else:
@@ -93,7 +99,7 @@ class ProjectAdd(StaffRequiredMixin, CreateView):
 
 
 ### Task views
-class TaskAdd(StaffRequiredMixin, CreateView):
+class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
     model = Task
     template_name = 'task_add_form.html'
     fields = ['completed', 'urgency', 'staff', 'description']
@@ -102,6 +108,11 @@ class TaskAdd(StaffRequiredMixin, CreateView):
         context = super(TaskAdd, self).get_context_data(**kwargs)
         context['today'] = datetime.datetime.today()
         return context
+
+    def form_valid(self, form):
+        description = form.cleaned_data['description']
+        form.instance.point = LocateTask(description).points()
+        return super().form_valid(form)
 
 
 class TaskEdit(StaffRequiredMixin, AjaxResponseMixin, UpdateView):

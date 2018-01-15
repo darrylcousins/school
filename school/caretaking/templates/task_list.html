@@ -99,10 +99,16 @@
 
     <table class="table">
         <tr>
-            <th>Date</th><th>Description</th>
+            <th></th><th>Date</th><th>Description</th>
             <th>Locations</th>
         {% for task in object_list %}
             <tr>
+                <td>
+                    <a href="{% url 'task-edit' staff.user.username task.pk %}" class="action small">
+                    <i class="fa fa-pencil-alt"></i>
+                    <span class="sr-only">Edit task<span>
+                    </a>
+                </td>
                 <td class="task-date" nowrap>{{ task.completed|date:"j N Y" }}</td>
                 <td class="task-description">
                     {{ task.description }}
@@ -116,12 +122,6 @@
                     <li class="small">{{ loc}}</li>
                     {% endfor %} 
                     </ul>
-                </td>
-                <td>
-                    <a href="{% url 'task-edit' staff.user.username task.pk %}" class="action small">
-                    <i class="fa fa-edit"></i>
-                    <span class="sr-only">Edit task<span>
-                    </a>
                 </td>
             </tr>
         {% endfor %}

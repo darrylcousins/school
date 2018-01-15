@@ -40,28 +40,55 @@
     <hr>
     <div class="task-list">
         <div class="float-right">
-            <a href="{% url 'task-add' staff.user.username %}" class="action small">
+            <a href="javascript:$('#task-add').removeClass('d-none').addClass('d-inline');" 
+                class="action">
             <i class="fa fa-plus-circle"></i>
             <span class="sr-only">Add task to dairy entry<span>
             </a>
         </div>
-        <h4>Edit task descriptions:</h4>
+
+    <div id="task-add" class="d-none">
+      <form id="task-form" novalidate>
+      <h4>Add task:</h4>
+          {% csrf_token %}
+          <input type="hidden" name="staff" value="{{ object.staff.pk }}" id="task_staff">
+          <input type="hidden" name="urgency" value="high" id="task_urgency">
+          <input type="hidden" name="completed" value="{{ object.day|date:'Y-m-d' }}"
+              id="task_completed">
+          <div class="form-group">
+              <label for="id_description">Description</label>
+              <textarea name="description" cols="40" rows="10" 
+                  class="form-control" required id="task_description"></textarea>
+              <small class="form-text text-muted">
+                Provide a description for the new task.
+              </small>
+          </div>
+          <div class="btn-group mb-2">
+            <button class="btn btn-success" type="submit">
+                <i class="fa fa-check"></i> Save
+            </button>
+            <button class="btn btn-secondary"
+                onclick="$('#task-add').removeClass('d-inline').addClass('d-none');$('#task_description').val('');">
+                <i class="fa fa-reply"></i> Cancel
+            </button>
+          </div>
+      </form>
+    </div>
+
+        <h4 class="mt-2">Edit task descriptions:</h4>
         <ul class="task-list">
         {% for task in object.tasks %}
         <li>
         <span contenteditable="true" 
             data-pk="{{ task.pk }}"
+            data-description="{{ task.description }}"
             data-url="{% url 'task-edit' staff.user.username task.pk %}"
             data-staff="{{ task.staff.first.pk }}"
             data-completed="{{ task.completed|date:'Y-m-d' }}"
-            data-urgency="{{ task.urgency }}"
-            >
-            {{ task.description }}
-            </span>
+            data-urgency="{{ task.urgency }}">{{ task.description }}</span>
           </li>
         {% endfor %}
         </ul>
-        <div id="debug"></div>
     </div>
 {% endblock %}
 
@@ -73,6 +100,31 @@
 
 {% block extra_js %}
 <script>
+$(function(){
+    $('#task-form').on('submit', function(event) {
+      var data = $(this).serializeArray(),
+          url = "{% url 'task-add' object.staff.user.username %}";
+      // send an ajax request to update the field
+      $.ajax({
+        url: url,
+        data: data,
+        type: 'post',
+        success: function(data) {
+          console.log(data);  
+        },
+        error: function(e) {
+          console.log(e);
+        }
+      });
+      event.preventDefault();
+    });
+});
+document.addEventListener('click', function (event) {
+    if (event.target.hasAttribute('contenteditable')) {
+      document.execCommand('selectAll', false, null);
+    };
+}, true);
+
 document.addEventListener('keydown', function (event) {
   var esc = event.which == 27,
       nl = event.which == 13,
@@ -86,36 +138,36 @@ document.addEventListener('keydown', function (event) {
       document.execCommand('undo');
       el.blur();
     } else if (nl) {
-      data['pk'] = el.getAttribute('data-pk');
-      data['description'] = $.trim(el.innerHTML);
-      data['staff'] = el.getAttribute('data-staff');
-      data['urgency'] = el.getAttribute('data-urgency');
-      data['completed'] = el.getAttribute('data-completed');
-      url = el.getAttribute('data-url');
-      data['csrfmiddlewaretoken'] = $( "input[name='csrfmiddlewaretoken']" ).val();
+      description = $.trim(el.innerHTML);
+      if (description != el.getAttribute('data-description')) {
+          data['pk'] = el.getAttribute('data-pk');
+          data['description'] = description;
+          data['staff'] = el.getAttribute('data-staff');
+          data['urgency'] = el.getAttribute('data-urgency');
+          data['completed'] = el.getAttribute('data-completed');
+          url = el.getAttribute('data-url');
+          data['csrfmiddlewaretoken'] = $( "input[name='csrfmiddlewaretoken']" ).val();
 
-      // send an ajax request to update the field
-      $.ajax({
-        url: url,
-        data: data,
-        type: 'post',
-        success: function(data) {
-          changed_el = $("span[data-pk='" + data['pk'] + "']").first();
-          changed_el.append('<i class="fa fa-check ml-3 text-success"></i>');
-        },
-        error: function(e) {
-	      log(e);
-        }
-      });
+          // send an ajax request to update the field
+          $.ajax({
+            url: url,
+            data: data,
+            type: 'post',
+            success: function(data) {
+              changed_el = $("span[data-pk='" + data['pk'] + "']").first();
+              changed_el.parent().append('<i class="fa fa-check ml-3 text-success"></i>');
+            },
+            error: function(e) {
+              console.log(e);
+            }
+          });
+      };
 
       el.blur();
       event.preventDefault();
-    }
-  }
+    };
+  };
 }, true);
 
-function log(s) {
-  document.getElementById('debug').innerHTML = s;
-}
 </script>
 {% endblock extra_js %}

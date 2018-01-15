@@ -92,7 +92,15 @@
     <ul class="diary-list list-unstyled">
         {% for day in diary %}
         <li{% if day.hours == -1 %} class="sr-only"{% endif %}>
+
+            <a href="{{ day.get_edit_url }}"
+                class="action small mt-2">
+            <i class="fa fa-pencil-alt"></i>
+            <span class="sr-only">Edit diary entry<span>
+            </a>
+
             {{ day.total_hours }}
+
                 <a href="{{ day.get_absolute_url }}">{{ day.day|date:"D j N Y" }}</a> 
                 <span>({{ day.hours }} hrs)</span>
                 {% if day.comment %}
