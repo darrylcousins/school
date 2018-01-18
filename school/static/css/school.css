@@ -28,16 +28,13 @@ div.container {
     width: 960px;
 }
 a.action > i.fa {
-    color:#d95f0e;
+    color:#d90000;
     font-size:1.5rem;
     text-shadow:1px 1px 3px rgba(0,0,0,0.5);
     padding: 0 5px;
 }
 a.action.small > i.fa {
-    color:#d95f0e;
     font-size:1rem;
-    text-shadow:1px 1px 3px rgba(0,0,0,0.5);
-    padding: 0 5px;
 }
 a.page-link > i.fas {
     color:darker;

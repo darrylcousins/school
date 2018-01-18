@@ -79,9 +79,8 @@ class Command(BaseCommand):
                 # use regex to identify if possible a point
                 point = LocateTask(t).points()
                 task = Task.objects.create(description=t, urgency='high',
-                    point=point, completed=day)
+                    point=point, completed=day, staff=caretaker)
                 task.save()
-                task.staff.add(caretaker)
 
         # and the newer data
         reader = csv.reader(open('caretaking/data/oct_current.csv'), delimiter='\t')
@@ -106,9 +105,8 @@ class Command(BaseCommand):
             for t in tasklist:
                 point = LocateTask(t).points()
                 task = Task.objects.create(description=t, urgency='high',
-                    point=point, completed=day)
+                    point=point, completed=day, staff=caretaker)
                 task.save()
-                task.staff.add(caretaker)
                 for task_type in TypeTask(t).types():
                     task.tasktype.add(task_type)
 

@@ -9,6 +9,7 @@ from io import BytesIO
 from django.db.models import Sum, Count, Q
 from django.http import JsonResponse
 from django.http.request import QueryDict
+from django.urls import reverse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -61,6 +62,8 @@ class AjaxResponseMixin:
             data = json.loads(serializers.serialize('json', 
                     [self.object],
                     fields=fields))[0]
+            if getattr(self, 'get_edit_url', False):
+                data['edit-url'] = self.get_edit_url()
             print('SUCCESS', data)
             return JsonResponse(data)
         else:
@@ -114,12 +117,17 @@ class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
         form.instance.point = LocateTask(description).points()
         return super().form_valid(form)
 
+    def get_edit_url(self):
+        """Provide edit url to be passed back to 'diary-edit' page"""
+        return reverse('task-edit',
+                kwargs={'username': self.object.staff.first().user.username,
+                    'pk': self.object.pk})
+
 
 class TaskEdit(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
     model = Task
     template_name = 'task_edit_form.html'
     fields = ['completed', 'urgency', 'staff', 'description']
-
 
 class TaskList(ListView):
     model = Task
