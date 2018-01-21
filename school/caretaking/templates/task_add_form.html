@@ -77,11 +77,18 @@
             </div>
         </div>
 
-        {% with field=form.description %}
-          <div class="form-group">
-            {% include 'snippet_form_field.html' %}
-          </div>
-        {% endwith %}
+        <div class="form-row">
+            <div class="col-md-8 mb-3">
+                {% with field=form.description %}
+                    {% include 'snippet_form_field.html' %}
+                {% endwith %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {% with field=form.tasktype %}
+                    {% include 'snippet_form_field.html' %}
+                {% endwith %}
+            </div>
+        </div>
 
 {% comment %}
         {% with field=form.point %}

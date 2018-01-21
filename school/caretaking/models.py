@@ -115,10 +115,11 @@ class Task(models.Model):
     Without a completed date then the task can be considered a todo::
 
         >>> todo = Task.objects.create(description="Clear downpipe at library", urgency='high',
-        ...     point='POINT (172.29307 -43.75858)')
+        ...     point='POINT (172.29307 -43.75858)', staff=caretaker)
         >>> todo.save()
         >>> print(todo)
         Clear downpipe at library
+        >>> todo.tasktype.add(maintenance)
 
     It can have more than one point of activity::
 
@@ -127,9 +128,8 @@ class Task(models.Model):
 
     Assign the task::
 
-        >>> todo.staff.add(caretaker)
-        >>> print([str(s) for s in todo.staff.all()])
-        ['Darryl Cousins (Caretaker)']
+        >>> print(todo.staff)
+        Darryl Cousins (Caretaker)
 
     It has a location::
 
@@ -186,15 +186,13 @@ class Task(models.Model):
             default='low'
             )
     tasktype = models.ManyToManyField(
-        'TaskType',
-        blank=True)
-    # make FK
-    staff = models.ManyToManyField(
+        'TaskType')
+    staff = models.ForeignKey(
         'Staff',
-        blank=True)
-    point = GeometryField()
-    # remove, not necessary
-    comment = models.TextField(blank=True, null=True)
+        blank=True,
+        null=True,
+        on_delete=models.DO_NOTHING)
+    point = GeometryField(blank=True, null=True)
 
     class Meta:
         get_latest_by = 'completed'
@@ -206,6 +204,9 @@ class Task(models.Model):
             return '{0} {1:.100}'.format(day, self.description)
         else:
             return '{:.100}'.format(self.description)
+
+    def get_absolute_url(self):
+        return reverse('task-list', kwargs={'username': self.staff.user.username})
 
     def locations(self):
         return Location.objects.filter(
@@ -242,9 +243,9 @@ class Diary(models.Model):
         >>> for i in range(10):
         ...     t = Task.objects.create(description=str(i),
         ...         completed=diary.day,
-        ...         point=thispoint)
+        ...         point=thispoint,
+        ...         staff=caretaker)
         ...     t.save()
-        ...     t.staff.add(caretaker)
 
     Getting tasks completed on this diary day::
 
@@ -282,6 +283,12 @@ class Diary(models.Model):
 
     def get_edit_url(self):
         return reverse('diary-edit', kwargs=self.get_url_kwargs())
+
+    def get_delete_url(self):
+        return reverse('diary-delete', kwargs=self.get_url_kwargs())
+
+    def get_confirm_delete_url(self):
+        return reverse('diary-confirm-delete', kwargs=self.get_url_kwargs())
 
     @property
     def tasks(self):
@@ -352,11 +359,12 @@ class Project(models.Model):
         on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(
         'Staff',
+        blank=True,
+        null=True,
         on_delete=models.CASCADE)
     comment = models.TextField(blank=True, null=True)
     tasks = models.ManyToManyField(
-        'Task',
-        blank=True)
+        'Task')
 
     def __str__(self):
         "Returns the project's name."

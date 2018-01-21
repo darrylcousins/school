@@ -10,24 +10,24 @@
           <a href="{% url 'caretaking' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
-          {{ staff.user.username }}
+          {{ object.user.username }}
       </li>
   </ol>
 </nav>
 {% endblock %}
 
 {% block content %}
-    <h2>{{ staff }}</h2>
+    <h2>{{ object }}</h2>
 
     <p>
     {% if earliest_record %}
     Recording since {{ earliest_record.completed|date:"j N Y" }}.
     {% else %}
-    No diary entries recorded for {{ staff }}.
+    No diary entries recorded for {{ object }}.
     {% endif %}
     </p>
     <p>
-    {{ staff.comment }}
+    {{ object.comment }}
     </p>
 
     <h3>Summary</h3>
@@ -51,10 +51,10 @@
     <h3>Links</h3>
     <ul class="stafflist list-unstyled">
         <li>
-            <a href="{% url 'diary-list' staff.user.username %}">Diary</a> 
+            <a href="{% url 'diary-list' object.user.username %}">Diary</a> 
         </li>
         <li>
-            <a href="{% url 'task-list' staff.user.username %}">Tasks</a> 
+            <a href="{% url 'task-list' object.user.username %}">Tasks</a> 
         </li>
     </ul>
 {% endblock %}

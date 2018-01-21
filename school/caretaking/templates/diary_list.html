@@ -10,7 +10,7 @@
           <a href="{% url 'caretaking' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item active">
-          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
+          <a href="{% url 'staff-detail' member.user.username %}">{{ member.user.username }}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
           diary
@@ -20,13 +20,17 @@
 {% endblock %}
 
 {% block content %}
-    <div class="float-right">
-        <a href="{% url 'diary-add' staff.user.username %}" class="action">
-        <i class="fa fa-plus-circle"></i>
-        <span class="sr-only">Add day to dairy<span>
-        </a>
-    </div>
-    <h2>Diary: {{ staff }}</h2>
+  {% if user.is_authenticated %}
+      {% ifequal user staff.user %}
+        <div class="float-right">
+            <a href="{% url 'diary-add' member.user.username %}" class="action">
+            <i class="fa fa-plus-circle"></i>
+            <span class="sr-only">Add day to dairy<span>
+            </a>
+        </div>
+    {% endifequal %}
+  {% endif %}
+    <h2>Diary: {{ member }}</h2>
     <!-- info box -->
     <div class="alert alert-info" role="alert">
         <p>
@@ -93,11 +97,13 @@
         {% for day in diary %}
         <li{% if day.hours == -1 %} class="sr-only"{% endif %}>
 
-            <a href="{{ day.get_edit_url }}"
-                class="action small mt-2">
-            <i class="fa fa-pencil-alt"></i>
-            <span class="sr-only">Edit diary entry<span>
-            </a>
+            {% ifequal staff member %}
+                <a href="{{ day.get_edit_url }}"
+                    class="action small mt-2">
+                <i class="fa fa-pencil-alt"></i>
+                <span class="sr-only">Edit diary entry<span>
+                </a>
+            {% endifequal %}
 
             {{ day.total_hours }}
 

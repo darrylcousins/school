@@ -15,11 +15,16 @@ from django.views.generic import ListView
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import UpdateView
+from django.views.generic.edit import DeleteView
 from django.views.generic.dates import DateDetailView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import BaseDetailView
 from django.contrib.auth.models import User
 from django.contrib.gis import gdal, geos
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core import serializers
+from django.forms import modelform_factory
+from django.forms import HiddenInput
 
 from wordcloud import WordCloud, STOPWORDS
 from matplotlib import pyplot
@@ -39,6 +44,20 @@ def color_func(word, font_size, position, orientation, random_state=None, **kwar
     return tuple(sequential.PuBuGn_9.colors[random.randint(2,8)])
 
 ### Mixins
+class AjaxDeletionMixin:
+
+    def post(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        pk = self.object.pk
+        self.object.delete()
+        data = {'pk': pk}
+        return JsonResponse(data)
+
+
 class AjaxResponseMixin:
     """
     Mixin to add AJAX support to a form.
@@ -46,7 +65,6 @@ class AjaxResponseMixin:
     """
     def form_invalid(self, form):
         if self.request.is_ajax():
-            print(form.errors)
             return JsonResponse(form.errors, status=400)
         else:
             response = super().form_invalid(form)
@@ -64,7 +82,8 @@ class AjaxResponseMixin:
                     fields=fields))[0]
             if getattr(self, 'get_edit_url', False):
                 data['edit-url'] = self.get_edit_url()
-            print('SUCCESS', data)
+            if getattr(self, 'get_delete_url', False):
+                data['delete-url'] = self.get_delete_url()
             return JsonResponse(data)
         else:
             response = super().form_valid(form)
@@ -79,6 +98,7 @@ class StaffRequiredMixin(LoginRequiredMixin):
         context = super(LoginRequiredMixin, self).get_context_data(**kwargs)
         self.user = self.request.user
         self.staff = get_object_or_404(Staff, user=self.user)
+        print('StaffRequiredMixin', self.staff, self.staff.user)
         context['staff'] = self.staff
         return context
 
@@ -87,6 +107,55 @@ class StaffRequiredMixin(LoginRequiredMixin):
 class StaffList(StaffRequiredMixin, ListView):
     model = Staff
     template_name = 'staff_list.html'
+
+
+class StaffDetail(StaffRequiredMixin, DetailView):
+    """
+        >>> staff = Staff.objects.first()
+
+    Set up test client::
+
+        >>> from django.test import Client
+        >>> client = Client()
+
+    Get url::
+
+        >>> from django.urls import reverse
+        >>> url = reverse('staff-detail', kwargs={'username':staff.user.username})
+        >>> response = client.get(url)
+        >>> print(response.status_code)
+        200
+        >>> print(response.context['object'])
+        Darryl Cousins (Caretaker)
+
+    """
+    model = Staff
+    slug_field = 'user__username'
+    slug_url_kwarg = 'username'
+    template_name = 'staff_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StaffDetail, self).get_context_data(**kwargs)
+        try:
+            context['earliest_record'] = Task.objects.filter(staff=self.object).earliest()
+        except Task.DoesNotExist:
+            pass
+
+        context['years'] = []
+        for year in ('2016', '2017', '2018'):
+            start_date = datetime.datetime.strptime(year + "-01-01", "%Y-%m-%d")
+            end_date = datetime.datetime.strptime(year + "-12-31", "%Y-%m-%d")
+            # filter by the staff member and date range
+            qs = Diary.objects.filter(staff=self.object).filter(
+                    day__lte=end_date, day__gt=start_date)
+            d = {}
+            d['days_worked'] = qs.filter(hours__gt=0.0).count()
+            d['total_hours'] = qs.aggregate(total_hours=Sum('hours'))['total_hours']
+            d['total_tasks'] = Task.objects.filter(
+                    completed__in=qs.values_list('day', flat=True)).count()
+            d['year'] = year
+            context['years'].append(d)
+        return context
 
 
 ### Project views
@@ -105,7 +174,7 @@ class ProjectAdd(StaffRequiredMixin, CreateView):
 class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
     model = Task
     template_name = 'task_add_form.html'
-    fields = ['completed', 'urgency', 'staff', 'description']
+    fields = ['completed', 'urgency', 'staff', 'description', 'tasktype']
 
     def get_context_data(self, **kwargs):
         context = super(TaskAdd, self).get_context_data(**kwargs)
@@ -120,14 +189,31 @@ class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
     def get_edit_url(self):
         """Provide edit url to be passed back to 'diary-edit' page"""
         return reverse('task-edit',
-                kwargs={'username': self.object.staff.first().user.username,
+                kwargs={'username': self.object.staff.user.username,
+                    'pk': self.object.pk})
+
+    def get_delete_url(self):
+        """Provide delete url to be passed back to 'diary-edit' page"""
+        return reverse('task-delete',
+                kwargs={'username': self.object.staff.user.username,
                     'pk': self.object.pk})
 
 
-class TaskEdit(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
+class TaskEdit(StaffRequiredMixin, UpdateView):
+    model = Task
+    template_name = 'task_edit_form.html'
+    fields = ['completed', 'urgency', 'staff', 'description', 'tasktype']
+
+
+class TaskEditAjax(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
     model = Task
     template_name = 'task_edit_form.html'
     fields = ['completed', 'urgency', 'staff', 'description']
+
+
+class TaskDelete(StaffRequiredMixin, BaseDetailView, AjaxDeletionMixin):
+    model = Task
+
 
 class TaskList(ListView):
     model = Task
@@ -217,55 +303,6 @@ class TaskList(ListView):
         return context
 
 
-class StaffDetail(DetailView):
-    """
-        >>> staff = Staff.objects.first()
-
-    Set up test client::
-
-        >>> from django.test import Client
-        >>> client = Client()
-
-    Get url::
-
-        >>> from django.urls import reverse
-        >>> url = reverse('staff-detail', kwargs={'username':staff.user.username})
-        >>> response = client.get(url)
-        >>> print(response.status_code)
-        200
-        >>> print(response.context['object'])
-        Darryl Cousins (Caretaker)
-
-    """
-    model = Staff
-    slug_field = 'user__username'
-    slug_url_kwarg = 'username'
-    template_name = 'staff_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(StaffDetail, self).get_context_data(**kwargs)
-        try:
-            context['earliest_record'] = Task.objects.filter(staff=self.object).earliest()
-        except Task.DoesNotExist:
-            pass
-
-        context['years'] = []
-        for year in ('2016', '2017', '2018'):
-            start_date = datetime.datetime.strptime(year + "-01-01", "%Y-%m-%d")
-            end_date = datetime.datetime.strptime(year + "-12-31", "%Y-%m-%d")
-            # filter by the staff member and date range
-            qs = Diary.objects.filter(staff=self.object).filter(
-                    day__lte=end_date, day__gt=start_date)
-            d = {}
-            d['days_worked'] = qs.filter(hours__gt=0.0).count()
-            d['total_hours'] = qs.aggregate(total_hours=Sum('hours'))['total_hours']
-            d['total_tasks'] = Task.objects.filter(
-                    completed__in=qs.values_list('day', flat=True)).count()
-            d['year'] = year
-            context['years'].append(d)
-        return context
-
-
 ### Diary views
 class DiaryAdd(StaffRequiredMixin, CreateView):
     model = Diary
@@ -279,14 +316,26 @@ class DiaryAdd(StaffRequiredMixin, CreateView):
         context['next_day'] = latest + datetime.timedelta(days=1)
         return context
 
+    def get_success_url(self):
+        return self.object.get_edit_url()
+
 
 class DiaryEdit(StaffRequiredMixin, UpdateView):
     model = Diary
     template_name = 'diary_edit_form.html'
     fields = ['day', 'hours', 'staff', 'comment']
 
+    def get_context_data(self, **kwargs):
+        context = super(DiaryEdit, self).get_context_data(**kwargs)
+        context['task_add_form'] = modelform_factory(Task,
+            fields=['description', 'tasktype', 'staff', 'urgency', 'completed'],
+            widgets={'staff': HiddenInput(),
+                'urgency': HiddenInput(),
+                'completed': HiddenInput()})
+        return context
 
-class DiaryList(ListView):
+
+class DiaryList(StaffRequiredMixin, ListView):
     template_name = 'diary_list.html'
     context_object_name = 'diary'
     paginate_by = 30
@@ -324,10 +373,10 @@ class DiaryList(ListView):
         Also filter by a search term which will highlight tasks containing the search term.
         """
         self.user = get_object_or_404(User, username=self.kwargs.get('username'))
-        self.staff = get_object_or_404(Staff, user=self.user)
+        self.member = get_object_or_404(Staff, user=self.user)
 
         # filter by the staff member
-        qs = Diary.objects.filter(staff=self.staff)
+        qs = Diary.objects.filter(staff=self.member)
 
         # filter for past range
         qs = qs.filter(day__lte=self.end_date, day__gt=self.start_date)
@@ -339,7 +388,7 @@ class DiaryList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(DiaryList, self).get_context_data(**kwargs)
-        context['staff'] = self.staff
+        context['member'] = self.member
         context['start_date'] = self.start_date
         context['end_date'] = self.end_date
         context['today'] = datetime.datetime.today()
@@ -361,22 +410,23 @@ class DiaryList(ListView):
 
         # create word cloud from task descriptions
         words = ' '.join(task_qs.values_list('description', flat=True)).lower()
-        stopwords = set(STOPWORDS)
-        stopwords.add('block')
+        if words:
+            stopwords = set(STOPWORDS)
+            stopwords.add('block')
 
-        cloud = WordCloud(background_color='white', stopwords=stopwords,
-                width=960, height=100, max_font_size=50, min_font_size=2,
-                font_path=FONT_PATH, max_words=300, prefer_horizontal=0.8)
-        cloud.generate(words)
-        cloud.recolor(color_func=color_func, random_state=3)
-        img = cloud.to_image()
+            cloud = WordCloud(background_color='white', stopwords=stopwords,
+                    width=960, height=100, max_font_size=50, min_font_size=2,
+                    font_path=FONT_PATH, max_words=300, prefer_horizontal=0.8)
+            cloud.generate(words)
+            cloud.recolor(color_func=color_func, random_state=3)
+            img = cloud.to_image()
 
-        in_mem_file = BytesIO()
-        img.save(in_mem_file, format="PNG")
-        img_bytes = in_mem_file.getvalue()
-        result_bytes = base64.b64encode(img_bytes)
-        result_str = result_bytes.decode('ascii')
-        context['wordcloud'] = 'data:image/png;base64,' + result_str
+            in_mem_file = BytesIO()
+            img.save(in_mem_file, format="PNG")
+            img_bytes = in_mem_file.getvalue()
+            result_bytes = base64.b64encode(img_bytes)
+            result_str = result_bytes.decode('ascii')
+            context['wordcloud'] = 'data:image/png;base64,' + result_str
 
         # query string to be included in pagination links
         qd = QueryDict(self.request.GET.urlencode(), mutable=True)
@@ -415,9 +465,9 @@ class DiaryDetail(DateDetailView):
         >>> for i in range(10):
         ...     t = Task.objects.create(description=str(i),
         ...         completed=thisday,
-        ...         point=thispoint)
+        ...         point=thispoint,
+        ...         staff=task.staff)
         ...     t.save()
-        ...     t.staff.add(task.staff.first())
 
     Set up test client::
 
@@ -445,6 +495,7 @@ class DiaryDetail(DateDetailView):
     context_object_name = 'diary'
     points = []
     targets = [t*0.00001 for t in (0, 1, 2, -1, -2)]
+    allow_future = True
 
     def get_context_data(self, **kwargs):
         context = super(DiaryDetail, self).get_context_data(**kwargs)
@@ -493,3 +544,11 @@ class DiaryDetail(DateDetailView):
             context['previous'] = None
 
         return context
+
+
+class DiaryDelete(StaffRequiredMixin, DeleteView):
+    model = Diary
+    template_name = 'diary_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('diary-list', kwargs={'username': self.request.user.username})

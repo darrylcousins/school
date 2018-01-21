@@ -30,6 +30,7 @@
     <script src="{% static 'js/jquery/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui/jquery-ui.min.js' %}"></script>
     <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/notify.min.js' %}"></script>
 
     <!-- before school.js if libs required -->
     {% block extra_js %}{% endblock extra_js %}
@@ -43,23 +44,29 @@
 
     <div class="container">
       {% if user.is_authenticated %}
-          {% if staff %}
+          {% if user.staff_set.first %}
+             {% with staff=user.staff_set.first %}
               <div class="float-right">
                   <span class="text-secondary">
                   Logged in as: 
                   </span>
                   <span class="text-dark">
-                      {{ staff.user.first_name }}
-                      {{ staff.user.last_name }}
+                      {{ user.first_name }}
+                      {{ user.last_name }}
                       ({{ staff.title }})
                   </span>
-                  <a href="{% url 'staff-detail' staff.user.username %}">
-                      &lt;{{ staff.user.username }}&gt;
-                  </a> </div>
+                  <a href="{% url 'staff-detail' user.username %}"
+                      class="text-warning">
+                      &lt;{{ user.username }}&gt;
+                  </a>
+                  <a class="btn btn-info btn-sm ml-3" href="{% url 'logout' %}">Logout</a>
+                </div>
+                  {% endwith %}
           {% else %}
               <div class="float-right">Logged in as: {{ user.username }}</div><br>
           {% endif %}
       {% endif %}
+      <br>
 
       <h1>{% block page_title %}Ellesmere College{% endblock page_title %}</h1>
 

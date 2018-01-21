@@ -62,14 +62,19 @@
           <input type="hidden" name="urgency" value="high" id="task_urgency">
           <input type="hidden" name="completed" value="{{ object.day|date:'Y-m-d' }}"
               id="task_completed">
-          <div class="form-group">
-              <label for="task_description">Description</label>
-              <textarea name="description" cols="40" rows="10" 
-                  class="form-control" required id="task_description"></textarea>
-              <small class="form-text text-muted">
-                Provide a description for the new task.
-              </small>
-          </div>
+        <div class="form-row">
+            <div class="col-md-8 mb-3">
+                {% with field=task_add_form.description %}
+                    {% include 'snippet_form_field.html' %}
+                {% endwith %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {% with field=task_add_form.tasktype %}
+                    {% include 'snippet_form_field.html' %}
+                {% endwith %}
+            </div>
+        </div>
+
           <div class="btn-group mb-2">
             <button class="btn btn-success" type="submit">
                 <i class="fa fa-check"></i> Save
@@ -84,54 +89,62 @@
     <!-- end add task form -->
 
     <!-- start editable task list -->
-        <h4 class="mt-2">Edit tasks:</h4>
-        <ul class="task-list list-unstyled">
+        <h4 class="mt-2" id="edit-task-header">Edit tasks:</h4>
+        <ul class="task-list list-unstyled" id="task-list">
         {% for task in object.tasks %}
-        <li>
-            <a
-                data-toggle="modal" data-target="#exampleModal"
+        <li id="task_{{ task.pk }}">
+            <a data-toggle="modal" data-target="#delete-modal"
                 class="action small mt-2">
             <i class="fa fa-trash-alt"></i>
-            <span class="sr-only">Delete task<span>
+            <i class="sr-only">Delete task</i>
             </a>
-        <span contenteditable="true" 
-              style="padding:0.25em;"
-            data-pk="{{ task.pk }}"
-            data-description="{{ task.description }}"
-            data-url="{% url 'task-edit' staff.user.username task.pk %}"
-            data-staff="{{ task.staff.first.pk }}"
-            data-completed="{{ task.completed|date:'Y-m-d' }}"
-            data-urgency="{{ task.urgency }}">{{ task.description }}</span>
+            <a class="action small mt-2" href="{% url 'task-edit' staff.user.username task.pk %}">
+            <i class="fa fa-pencil-alt"></i>
+            <i class="sr-only">Edit task</i>
+            </a>
+            <span contenteditable="true" 
+                class="task-description"  
+                data-pk="{{ task.pk }}"
+                data-description="{{ task.description }}"
+                data-edit-url="{% url 'task-edit' staff.user.username task.pk %}"
+                data-ajax-edit-url="{% url 'task-edit-ajax' staff.user.username task.pk %}"
+                data-delete-url="{% url 'task-delete' staff.user.username task.pk %}"
+                data-staff="{{ task.staff.pk }}"
+                data-completed="{{ task.completed|date:'Y-m-d' }}"
+                data-urgency="{{ task.urgency }}">{{ task.description }}</span>
           </li>
         {% endfor %}
         </ul>
     </div>
     <!-- end editable task list -->
-    <!-- begin modal code -->
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Permanently delete the task:
-        <i>description</i>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary">
-            <i class="fa fa-trash-alt"></i>
-            Delete task
+    <!-- begin modal code -->
+    <div class="modal fade" id="delete-modal" tabindex="-1"
+        role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="delete-modal-label">Delete task</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
             </button>
+          </div>
+          <div class="modal-body">
+              <p>Permanently delete this task?:<br>
+                <strong class="modal-description">description</strong>
+              </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary delete-button"
+                onclick="deleteTask();">
+                <i class="fa fa-trash-alt"></i>
+                Delete task
+                </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
     <!-- end modal code -->
 
 {% endblock %}
@@ -139,6 +152,7 @@
 {% block extra_js %}
 <script>
 $(function(){
+    /* add task form algorithm */
     $('#task-form').on('submit', function(event) {
       var data = $(this).serializeArray(),
           url = "{% url 'task-add' object.staff.user.username %}";
@@ -148,18 +162,34 @@ $(function(){
         data: data,
         type: 'post',
         success: function(data) {
-          //console.log(data);
-          var fields = data['fields'],
-              span_el = $('<span contenteditable>' + fields['description']+ '</span>');
-              li_el = $('<li></li>');
-          $('ul[class="task-list"]').append(li_el);
+          console.log(data);
+          var fields = data["fields"],
+              span_el = $("<span contenteditable class='task-description'>" + fields['description']+ "</span>"),
+              li_el = $("<li></li>"),
+              del_el = $("<a data-toggle='modal' data-target='#delete-modal' " +
+                         "class='action small mt-2'>" +
+                         "<i class='fa fa-trash-alt'></i>" +
+                         "<span class='sr-only'>Delete task<span>" +
+                         "</a>"),
+              edit_el = $("<a href='" + data["edit-url"] + "'" +
+                         "class='action small mt-2'>" +
+                         "<i class='fa fa-pencil-alt'></i>" +
+                         "<span class='sr-only'>Edit task<span>" +
+                         "</a>");
+          li_el.attr("id", "task_" + data["pk"]);
+          $('ul[id="task-list"]').append(li_el);
+          span_el.attr("data-pk", data["pk"]);
+          span_el.attr("data-completed", fields["completed"]);
+          span_el.attr("data-urgency", fields["urgency"]);
+          span_el.attr("data-staff", fields["staff"]);
+          span_el.attr("data-edit-url", data["edit-url"]);
+          span_el.attr("data-delete-url", data["delete-url"]);
+          li_el.append(del_el);
+          li_el.append(edit_el);
           li_el.append(span_el);
-          span_el.attr('data-pk', data['pk']);
-          span_el.attr('data-completed', fields['completed']);
-          span_el.attr('data-urgency', fields['urgency']);
-          span_el.attr('data-staff', fields['staff'][0]);
-          span_el.attr('data-url', data['edit-url']);
-          span_el.parent().append("<strong class='ml-3 text-danger'>new</strong>");
+          //span_el.parent().append("<strong class='ml-3 text-danger'>new</strong>");
+          $("li#task_" + data["pk"] + " > span.task-description").notify(
+                  "Task created");
           hideForm();
         },
         error: function(e) {
@@ -171,33 +201,77 @@ $(function(){
       });
       event.preventDefault();
     });
+    /* end add task form algorithm */
+
+    /* start delete task modal algorithm */
+    $("#delete-modal").on("show.bs.modal", function (event) {
+      var button = $(event.relatedTarget),
+          modal = $(this),
+          span = button.parent().find("span.task-description"),
+          description = span.html(),
+          pk = span.data("pk");
+      modal.find(".modal-description").text(description);
+      modal.find(".modal-footer").find(".delete-button").data("pk", pk);
+    });
+    /* end delete task modal algorithm */
+
+    /* set notify defaults */
+    $.notify.defaults({
+        className: "success",
+        position: "right",
+        autoHide: "true",
+        autoHideDelay: "2000"
+    });
 });
+/* start delete task method */
+var deleteTask = function() {
+    var pk = $("#delete-modal").find(".modal-footer").find(".delete-button").data("pk"),
+        url = $("[data-pk=" + pk + "]").data("delete-url"),
+        data = {"pk": pk};
+        data["csrfmiddlewaretoken"] = $( "input[name='csrfmiddlewaretoken']" ).val();
+    $.ajax({
+        url: url,
+        data: data,
+        type: 'post',
+        success: function(data) {
+          console.log(data);
+          console.log($("li#task_" + data["pk"]));
+          $("li#task_" + data["pk"]).remove();
+          $("#delete-modal").modal("hide");
+          $("#edit-task-header").notify("Task deleted", {position: "top center"});
+        },
+        error: function(e) {
+          console.log(e);
+        }
+    });
+};
+/* end delete task method */
+
+/* start add task form methods */
 var showForm = function() {
-    $('#add-task-link').removeClass('d-inline').addClass('d-none');
-    $('#task-add').removeClass('d-none').addClass('d-inline');$('#task_description').val('');
-    $('html, body').animate({
-        scrollTop: ($('div[class="task-list"]').offset().top)
+    $("#add-task-link").removeClass("d-inline").addClass("d-none");
+    $("#task-add").removeClass("d-none").addClass("d-inline");$("#task_description").val("");
+    $("html, body").animate({
+        scrollTop: ($("div[class='task-list']").offset().top)
     },500);
-    $('#task_description').focus();
+    $("#task_description").focus();
     return;
 };
-var hideForm = function() {
-    $('#add-task-link').removeClass('d-none').addClass('d-inline');
-    $('#task-add').removeClass('d-inline').addClass('d-none');$('#task_description').val('');
-};
-//document.addEventListener('click', function (event) {
-//    if (event.target.hasAttribute('contenteditable')) {
-//      document.execCommand('selectAll', false, null);
-//    };
-//}, true);
 
-document.addEventListener('keydown', function (event) {
+var hideForm = function() {
+    $("#add-task-link").removeClass("d-none").addClass("d-inline");
+    $("#task-add").removeClass("d-inline").addClass("d-none");$("#task_description").val("");
+};
+/* end add task form methods */
+
+/* start edit task description algorithms */
+document.addEventListener("keydown", function (event) {
   var esc = event.which == 27,
       nl = event.which == 13,
-      el = event.target,
-      input = el.nodeName != 'INPUT' &&
-              el.nodeName != 'TEXTAREA' &&
-              el.nodeName != 'BUTTON',
+      el = $(event.target),
+      input = el.prop("nodeName") != "INPUT" &&
+              el.prop("nodeName") != "TEXTAREA" &&
+              el.prop("nodeName") != "BUTTON",
       data = {};
 
   if (input) {
@@ -206,14 +280,14 @@ document.addEventListener('keydown', function (event) {
       document.execCommand("undo");
       el.blur();
     } else if (nl) {
-      description = $.trim(el.innerHTML);
-      if (description != el.getAttribute("data-description")) {
-          data["pk"] = el.getAttribute("data-pk");
+      description = $.trim(el.html());
+      if (description != el.data("description")) {
+          data["pk"] = el.data("pk");
           data["description"] = description;
-          data["staff"] = el.getAttribute("data-staff");
-          data["urgency"] = el.getAttribute("data-urgency");
-          data["completed"] = el.getAttribute("data-completed");
-          url = el.getAttribute("data-url");
+          data["staff"] = el.data("staff");
+          data["urgency"] = el.data("urgency");
+          data["completed"] = el.data("completed");
+          url = el.data("ajax-edit-url");
           data["csrfmiddlewaretoken"] = $( "input[name='csrfmiddlewaretoken']" ).val();
 
           // send an ajax request to update the field
@@ -222,11 +296,21 @@ document.addEventListener('keydown', function (event) {
             data: data,
             type: 'post',
             success: function(data) {
+              console.log(data);
               changed_el = $("span[data-pk='" + data["pk"] + "']").first();
-              changed_el.parent().append("<i class='fa fa-check ml-3 text-success'></i>");
+              //changed_el.parent().append("<i class='fa fa-check ml-3 text-success'></i>");
+              $("li#task_" + data["pk"] + " > span.task-description").notify(
+                      "Task updated");
             },
             error: function(e) {
               console.log(e);
+              res = $.parseJSON(e.responseText);
+              $.each(res, function(key, val) {
+                  console.log(key, val);
+                  el.parent().append("<span class='invalid-feedback d-inline'>" + 
+                          key + ": " + val[0] + "</span>");
+              });
+              // TODO: do something
             }
           });
       };
@@ -236,6 +320,7 @@ document.addEventListener('keydown', function (event) {
     };
   };
 }, true);
+/* end edit task description algorithms */
 
 </script>
 {% endblock extra_js %}

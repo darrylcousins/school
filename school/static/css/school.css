@@ -6,8 +6,11 @@ body {
 h1, h2 {
     margin-bottom: 1rem;
 }
+h2, h3 {
+    background-color: #f8f9fa;
+}
 textarea {
-    height: 5rem;
+    height: 6rem;
 }
 ul.diary-list > li > a {
     font-weight: bold;
@@ -23,6 +26,9 @@ ul.task-list {
 }
 ul.task-list li a {
     color: inherit;
+}
+span.task-description {
+    padding: 0.25em;
 }
 div.container {
     width: 960px;

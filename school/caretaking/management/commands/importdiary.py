@@ -47,12 +47,10 @@ class Command(BaseCommand):
         sql ="DELETE FROM caretaking_%s;"
         pksql = "DBCC CHECKIDENT(caretaking_%s, RESEED, 0);"
         with connection.cursor() as cursor:
-            cursor.execute(sql % 'task_staff')
             cursor.execute(sql % 'task_tasktype')
             cursor.execute(sql % 'task')
             cursor.execute(sql % 'diary')
             cursor.execute(sql % 'task')
-            #cursor.execute(pksql % 'task_staff')
             #cursor.execute(pksql % 'task_tasktype')
             #cursor.execute(pksql % 'task')
             #cursor.execute(pksql % 'diary')

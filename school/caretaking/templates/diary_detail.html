@@ -44,12 +44,20 @@
 
 {% block content %}
 
-    <div class="float-right">
-        <a href="{{ diary.get_edit_url}}" class="action">
-        <i class="fa fa-edit"></i>
-        <span class="sr-only">Edit diary entry<span>
-        </a>
-    </div>
+  {% if user.is_authenticated %}
+      {% ifequal user staff.user %}
+        <div class="float-right">
+            <a href="{{ diary.get_edit_url}}" class="action">
+            <i class="fa fa-pencil-alt"></i>
+            <span class="sr-only">Edit diary entry<span>
+            </a>
+            <a href="{{ diary.get_confirm_delete_url}}" class="action">
+            <i class="fa fa-trash-alt"></i>
+            <span class="sr-only">Delete diary entry<span>
+            </a>
+        </div>
+    {% endif %}
+  {% endif %}
 
     <h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
         {{ staff.user.first_name }} {{ staff.user.last_name }} ({{ staff.title }})
@@ -78,6 +86,17 @@
     </li>
 {% endif %}
 </ul>
+
+
+<div class="task-list">
+    <ul class="task-list">
+    {% for task in diary.tasks %}
+        <li>
+            <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
 
 <span id="diary_span_map">
     <div id="diary_map"></div>
@@ -114,61 +133,67 @@
       });
       // end generate background college view
 
-      // generate view of this object
-      var wkt = '{{ diary_wkt }}';
-      var format = new ol.format.WKT();
-      var feature = format.readFeature(wkt);
+      {% if diary_wkt %}
+          // generate view of this object
+          var wkt = '{{ diary_wkt }}';
+          var format = new ol.format.WKT();
+          var feature = format.readFeature(wkt);
 
-      var object_style = new ol.style.Style({
-            image: new ol.style.Circle({
-              radius: width * 2,
-              fill: new ol.style.Fill({
-                color: white
-              }),
-              stroke: new ol.style.Stroke({
-                color: red,
-                width: width/2
-              })
+          var object_style = new ol.style.Style({
+                image: new ol.style.Circle({
+                  radius: width * 2,
+                  fill: new ol.style.Fill({
+                    color: white
+                  }),
+                  stroke: new ol.style.Stroke({
+                    color: red,
+                    width: width/2
+                  })
+                })
+          })
+
+          var object_vector = new ol.layer.Vector({
+            source: new ol.source.Vector({
+              features: [feature],
+            }),
+            style: object_style
+          });
+          // end generate view of this object
+
+          // build map
+          var map = new ol.Map({
+            layers: [raster, college_vector, object_vector],
+            target: 'diary_map',
+            interactions: ol.interaction.defaults({mouseWheelZoom:false}),
+            view: new ol.View({
+                center: ol.proj.fromLonLat([172.292576,-43.757829]),
+                zoom: 18
             })
-      })
+          });
 
-      var object_vector = new ol.layer.Vector({
-        source: new ol.source.Vector({
-          features: [feature],
-        }),
-        style: object_style
-      });
-      // end generate view of this object
+          var features = new ol.Collection();
+          features.extend([feature]);
+          var featureOverlay = new ol.layer.Vector({
+            source: new ol.source.Vector({features: features}),
+            style: object_style,
+          });
+          featureOverlay.setMap(map);
 
-      // build map
-      var map = new ol.Map({
-        layers: [raster, college_vector, object_vector],
-        target: 'diary_map',
-        view: new ol.View({
-            center: ol.proj.fromLonLat([172.292576,-43.757829]),
-            zoom: 18
-        })
-      });
+      {% else %}
 
-      var features = new ol.Collection();
-      features.extend([feature]);
-      var featureOverlay = new ol.layer.Vector({
-        source: new ol.source.Vector({features: features}),
-        style: object_style,
-      });
-      featureOverlay.setMap(map);
+          var map = new ol.Map({
+            layers: [raster, college_vector],
+            target: 'diary_map',
+            interactions: ol.interaction.defaults({mouseWheelZoom:false}),
+            view: new ol.View({
+                center: ol.proj.fromLonLat([172.292576,-43.757829]),
+                zoom: 18
+            })
+          });
+
+      {% endif %}
     }; // end onload
     </script>
-
-    <div class="task-list">
-        <ul class="task-list">
-        {% for task in diary.tasks %}
-            <li>
-                <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
-            </li>
-        {% endfor %}
-        </ul>
-    </div>
 {% endblock %}
 
 {% block extra_js %}
