@@ -16,7 +16,7 @@ from caretaking.views.mixins import StaffRequiredMixin
 
 
 ### Staff views
-class StaffList(StaffRequiredMixin, ListView):
+class StaffList(ListView):
     model = Staff
     template_name = 'staff_list.html'
 

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.contrib.gis.db.models.fields import GeometryField
 
-from caretaking.models import Location
+from caretaking.models.location import Location
 
 
 class TaskType(models.Model):
@@ -29,9 +29,11 @@ class TaskType(models.Model):
             help_text=_("Additional descriptive comment"))
 
     def __str__(self):
-        "Returns the task type's name."
+        """Returns the task type's name."""
         return self.name
 
+    class Meta:
+        verbose_name = "Task Type"
 
 class Task(models.Model):
     """
@@ -132,7 +134,7 @@ class Task(models.Model):
             help_text=_("The urgency of the task"))
     tasktype = models.ManyToManyField(
             'TaskType',
-            help_text=_("One or more types of tasks"))
+            help_text=_("One or more types"))
     staff = models.ForeignKey(
             'Staff',
             blank=True,
@@ -145,6 +147,7 @@ class Task(models.Model):
 
     class Meta:
         get_latest_by = 'completed'
+        ordering = ('completed',)
 
     def __str__(self):
         "Returns completed date and a truncated line of the tasks description."
@@ -156,6 +159,11 @@ class Task(models.Model):
 
     def get_absolute_url(self):
         return reverse('task-list', kwargs={'username': self.staff.user.username})
+
+    def get_diary_url(self):
+        from caretaking.models.diary import Diary
+        diary = Diary.objects.get(day=self.completed)
+        return diary.get_absolute_url()
 
     def locations(self):
         """Find the location or locations in which the point falls"""

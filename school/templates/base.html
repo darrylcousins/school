@@ -43,32 +43,52 @@
   <body>
 
     <div class="container">
-      {% if user.is_authenticated %}
-          {% if user.staff_set.first %}
-             {% with staff=user.staff_set.first %}
-              <div class="float-right">
-                  <span class="text-secondary">
-                  Logged in as: 
-                  </span>
-                  <span class="text-dark">
-                      {{ user.first_name }}
-                      {{ user.last_name }}
-                      ({{ staff.title }})
-                  </span>
-                  <a href="{% url 'staff-detail' user.username %}"
-                      class="text-warning">
-                      &lt;{{ user.username }}&gt;
-                  </a>
-                  <a class="btn btn-info btn-sm ml-3" href="{% url 'logout' %}">Logout</a>
-                </div>
-                  {% endwith %}
-          {% else %}
-              <div class="float-right">Logged in as: {{ user.username }}</div><br>
-          {% endif %}
-      {% endif %}
-      <br>
 
-      <h1>{% block page_title %}Ellesmere College{% endblock page_title %}</h1>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand"
+          href="{% url 'index' %}">Ellesmere College</a>
+        <button class="navbar-toggler" type="button"
+          data-toggle="collapse" data-target="#navbarText"
+          aria-controls="navbarText" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link"
+                href="{% url 'staff-list' %}">Caretaking</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link"
+                href="{% url 'project-list' %}">Projects</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          {% if user.is_authenticated %}
+            <span class="text-secondary">
+            Logged in as: 
+            </span>
+            <span class="text-dark">
+                {{ user.first_name }}
+                {{ user.last_name }}
+                {% if user.staff %}
+                  ({{ user.staff.title }})
+                {% endif %}
+            </span>
+            <a href="{% url 'staff-detail' user.username %}"
+                class="text-warning">
+                &lt;{{ user.username }}&gt;
+            </a>
+            <a class="btn btn-outline-success btn-sm ml-2" href="{% url 'logout' %}">Logout</a>
+          {% else %}
+          <a class="btn btn-outline-success btn-sm ml-2" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+          {% endif %}
+        </div>
+      </nav>
+
+      <h1>{% block page_title %}{% endblock page_title %}</h1>
 
       {% block breadcrumbs %}
       <nav aria-label="breadcrumb">
@@ -85,7 +105,9 @@
           {% block actions %}
           {% endblock %}
 
-          <p><a href="{% url 'caretaking' %}">Caretaking</a></p>
+          <p>
+          <a href="{% url 'staff-list' %}">Caretaking</a>
+          </p>
       {% endblock content %}
 
     </div> <!-- /container -->

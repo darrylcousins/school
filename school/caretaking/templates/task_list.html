@@ -22,12 +22,14 @@
 {% endblock %}
 
 {% block content %}
-    <div class="float-right">
-        <a href="{% url 'task-add' staff.user.username %}" class="action">
-        <i class="fa fa-plus-circle"></i>
-        <span class="sr-only">Add a task<span>
-        </a>
-    </div>
+    {% if user.is_authenticated and user.staff == staff or user.is_staff %}
+      <div class="float-right">
+          <a href="{% url 'task-add' staff.user.username %}" class="action">
+          <i class="fa fa-plus-circle"></i>
+          <span class="sr-only">Add a task<span>
+          </a>
+      </div>
+    {% endif %}
 
     <h2>Tasks: {{ staff }}</h2>
 
@@ -42,8 +44,9 @@
         the date range.
         </p>
 
-        <form action="." method="get">
+      <form action="." method="get">
         <!-- date range options -->
+        {% comment %}
         <div class="input-group" style="width: 75%">
             <input class="form-control" type="date" required name="start-date"
                 value="{{ start_date|date:"Y-m-d"}}" id="start-date"
@@ -69,29 +72,50 @@
                     <button class="btn btn-secondary" type="submit">Go</button>
                 </div>
             </div>
-        <br>
-            <label for="location-select">Filter by location:</label>
-            <div class="input-group" style="width: 75%">
-                <select class="form-control" multiple size="3"
-                    id="location-select" name="loc">
-            <option value="24"{% if not selected_location_pks or 24 in selected_location_pks %} selected{% endif %}>
-                        All
-                    </option>
-                    {% for loc in locations %}
-                        <option value="{{ loc.pk }}"{% if loc.pk in selected_location_pks %} selected{% endif %}>
-                            {{ loc.name|convert_camel_case }}
-                        </option>
-                    {% endfor %}
-                </select>
+        {% endcomment %}
+        <div class="input-group">
+            <input class="form-control col-md-3 my-1" type="date" required name="start-date"
+                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <input class="form-control col-md-3 my-1" type="date" required name="end-date"
+                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <input class="form-control col-md-6 my-1" type="text" placeholder="Search"
+                onclick="$('#clear-button').removeClass('d-none');"
+                id="search-term" name="q" value="{{ search_phrase }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
+                    type="button" id="clear-button"
+                    onclick="$('#search-term').val('');"
+                    >Clear</button>
+                <button class="btn btn-secondary" type="submit">
+                <i class="fa fa-search"></i>
+                  Go</button>
             </div>
-            <br>
-            {% if search_count %}
-                <p>
-                    <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
-                phrase <strong>{{ search_phrase }}</strong>.
-                </p>
-            {% endif %}
-        </form>
+        </div>
+        <br>
+        <label for="location-select">Filter by location:</label>
+        <div class="input-group">
+            <select class="form-control" multiple size="8"
+                id="location-select" name="loc">
+        <option value="24"{% if not selected_location_pks or 24 in selected_location_pks %} selected{% endif %}>
+                    All
+                </option>
+                {% for loc in locations %}
+                    <option value="{{ loc.pk }}"{% if loc.pk in selected_location_pks %} selected{% endif %}>
+                        {{ loc.name|convert_camel_case }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        {% if search_count %}
+            <p>
+                <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
+            phrase <strong>{{ search_phrase }}</strong>.
+            </p>
+        {% endif %}
+      </form>
 
     </div>
 
@@ -99,15 +123,22 @@
 
     <table class="table">
         <tr>
-            <th></th><th>Date</th><th>Description</th>
+              <th></th>
+            <th>Date</th><th>Description</th>
             <th>Locations</th>
         {% for task in object_list %}
             <tr>
-                <td>
+                <td nowrap>
+                  <a href="{{ task.get_diary_url }}" class="action small">
+                  <i class="fa fa-calendar"></i>
+                  <span class="sr-only">View diary entry<span>
+                  </a>
+                  {% if user.is_authenticated and user.staff == staff or user.is_staff %}
                     <a href="{% url 'task-edit' staff.user.username task.pk %}" class="action small">
                     <i class="fa fa-pencil-alt"></i>
                     <span class="sr-only">Edit task<span>
                     </a>
+                  {% endif %}
                 </td>
                 <td class="task-date" nowrap>{{ task.completed|date:"j N Y" }}</td>
                 <td class="task-description">

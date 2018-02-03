@@ -17,21 +17,85 @@
 {% endblock %}
 
 {% block content %}
-    <div class="float-right">
+    {% if request.user.is_staff %}
+    <div class="float-right mt-2 mr-1">
         <a href="{% url 'project-add' %}" class="action">
         <i class="fa fa-plus-circle"></i>
         <span class="sr-only">Add project<span>
         </a>
     </div>
+    {% endif %}
+
     <h2>{% block list_title %}Projects{% endblock %}</h2>
+
     <ul class="project-list list-unstyled">
         {% for project in object_list %}
-            <li>
-                <a href="#">{{ project }}</a> 
+            <li id="project_{{ project.pk }}">
+              <a data-toggle="modal" data-target="#project-delete-modal"
+                  class="action small mt-2">
+              <i class="fa fa-trash-alt"></i>
+              <i class="sr-only">Delete project</i>
+              </a>
+              <a class="project-name" 
+                 data-pk="{{ project.pk }}"
+                 href="{{ project.get_absolute_url }}">
+                {{ project.name }}
+              </a>
+              <span class="small text-muted">
+                {{ project.description }}
+              </span>
             </li>
         {% endfor %}
     </ul>
 
+    <!-- begin project delete confirm modal code -->
+    <div class="modal fade" id="project-delete-modal" tabindex="-1"
+        role="dialog" aria-labelledby="project-delete-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="project-delete-modal-label">Delete project</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <p>Permanently delete this project?:<br>
+                <strong class="modal-description">description</strong>
+              </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary delete-button"
+                onclick="deleteProject();">
+                <i class="fa fa-trash-alt"></i>
+                Delete project
+                </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal code -->
+
 {% endblock %}
 
+{% block extra_js %}
+<script>
+$(function(){
 
+    /* start delete projct modal algorithm */
+    $("#project-delete-modal").on("show.bs.modal", function (event) {
+      var button = $(event.relatedTarget),
+          modal = $(this),
+          a_el = button.parent().find("a.project-name"),
+          name = a_el.html(),
+          pk = a_el.data("pk");
+      console.log('pk = ' + pk);
+      modal.find(".modal-description").text(name);
+      modal.find(".modal-footer").find(".delete-button").data("pk", pk);
+    });
+    /* end delete task modal algorithm */
+
+});
+</script>
+{% endblock extra_js %}

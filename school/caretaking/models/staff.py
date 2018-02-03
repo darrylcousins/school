@@ -30,7 +30,7 @@ class Staff(models.Model):
             help_text=_("The job title of this staff member"))
     comment = models.TextField(blank=True, null=True,
             help_text=_("Relevant useful information about this staff member"))
-    user = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING,
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE,
             help_text=_("The authentication backend user of the application"))
 
     class Meta:

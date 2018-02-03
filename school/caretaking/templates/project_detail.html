@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'project-list' %}">projects</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          {{ object.name }}
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <h2>{{ object }}</h2>
+
+    <p class="lead">{{ object.description }}</p>
+    {% if object.comment %}
+      <p>{{ object.comment }}</p>
+    {% endif %}
+
+    <table class="table">
+    {% for task in object.tasks.all %}
+    <tr>
+      <td class="text-muted">{{ task.completed }}</td>
+      <td>{{ task.description }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}
+
+
+

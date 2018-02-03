@@ -44,19 +44,17 @@
 
 {% block content %}
 
-  {% if user.is_authenticated %}
-      {% ifequal user staff.user %}
-        <div class="float-right">
-            <a href="{{ diary.get_edit_url}}" class="action">
-            <i class="fa fa-pencil-alt"></i>
-            <span class="sr-only">Edit diary entry<span>
-            </a>
-            <a href="{{ diary.get_confirm_delete_url}}" class="action">
-            <i class="fa fa-trash-alt"></i>
-            <span class="sr-only">Delete diary entry<span>
-            </a>
-        </div>
-    {% endifequal %}
+  {% if user.is_authenticated and user.staff == staff or user.is_staff %}
+    <div class="float-right">
+        <a href="{{ diary.get_edit_url}}" class="action">
+        <i class="fa fa-pencil-alt"></i>
+        <span class="sr-only">Edit diary entry<span>
+        </a>
+        <a href="{{ diary.get_confirm_delete_url}}" class="action">
+        <i class="fa fa-trash-alt"></i>
+        <span class="sr-only">Delete diary entry<span>
+        </a>
+    </div>
   {% endif %}
 
     <h2>{% block list_title %}{{ diary.day|date:"D j N Y" }}: 
@@ -92,7 +90,7 @@
     <ul class="task-list">
     {% for task in diary.tasks %}
         <li>
-            <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+            {{ task.description }}
         </li>
     {% endfor %}
     </ul>

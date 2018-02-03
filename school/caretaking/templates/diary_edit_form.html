@@ -93,7 +93,7 @@
         <ul class="task-list list-unstyled" id="task-list">
         {% for task in object.tasks %}
         <li id="task_{{ task.pk }}">
-            <a data-toggle="modal" data-target="#delete-modal"
+            <a data-toggle="modal" data-target="#task-delete-modal"
                 class="action small mt-2">
             <i class="fa fa-trash-alt"></i>
             <i class="sr-only">Delete task</i>
@@ -118,13 +118,13 @@
     </div>
     <!-- end editable task list -->
 
-    <!-- begin modal code -->
-    <div class="modal fade" id="delete-modal" tabindex="-1"
-        role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">
+    <!-- begin task delete confirm modal code -->
+    <div class="modal fade" id="task-delete-modal" tabindex="-1"
+        role="dialog" aria-labelledby="task-delete-modal-label" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="delete-modal-label">Delete task</h5>
+            <h5 class="modal-title" id="task-delete-modal-label">Delete task</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -166,7 +166,7 @@ $(function(){
           var fields = data["fields"],
               span_el = $("<span contenteditable class='task-description'>" + fields['description']+ "</span>"),
               li_el = $("<li></li>"),
-              del_el = $("<a data-toggle='modal' data-target='#delete-modal' " +
+              del_el = $("<a data-toggle='modal' data-target='#task-delete-modal' " +
                          "class='action small mt-2'>" +
                          "<i class='fa fa-trash-alt'></i>" +
                          "<span class='sr-only'>Delete task<span>" +
@@ -204,7 +204,7 @@ $(function(){
     /* end add task form algorithm */
 
     /* start delete task modal algorithm */
-    $("#delete-modal").on("show.bs.modal", function (event) {
+    $("#task-delete-modal").on("show.bs.modal", function (event) {
       var button = $(event.relatedTarget),
           modal = $(this),
           span = button.parent().find("span.task-description"),
@@ -225,7 +225,7 @@ $(function(){
 });
 /* start delete task method */
 var deleteTask = function() {
-    var pk = $("#delete-modal").find(".modal-footer").find(".delete-button").data("pk"),
+    var pk = $("#task-delete-modal").find(".modal-footer").find(".delete-button").data("pk"),
         url = $("[data-pk=" + pk + "]").data("delete-url"),
         data = {"pk": pk};
         data["csrfmiddlewaretoken"] = $( "input[name='csrfmiddlewaretoken']" ).val();
@@ -237,7 +237,7 @@ var deleteTask = function() {
           console.log(data);
           console.log($("li#task_" + data["pk"]));
           $("li#task_" + data["pk"]).remove();
-          $("#delete-modal").modal("hide");
+          $("#task-delete-modal").modal("hide");
           $("#edit-task-header").notify("Task deleted", {position: "top center"});
         },
         error: function(e) {
@@ -310,7 +310,6 @@ document.addEventListener("keydown", function (event) {
                   el.parent().append("<span class='invalid-feedback d-inline'>" + 
                           key + ": " + val[0] + "</span>");
               });
-              // TODO: do something
             }
           });
       };

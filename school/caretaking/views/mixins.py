@@ -4,7 +4,10 @@ import json
 
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.core import serializers
 
 from caretaking.models import Staff
 
@@ -58,15 +61,18 @@ class AjaxResponseMixin:
             return response
 
 
-class StaffRequiredMixin(LoginRequiredMixin):
-    """Mixin to provide staff user for view. TODO raise Unauthenticated or similar.
+class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Mixin to ensure staff user for view.
     """
 
-    def get_context_data(self, **kwargs):
-        #context = super(StaffRequiredMixin, self).get_context_data(**kwargs)
-        context = super().get_context_data(**kwargs)
-        self.user = self.request.user
-        self.staff = get_object_or_404(Staff, user=self.user)
-        print('StaffRequiredMixin', self.staff, self.staff.user)
-        context['staff'] = self.staff
-        return context
+    def test_func(self):
+        """Authenticated user **must** have a staff object
+        
+        For all edit views the authenticated user must be the staff member being edited or also
+        allow administrators. 
+        """
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+
+        self.staff = user.staff
+
+        return bool(user.staff == self.request.user.staff) or self.request.user.is_staff

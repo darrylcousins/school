@@ -1,6 +1,7 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 
@@ -38,3 +39,6 @@ class Project(models.Model):
     def __str__(self):
         "Returns the project's name."
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('project-detail', kwargs={'pk': self.pk})

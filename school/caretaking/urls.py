@@ -6,8 +6,8 @@ from django.views.generic import TemplateView
 from .views import StaffList, StaffDetail
 from .views import DiaryList, DiaryDetail, DiaryAdd
 from .views import DiaryEdit, DiaryDelete
-from .views import TaskList, TaskAdd, TaskEdit, TaskDelete, TaskEditAjax
-from .views import ProjectList, ProjectAdd
+from .views import TaskList, TaskAdd, TaskEdit, TaskDelete, TaskEditAjax, TaskListAjax
+from .views import ProjectList, ProjectAdd, ProjectDetail, ProjectEdit
 
 urlpatterns = (
     path('', StaffList.as_view(), name="staff-list"),
@@ -19,6 +19,12 @@ urlpatterns = (
     path('projects/add',
         ProjectAdd.as_view(),
         name="project-add"),
+    path('projects/<int:pk>',
+        ProjectDetail.as_view(),
+        name="project-detail"),
+    path('projects/<int:pk>/edit',
+        ProjectEdit.as_view(),
+        name="project-edit"),
 
     # staff
     path('<str:username>/',
@@ -45,6 +51,9 @@ urlpatterns = (
     path('<str:username>/tasks/',
         TaskList.as_view(),
         name="task-list"),
+    path('<str:username>/tasks/ajax',
+        TaskListAjax.as_view(),
+        name="task-list-ajax"),
     path('<str:username>/tasks/add',
         TaskAdd.as_view(),
         name="task-add"),

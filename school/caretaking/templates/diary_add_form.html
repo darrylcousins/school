@@ -60,7 +60,7 @@
                   </small>
                 {% endif %}
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <label for="{{ form.hours.id_for_label }}">{{ form.hours.label }}</label>
                 {% if form.is_bound %}
                   {% if form.hours.errors %}
@@ -82,7 +82,7 @@
                   </small>
                 {% endif %}
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-5 mb-3">
                 {% with field=form.staff %}
                   <div class="form-group">
                     {% include 'snippet_form_field.html' %}

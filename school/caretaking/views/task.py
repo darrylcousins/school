@@ -1,11 +1,17 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import datetime
+import json
 
+from django.db.models import Q
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.http.request import QueryDict
 from django.contrib.auth.models import User
-from django.views.generic import ListView
+from django.core import serializers
+from django.views.generic.list import ListView
+from django.views.generic.list import BaseListView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import BaseDetailView
@@ -19,6 +25,7 @@ from caretaking.views.mixins import AjaxDeletionMixin
 from caretaking.views.mixins import StaffRequiredMixin
 from caretaking.utils import QueryBuilder
 
+
 ### Task views
 class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
     model = Task
@@ -26,9 +33,16 @@ class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
     fields = ['completed', 'urgency', 'staff', 'description', 'tasktype']
 
     def get_context_data(self, **kwargs):
-        context = super(TaskAdd, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['today'] = datetime.datetime.today()
+        context['staff'] = self.staff
         return context
+
+    def get_initial(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return {
+            'staff': user.staff
+        }
 
     def form_valid(self, form):
         description = form.cleaned_data['description']
@@ -53,6 +67,11 @@ class TaskEdit(StaffRequiredMixin, UpdateView):
     template_name = 'task_edit_form.html'
     fields = ['completed', 'urgency', 'staff', 'description', 'tasktype']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['staff'] = self.staff
+        return context
+
 
 class TaskEditAjax(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
     model = Task
@@ -64,23 +83,22 @@ class TaskDelete(StaffRequiredMixin, BaseDetailView, AjaxDeletionMixin):
     model = Task
 
 
-class TaskList(ListView):
-    model = Task
-    template_name = 'task_list.html'
-    paginate_by = 30
-    end_date = None
-    start_date = None
-    default_range = 7 # 7 days
-    search_phrase = ''
-    qb = None
+class TaskListBase:
 
-    def get(self, request, *args, **kwargs):
-        """Insert logic here before ``get_queryset`` and ``get_context_data are called.
+    def get_queryset(self):
+        """Collect task entries for this user.
 
-        Figure out number of days and start date based on user input.
+        Show particular date ranges: past week, past month, past year.
 
-        Default is to make a range of the past 7 days.
+        Also filter by a search term which will highlight tasks containing the search term.
         """
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        self.staff = get_object_or_404(Staff, user=user)
+
+        # filter by the staff member
+        qs = Task.objects.filter(staff=self.staff)
+
+        # collect variables passed to view from form
         start_date = self.request.GET.get('start-date', None)
         end_date = self.request.GET.get('end-date', None)
 
@@ -95,21 +113,6 @@ class TaskList(ListView):
         locations = self.request.GET.getlist('loc', [])
         self.locations = Location.objects.filter(pk__in=locations)
 
-        return super(TaskList, self).get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        """Collect task entries for this user.
-
-        Show particular date ranges: past week, past month, past year.
-
-        Also filter by a search term which will highlight tasks containing the search term.
-        """
-        self.user = get_object_or_404(User, username=self.kwargs.get('username'))
-        self.staff = get_object_or_404(Staff, user=self.user)
-
-        # filter by the staff member
-        qs = Task.objects.filter(staff=self.staff)
-
         # filter by selected locations using constructed OR query
         if self.locations:
             queries = [Q(point__intersects=loc.polygon) for loc in self.locations]
@@ -119,20 +122,47 @@ class TaskList(ListView):
             qs = Task.objects.filter(query)
 
         # filter for past range
-        qs = qs.filter(completed__lte=self.end_date, completed__gt=self.start_date)
+        qs = qs.filter(completed__lte=self.end_date, completed__gte=self.start_date)
 
         # filter for search term
         if self.search_phrase != '':
             self.qb = QueryBuilder(self.search_phrase, 'description')
             self.qb.parse_parts()
-            #qs = qs.filter(
-            #        description__contains=self.search_phrase)
             qs = qs.filter(self.qb.query)
 
         # order by day
         qs = qs.order_by('-completed')
         self.queryset = qs
         return qs
+
+
+class TaskListAjax(TaskListBase, BaseListView):
+    model = Task
+    paginate_by = None
+    end_date = None
+    start_date = None
+    default_range = 7 # 7 days
+    search_phrase = ''
+    qb = None
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = json.loads(serializers.serialize('json', 
+                queryset,
+                fields=['completed', 'description']))
+        print(data)
+        return JsonResponse(data, safe=False)
+
+
+class TaskList(TaskListBase, ListView):
+    model = Task
+    template_name = 'task_list.html'
+    paginate_by = 30
+    end_date = None
+    start_date = None
+    default_range = 7 # 7 days
+    search_phrase = ''
+    qb = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -149,4 +179,12 @@ class TaskList(ListView):
         context['locations'] = Location.objects.exclude(name__startswith='College')
         context['selected_locations'] = self.locations
         context['selected_location_pks'] = self.locations.values_list('pk', flat=True)
+
+        # query string to be included in pagination links
+        qd = QueryDict(self.request.GET.urlencode(), mutable=True)
+        try:
+            qd.pop('page')
+        except KeyError:
+            pass
+        context['query_string'] = '?' + qd.urlencode() + '&' if qd else '?'
         return context

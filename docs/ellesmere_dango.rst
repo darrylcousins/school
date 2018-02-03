@@ -130,8 +130,8 @@ Or create superuser a staff member::
 College Multipolygon
 --------------------
 
-This is the multipolygon mapped onto maps to identify school. If the location fixture is up to date
-then the following steps will not be necessary.
+This is the multipolygon mapped onto maps to identify school. **If the location fixture is up to date
+then the following steps will not be necessary.**
 
 Run ``mkcollege`` to construct sql for mulitpolygon college location (only necessary if the polygon
 locations have changed)::

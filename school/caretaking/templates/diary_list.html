@@ -10,7 +10,7 @@
           <a href="{% url 'staff-list' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item active">
-          <a href="{% url 'staff-detail' member.user.username %}">{{ member.user.username }}</a>
+          <a href="{% url 'staff-detail' staff.user.username %}">{{ staff.user.username }}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
           diary
@@ -20,17 +20,15 @@
 {% endblock %}
 
 {% block content %}
-  {% if user.is_authenticated %}
-      {% ifequal user staff.user %}
-        <div class="float-right">
-            <a href="{% url 'diary-add' member.user.username %}" class="action">
-            <i class="fa fa-plus-circle"></i>
-            <span class="sr-only">Add day to dairy<span>
-            </a>
-        </div>
-    {% endifequal %}
+    {% if user.is_authenticated and user.staff == staff or user.is_staff %}
+      <div class="float-right">
+          <a href="{% url 'diary-add' staff.user.username %}" class="action">
+          <i class="fa fa-plus-circle"></i>
+          <span class="sr-only">Add day to dairy<span>
+          </a>
+      </div>
   {% endif %}
-    <h2>Diary: {{ member }}</h2>
+    <h2>Diary: {{ staff }}</h2>
     <!-- info box -->
     <div class="alert alert-info" role="alert">
         <p>
@@ -39,12 +37,33 @@
         <strong>{{ end_date|date:"j N Y" }}</strong>.
         </p>
         <p>
-        Use the form below to change
-        the date range.
+        Select a date range.
         </p>
 
         <form action="." method="get">
         <!-- date range options -->
+        <div class="input-group">
+            <input class="form-control col-md-3" type="date" required name="start-date"
+                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <input class="form-control col-md-3" type="date" required name="end-date"
+                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
+                min="" max="{{ today|date:"Y-m-d" }}">
+            <input class="form-control col-md-6" type="text" placeholder="Search"
+                onclick="$('#clear-button').removeClass('d-none');"
+                id="search-term" name="q" value="{{ search_phrase }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
+                    type="button" id="clear-button"
+                    onclick="$('#search-term').val('');"
+                    >Clear</button>
+                <button class="btn btn-secondary" type="submit">
+                <i class="fa fa-search"></i>
+                  Go</button>
+            </div>
+        </div>
+
+        {% comment %}
         <div class="input-group" style="width: 75%">
             <input class="form-control" type="date" required name="start-date"
                 value="{{ start_date|date:"Y-m-d"}}" id="start-date"
@@ -56,10 +75,6 @@
                 <button class="btn btn-secondary" type="submit">Go</button>
             </div>
         </div>
-
-        <p class="mt-2">
-        Search in the selected range:
-        </p>
 
         <div class="input-group" style="width: 75%">
             <input class="form-control" type="text" placeholder="Search"
@@ -73,8 +88,9 @@
                 <button class="btn btn-secondary" type="submit">Go</button>
             </div>
         </div>
+        {% endcomment %}
         {% if search_count %}
-            <p>
+            <p class="mt-2">
                 <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
             phrase <strong>{{ search_phrase }}</strong>.
             </p>
@@ -82,7 +98,7 @@
             
         </form>
 
-        <p class="mb-0 mt-1"><strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
+        <p class="mb-0 mt-3"><strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
         and <strong>{{ total_tasks }} tasks</strong> completed.
         </p>
     </div>
@@ -97,13 +113,13 @@
         {% for day in diary %}
         <li{% if day.hours == -1 %} class="sr-only"{% endif %}>
 
-            {% ifequal staff member %}
-                <a href="{{ day.get_edit_url }}"
-                    class="action small mt-2">
-                <i class="fa fa-pencil-alt"></i>
-                <span class="sr-only">Edit diary entry<span>
-                </a>
-            {% endifequal %}
+        {% if user.is_authenticated and user.staff == staff or user.is_staff %}
+          <a href="{{ day.get_edit_url }}"
+              class="action small mt-2">
+          <i class="fa fa-pencil-alt"></i>
+          <span class="sr-only">Edit diary entry<span>
+          </a>
+        {% endif %}
 
             {{ day.total_hours }}
 
@@ -117,7 +133,7 @@
                         <ul class="task-list">
                         {% for task in day.tasks %}
                             <li>
-                                <a href="{{ task.get_absolute_url }}">{{ task.description }}</a>
+                                {{ task.description }}
                             </li>
                         {% endfor %}
                         </ul>

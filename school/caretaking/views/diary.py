@@ -34,14 +34,24 @@ class DiaryAdd(StaffRequiredMixin, CreateView):
     fields = ['day', 'hours', 'staff', 'comment']
 
     def get_context_data(self, **kwargs):
-        context = super(DiaryAdd, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['today'] = datetime.datetime.today()
-        latest = Diary.objects.filter(staff=self.staff).latest('day').day
-        context['next_day'] = latest + datetime.timedelta(days=1)
+        try:
+            latest = Diary.objects.filter(staff=self.staff).latest('day').day
+            context['next_day'] = latest + datetime.timedelta(days=1)
+        except Diary.DoesNotExist:
+            context['next_day'] = context['today']
+        context['staff'] = self.staff
         return context
 
     def get_success_url(self):
         return self.object.get_edit_url()
+
+    def get_initial(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return {
+            'staff': user.staff
+        }
 
 
 class DiaryEdit(StaffRequiredMixin, UpdateView):
@@ -56,10 +66,11 @@ class DiaryEdit(StaffRequiredMixin, UpdateView):
             widgets={'staff': HiddenInput(),
                 'urgency': HiddenInput(),
                 'completed': HiddenInput()})
+        context['staff'] = self.staff
         return context
 
 
-class DiaryList(StaffRequiredMixin, ListView):
+class DiaryList(ListView):
     template_name = 'diary_list.html'
     context_object_name = 'diary'
     paginate_by = 30
@@ -87,7 +98,7 @@ class DiaryList(StaffRequiredMixin, ListView):
 
         self.search_phrase = self.request.GET.get('q', '')
 
-        return super(DiaryList, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         """Collect diary entries for this user.
@@ -97,13 +108,12 @@ class DiaryList(StaffRequiredMixin, ListView):
         Also filter by a search term which will highlight tasks containing the search term.
         """
         self.user = get_object_or_404(User, username=self.kwargs.get('username'))
-        self.member = get_object_or_404(Staff, user=self.user)
 
         # filter by the staff member
-        qs = Diary.objects.filter(staff=self.member)
+        qs = Diary.objects.filter(staff=self.user.staff)
 
         # filter for past range
-        qs = qs.filter(day__lte=self.end_date, day__gt=self.start_date)
+        qs = qs.filter(day__lte=self.end_date, day__gte=self.start_date)
 
         # order by day
         qs = qs.order_by('-day')
@@ -111,8 +121,8 @@ class DiaryList(StaffRequiredMixin, ListView):
         return qs
 
     def get_context_data(self, **kwargs):
-        context = super(DiaryList, self).get_context_data(**kwargs)
-        context['member'] = self.member
+        context = super().get_context_data(**kwargs)
+        context['staff'] = self.user.staff
         context['start_date'] = self.start_date
         context['end_date'] = self.end_date
         context['today'] = datetime.datetime.today()
