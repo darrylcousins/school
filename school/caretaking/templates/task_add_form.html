@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 
-{% comment %}
-{% block extra_js %}{{ form.media }}{% endblock extra_js %}
-{% endcomment %}
+{% block title %}Task Add ({{ staff.user.username }}){% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
@@ -37,17 +35,17 @@
         {% include 'snippet_form_start.html' %}
 
         <div class="form-row">
-            <div class="col-md-5 mb-3">
+            <div class="col-sm-5 mb-3">
               {% with field=form.staff %}
                 {% include 'snippet_form_field.html' %}
               {% endwith %}
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-sm-3 mb-3">
               {% with field=form.urgency %}
                 {% include 'snippet_form_field.html' %}
               {% endwith %}
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-sm-4 mb-3">
                 <label for="{{ form.completed.id_for_label }}">{{ form.completed.label }}</label>
                 {% if form.is_bound %}
                   {% if form.completed.errors %}
@@ -78,34 +76,28 @@
         </div>
 
         <div class="form-row">
-            <div class="col-md-8 mb-3">
+            <div class="col-sm-8 mb-3">
                 {% with field=form.description %}
                     {% include 'snippet_form_field.html' %}
                 {% endwith %}
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-sm-4 mb-3">
                 {% with field=form.tasktype %}
                     {% include 'snippet_form_field.html' %}
                 {% endwith %}
             </div>
         </div>
 
-{% comment %}
-        {% with field=form.point %}
-          <div class="form-group">
-            {% include 'snippet_form_field.html' %}
-          </div>
-        {% endwith %}
-{% endcomment %}
-
         <div class="btn-group">
             <button class="btn btn-success" type="submit">
             <i class="fa fa-check"></i> Save
             </button>
-            <a role="button" class="btn btn-secondary"
-                 href="{% url 'task-list' staff.user.username %}">
-                <i class="fa fa-reply"></i> Cancel
-            </a>
+            {% block extra_button %}
+              <a role="button" class="btn btn-secondary"
+                   href="{% url 'task-list' staff.user.username %}">
+                  <i class="fa fa-reply"></i> Cancel
+              </a>
+            {% endblock %}
         </div>
 
     </form>

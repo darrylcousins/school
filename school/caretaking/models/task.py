@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from django.contrib.gis.db.models.fields import GeometryField
 
 from caretaking.models.location import Location
+from .mixins import PhotoEnabled
 
 
 class TaskType(models.Model):
@@ -34,14 +35,16 @@ class TaskType(models.Model):
 
     class Meta:
         verbose_name = "Task Type"
+        ordering = ('name',)
 
-class Task(models.Model):
+class Task(PhotoEnabled, models.Model):
     """
     A task, also used to generate a todo list, i.e. those without a completed date.
 
     Tasks need a staff member/s to do the work::
 
         >>> from django.contrib.auth.models import User
+        >>> from caretaking.models import Staff
         >>> darryl, created = User.objects.get_or_create(username='cousinsd', first_name='Darryl',
         ...     last_name='Cousins')
         >>> if created:
@@ -50,18 +53,24 @@ class Task(models.Model):
 
     A type of task is also required::
 
+        >>> from caretaking.models import TaskType
         >>> maintenance, created = TaskType.objects.get_or_create(name='Maintenance')
         >>> if created:
         ...     maintenance.save()
+        >>> duties, created = TaskType.objects.get_or_create(name='Duties')
+        >>> if created:
+        ...     duties.save()
 
     Without a completed date then the task can be considered a todo::
 
+        >>> from caretaking.models import Task
         >>> todo = Task.objects.create(description="Clear downpipe at library", urgency='high',
         ...     point='POINT (172.29307 -43.75858)', staff=caretaker)
         >>> todo.save()
         >>> print(todo)
         Clear downpipe at library
         >>> todo.tasktype.add(maintenance)
+        >>> todo.tasktype.add(duties)
 
     It can have more than one point of activity::
 
@@ -158,12 +167,15 @@ class Task(models.Model):
             return '{:.100}'.format(self.description)
 
     def get_absolute_url(self):
-        return reverse('task-list', kwargs={'username': self.staff.user.username})
+        return self.get_diary_url()
 
-    def get_diary_url(self):
+    def get_diary_entry(self):
         from caretaking.models.diary import Diary
         diary = Diary.objects.get(day=self.completed)
-        return diary.get_absolute_url()
+        return diary
+
+    def get_diary_url(self):
+        return self.get_diary_entry().get_absolute_url()
 
     def locations(self):
         """Find the location or locations in which the point falls"""

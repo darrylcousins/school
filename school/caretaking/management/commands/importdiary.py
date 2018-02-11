@@ -45,16 +45,20 @@ class Command(BaseCommand):
 
         # delete all rows
         sql ="DELETE FROM caretaking_%s;"
-        pksql = "DBCC CHECKIDENT(caretaking_%s, RESEED, 0);"
+        #pksql = "DBCC CHECKIDENT(caretaking_%s, RESEED, 0);"
+        pksql = "ALTER SEQUENCE caretaking_%s RESTART;"
         with connection.cursor() as cursor:
             cursor.execute(sql % 'task_tasktype')
+            cursor.execute(sql % 'project_tasks')
+            cursor.execute(sql % 'project')
             cursor.execute(sql % 'task')
             cursor.execute(sql % 'diary')
-            cursor.execute(sql % 'task')
-            #cursor.execute(pksql % 'task_tasktype')
-            #cursor.execute(pksql % 'task')
-            #cursor.execute(pksql % 'diary')
-            #cursor.execute(pksql % 'task')
+
+            cursor.execute(pksql % 'task_tasktype_id_seq')
+            cursor.execute(pksql % 'project_projectid_seq')
+            cursor.execute(pksql % 'project_tasks_id_seq')
+            cursor.execute(pksql % 'task_taskid_seq')
+            cursor.execute(pksql % 'diary_diaryid_seq')
 
         # older data has different column format
         reader = csv.reader(open('caretaking/data/jan_oct.csv'), delimiter='\t')

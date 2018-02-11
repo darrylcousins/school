@@ -1,5 +1,7 @@
 {% extends "diary_add_form.html" %}
 
+{% block title %}Diary Edit: {{ diary }}{% endblock %}
+
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -90,31 +92,54 @@
 
     <!-- start editable task list -->
         <h4 class="mt-2" id="edit-task-header">Edit tasks:</h4>
-        <ul class="task-list list-unstyled" id="task-list">
+        <table class="task-list table table-sm" id="task-list">
         {% for task in object.tasks %}
-        <li id="task_{{ task.pk }}">
-            <a data-toggle="modal" data-target="#task-delete-modal"
-                class="action small mt-2">
-            <i class="fa fa-trash-alt"></i>
-            <i class="sr-only">Delete task</i>
-            </a>
-            <a class="action small mt-2" href="{% url 'task-edit' staff.user.username task.pk %}">
-            <i class="fa fa-pencil-alt"></i>
-            <i class="sr-only">Edit task</i>
-            </a>
-            <span contenteditable="true" 
-                class="task-description"  
-                data-pk="{{ task.pk }}"
-                data-description="{{ task.description }}"
-                data-edit-url="{% url 'task-edit' staff.user.username task.pk %}"
-                data-ajax-edit-url="{% url 'task-edit-ajax' staff.user.username task.pk %}"
-                data-delete-url="{% url 'task-delete' staff.user.username task.pk %}"
-                data-staff="{{ task.staff.pk }}"
-                data-completed="{{ task.completed|date:'Y-m-d' }}"
-                data-urgency="{{ task.urgency }}">{{ task.description }}</span>
-          </li>
+          <tr id="task_{{ task.pk }}">
+            <td nowrap class="task-actions">
+              <a data-toggle="modal" data-target="#task-delete-modal"
+                  class="action small mt-2">
+                <i class="fa fa-trash-alt"></i>
+                <i class="sr-only">Delete task</i>
+              </a>
+              <a class="action small mt-2" href="{% url 'task-edit' staff.user.username task.pk %}">
+                <i class="fa fa-pencil-alt"></i>
+                <i class="sr-only">Edit task</i>
+              </a>
+            </td>
+            <td class="task-description">
+              <span contenteditable="true" 
+                  class="task-description"  
+                  data-pk="{{ task.pk }}"
+                  data-description="{{ task.description }}"
+                  data-edit-url="{% url 'task-edit' staff.user.username task.pk %}"
+                  data-ajax-edit-url="{% url 'task-edit-ajax' staff.user.username task.pk %}"
+                  data-delete-url="{% url 'task-delete' staff.user.username task.pk %}"
+                  data-staff="{{ task.staff.pk }}"
+                  data-completed="{{ task.completed|date:'Y-m-d' }}"
+                  data-urgency="{{ task.urgency }}">{{ task.description }}</span>
+            </td>
+            <td class="text-muted small task-tasktype">
+              {% for type in task.tasktype.all %}
+              {{ type }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </td>
+            <td class="text-muted small task-locations">
+              {% for loc in task.locations %}
+              {{ loc }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </td>
+            <td class="task-project">
+              {% if task.project_set.count %}
+                <a href="{{ task.project_set.first.get_absolute_url }}"
+                    class="action small mt-2">
+                <i class="fa fa-cogs"></i>
+                <span class="sr-only">View project<span>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
         {% endfor %}
-        </ul>
+        </table>
     </div>
     <!-- end editable task list -->
 
@@ -165,7 +190,10 @@ $(function(){
           console.log(data);
           var fields = data["fields"],
               span_el = $("<span contenteditable class='task-description'>" + fields['description']+ "</span>"),
-              li_el = $("<li></li>"),
+              tr_el = $("<tr></tr>"),
+              td_button_el = $("<td></td>"),
+              td_desc_el = $("<td></td>"),
+              td_type_el = $("<td></td>"),
               del_el = $("<a data-toggle='modal' data-target='#task-delete-modal' " +
                          "class='action small mt-2'>" +
                          "<i class='fa fa-trash-alt'></i>" +
@@ -176,19 +204,22 @@ $(function(){
                          "<i class='fa fa-pencil-alt'></i>" +
                          "<span class='sr-only'>Edit task<span>" +
                          "</a>");
-          li_el.attr("id", "task_" + data["pk"]);
-          $('ul[id="task-list"]').append(li_el);
+          tr_el.attr("id", "task_" + data["pk"]);
+          $('table[id="task-list"]').append(tr_el);
           span_el.attr("data-pk", data["pk"]);
           span_el.attr("data-completed", fields["completed"]);
           span_el.attr("data-urgency", fields["urgency"]);
           span_el.attr("data-staff", fields["staff"]);
           span_el.attr("data-edit-url", data["edit-url"]);
           span_el.attr("data-delete-url", data["delete-url"]);
-          li_el.append(del_el);
-          li_el.append(edit_el);
-          li_el.append(span_el);
+          td_button_el.append(del_el);
+          td_button_el.append(edit_el);
+          td_desc_el.append(span_el);
+          tr_el.append(td_button_el);
+          tr_el.append(td_desc_el);
+          tr_el.append(td_type_el);
           //span_el.parent().append("<strong class='ml-3 text-danger'>new</strong>");
-          $("li#task_" + data["pk"] + " > span.task-description").notify(
+          $("tr#task_" + data["pk"] + " > span.task-description").notify(
                   "Task created");
           hideForm();
         },
@@ -207,7 +238,7 @@ $(function(){
     $("#task-delete-modal").on("show.bs.modal", function (event) {
       var button = $(event.relatedTarget),
           modal = $(this),
-          span = button.parent().find("span.task-description"),
+          span = button.parent().parent().find("span.task-description"),
           description = span.html(),
           pk = span.data("pk");
       modal.find(".modal-description").text(description);
@@ -235,8 +266,8 @@ var deleteTask = function() {
         type: 'post',
         success: function(data) {
           console.log(data);
-          console.log($("li#task_" + data["pk"]));
-          $("li#task_" + data["pk"]).remove();
+          console.log($("tr#task_" + data["pk"]));
+          $("tr#task_" + data["pk"]).remove();
           $("#task-delete-modal").modal("hide");
           $("#edit-task-header").notify("Task deleted", {position: "top center"});
         },
@@ -298,8 +329,7 @@ document.addEventListener("keydown", function (event) {
             success: function(data) {
               console.log(data);
               changed_el = $("span[data-pk='" + data["pk"] + "']").first();
-              //changed_el.parent().append("<i class='fa fa-check ml-3 text-success'></i>");
-              $("li#task_" + data["pk"] + " > span.task-description").notify(
+              $("tr#task_" + data["pk"] + " > td > span.task-description").notify(
                       "Task updated");
             },
             error: function(e) {

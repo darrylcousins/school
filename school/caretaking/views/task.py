@@ -15,9 +15,10 @@ from django.views.generic.list import BaseListView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import BaseDetailView
+from django.views.generic.detail import DetailView
 
 from caretaking.models import Staff
-from caretaking.models import Location, Task
+from caretaking.models import Location, Task, TaskType
 from caretaking.utils import QueryBuilder
 from caretaking.management.locate_task import LocateTask
 from caretaking.views.mixins import AjaxResponseMixin
@@ -27,6 +28,21 @@ from caretaking.utils import QueryBuilder
 
 
 ### Task views
+class TaskDetail(DetailView):
+    model = Task
+    template_name = 'task_detail.html'
+
+
+class TaskEditAjax(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
+    model = Task
+    template_name = 'task_edit_form.html'
+    fields = ['completed', 'urgency', 'staff', 'description']
+
+
+class TaskDelete(StaffRequiredMixin, BaseDetailView, AjaxDeletionMixin):
+    model = Task
+
+
 class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
     model = Task
     template_name = 'task_add_form.html'
@@ -72,16 +88,8 @@ class TaskEdit(StaffRequiredMixin, UpdateView):
         context['staff'] = self.staff
         return context
 
-
-class TaskEditAjax(StaffRequiredMixin, AjaxResponseMixin, UpdateView):
-    model = Task
-    template_name = 'task_edit_form.html'
-    fields = ['completed', 'urgency', 'staff', 'description']
-
-
-class TaskDelete(StaffRequiredMixin, BaseDetailView, AjaxDeletionMixin):
-    model = Task
-
+    def get_success_url(self):
+        return self.object.get_diary_entry().get_edit_url()
 
 class TaskListBase:
 
@@ -91,6 +99,8 @@ class TaskListBase:
         Show particular date ranges: past week, past month, past year.
 
         Also filter by a search term which will highlight tasks containing the search term.
+
+        Other filters are location and tasktype.
         """
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         self.staff = get_object_or_404(Staff, user=user)
@@ -110,16 +120,23 @@ class TaskListBase:
             self.start_date = self.end_date - datetime.timedelta(days=self.default_range)
 
         self.search_phrase = self.request.GET.get('q', '')
-        locations = self.request.GET.getlist('loc', [])
-        self.locations = Location.objects.filter(pk__in=locations)
 
         # filter by selected locations using constructed OR query
+        locations = self.request.GET.getlist('loc', [])
+        self.locations = Location.objects.filter(pk__in=locations)
+        print(self.locations)
         if self.locations:
             queries = [Q(point__intersects=loc.polygon) for loc in self.locations]
             query = queries.pop()
             for q in queries:
                 query |= q
-            qs = Task.objects.filter(query)
+            qs = qs.filter(query)
+
+        # filter by selected tasktypes
+        tasktypes = self.request.GET.getlist('tasktype', [])
+        self.tasktypes = TaskType.objects.filter(pk__in=tasktypes)
+        if self.tasktypes:
+            qs = qs.filter(tasktype__pk__in=self.tasktypes)
 
         # filter for past range
         qs = qs.filter(completed__lte=self.end_date, completed__gte=self.start_date)
@@ -179,6 +196,10 @@ class TaskList(TaskListBase, ListView):
         context['locations'] = Location.objects.exclude(name__startswith='College')
         context['selected_locations'] = self.locations
         context['selected_location_pks'] = self.locations.values_list('pk', flat=True)
+
+        context['tasktypes'] = TaskType.objects.all()
+        context['selected_tasktypes'] = self.tasktypes
+        context['selected_tasktype_pks'] = self.tasktypes.values_list('pk', flat=True)
 
         # query string to be included in pagination links
         qd = QueryDict(self.request.GET.urlencode(), mutable=True)

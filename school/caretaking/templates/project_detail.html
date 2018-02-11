@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
+{% block title %}Project {{ object }}{% endblock %}
+
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
       <li class="breadcrumb-item">
           <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-list' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item">
           <a href="{% url 'project-list' %}">projects</a>
@@ -17,6 +22,24 @@
 {% endblock %}
 
 {% block content %}
+
+  {% if user.is_authenticated and user.is_staff %}
+    <div class="float-right">
+      <a href="{% url 'project-edit' object.pk %}" class="action">
+        <i class="fa fa-pencil-alt"></i>
+        <span class="sr-only">Edit project<span>
+      </a>
+      <a href="{% url 'project-confirm-delete' object.pk %}" class="action">
+        <i class="fa fa-trash-alt"></i>
+        <span class="sr-only">Delete project<span>
+      </a>
+      <a href="{% url 'photo-add' %}?{{ object.urlencode_ct }}" class="action">
+        <i class="fa fa-camera-retro"></i>
+        <span class="sr-only">Add photo<span>
+      </a>
+    </div>
+  {% endif %}
+
     <h2>{{ object }}</h2>
 
     <p class="lead">{{ object.description }}</p>
@@ -24,11 +47,26 @@
       <p>{{ object.comment }}</p>
     {% endif %}
 
-    <table class="table">
+    {% for photo in  object.get_photos %}
+      <img src="{{ photo.get_image_url }}" width="200">
+    {% endfor %}
+
+    <table class="table table-sm">
     {% for task in object.tasks.all %}
     <tr>
-      <td class="text-muted">{{ task.completed }}</td>
+      <td class="text-muted">
+        <a href="{{ task.get_diary_url }}" class="">
+        {{ task.completed }}
+        </a>
+      </td>
       <td>{{ task.description }}</td>
+      <td class="task-photos">
+          {% for photo in  task.get_photos %}
+            <a href="{{ photo.get_detail_url }}">
+              <img src="{{ photo.get_image_url }}" width="50">
+            </a>
+          {% endfor %}
+      </td>
     </tr>
     {% endfor %}
     </table>

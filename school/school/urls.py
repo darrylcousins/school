@@ -10,10 +10,10 @@ from django.contrib import admin
 admin.autodiscover() # this may be obsolete in Django-2
 admin.site.site_header = 'caretaking@ellesmere'
 
-urlpatterns = (
+urlpatterns = [
     path('', TemplateView.as_view(template_name='base.html'), name='index'),
     path('caretaking/', include('caretaking.urls')),
 
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

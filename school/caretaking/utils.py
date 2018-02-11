@@ -25,11 +25,11 @@ class QueryBuilder:
         """
         Run through the parts, group accordingly and create query object.
 
-            >>> s = 'graf*'
+            >>> s = 'grafitti'
             >>> qb = QueryBuilder(s, 'text')
             >>> qb.parse_parts()
-            >>> print(qb.query)
             >>> print(qb.words)
+            ['grafitti']
 
         """
         parts = self.parts.copy()

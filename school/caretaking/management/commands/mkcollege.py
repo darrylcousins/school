@@ -1,3 +1,5 @@
+__author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
+
 from django.core.management.base import BaseCommand, CommandError
 
 from caretaking.models import Location

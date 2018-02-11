@@ -12,7 +12,6 @@ from caretaking.models import Staff
 from caretaking.models import Diary
 from caretaking.models import Staff
 from caretaking.models import Task
-from caretaking.views.mixins import StaffRequiredMixin
 
 
 ### Staff views
@@ -21,7 +20,7 @@ class StaffList(ListView):
     template_name = 'staff_list.html'
 
 
-class StaffDetail(StaffRequiredMixin, DetailView):
+class StaffDetail(DetailView):
     """
         >>> staff = Staff.objects.first()
 
@@ -36,9 +35,9 @@ class StaffDetail(StaffRequiredMixin, DetailView):
         >>> url = reverse('staff-detail', kwargs={'username':staff.user.username})
         >>> response = client.get(url)
         >>> print(response.status_code)
-        200
-        >>> print(response.context['object'])
-        Darryl Cousins (Caretaker)
+        302
+
+    Redirected to login.
 
     """
     model = Staff

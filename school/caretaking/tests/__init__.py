@@ -9,11 +9,19 @@ DOCFILES = [
 # order does matter because of fixture loading
 # TODO load fixture in setUp
 DOCTESTS = [
-        'caretaking.models',
+        'caretaking.models.diary',
+        'caretaking.models.location',
+        'caretaking.models.photo',
+        'caretaking.models.project',
+        'caretaking.models.staff',
+        'caretaking.models.task',
         'caretaking.management.locate_task',
         'caretaking.management.type_task',
         'caretaking.management.commands.importdiary',
-        'caretaking.views',
+        'caretaking.views.diary',
+        'caretaking.views.project',
+        'caretaking.views.staff',
+        'caretaking.views.task',
         'caretaking.utils',
         'caretaking.templatetags.caretaking_extras',
     ]

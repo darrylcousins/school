@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load caretaking_extras %}
+
+{% block title %}Photo {{ object }}{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-list' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'photo-list' %}">photos</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          {{ object.title }}
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% if user.is_authenticated and user.is_staff %}
+    <div class="float-right">
+      <a href="{% url 'photo-edit' object.pk %}" class="action">
+        <i class="fa fa-pencil-alt"></i>
+        <span class="sr-only">Edit photo<span>
+      </a>
+      <a href="{% url 'photo-confirm-delete' object.pk %}" class="action">
+        <i class="fa fa-trash-alt"></i>
+        <span class="sr-only">Delete photo<span>
+      </a>
+    </div>
+  {% endif %}
+
+    <h2>{{ object }}</h2>
+
+    <p class="mb-3">
+    <a href="{{ object.get_absolute_url }}">{{ object.get_object }}</a>
+    </p>
+
+    <p class="lead">{{ object.description }}</p>
+
+    <img src="{{ object.get_image_url }}" width="500">
+
+{% endblock %}
+
+
+
+

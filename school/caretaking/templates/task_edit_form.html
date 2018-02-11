@@ -1,5 +1,7 @@
 {% extends "task_add_form.html" %}
 
+{% block title %}Task Edit ({{ staff.user.username }}){% endblock %}
+
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -22,19 +24,11 @@
 </nav>
 {% endblock %}
 
-{% block actions %}
-    <div class="float-right">
-        <a href="{% url 'task-list' staff.user.username %}" class="action">
-        <i class="fa fa-reply"></i>
-        <span class="sr-only">Back to task list<span>
-        </a>
-    </div>
-{% endblock %}
-
 {% block list_title %}Edit Task{% endblock %}
 
 {% block extra_button %}
-    <button class="btn btn-secondary" type="cancel">
+    <a role="button" class="btn btn-secondary"
+       href="{{ object.get_absolute_url }}edit">
         <i class="fa fa-reply"></i> Cancel
-    </button>
+    </a>
 {% endblock %}

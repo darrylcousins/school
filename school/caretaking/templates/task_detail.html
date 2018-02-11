@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load caretaking_extras %}
+
+{% block title %}Task: {{ object }} ({{ staff.user.username }}){% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-list' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'task-list' user.username %}">tasks</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          {{ object.name }}
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+  {% if user.is_authenticated and user.is_staff %}
+    <div class="float-right">
+      <a href="{% url 'task-edit' user.username object.pk %}" class="action">
+        <i class="fa fa-pencil-alt"></i>
+        <span class="sr-only">Edit task<span>
+      </a>
+      <a href="{% url 'photo-add' %}?{{ object.urlencode_ct }}" class="action">
+        <i class="fa fa-camera-retro"></i>
+        <span class="sr-only">Add photo<span>
+      </a>
+    </div>
+  {% endif %}
+
+    <h2>{{ object.completed }}</h2>
+
+    <p class="lead">{{ object.description }}</p>
+
+    {% for photo in  object.get_photos %}
+      <img src="{{ photo.get_image_url }}" width="200">
+    {% endfor %}
+
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,32 @@
+{% extends "project_add_form.html" %}
+
+{% block title %}Project Edit {{ object }}{% endblock %}
+
+{% block action_type %}
+  <li class="breadcrumb-item active" aria-current="page">
+    <a href="{% url 'project-detail' object.pk %}">{{ object.name }}</a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">
+      edit
+  </li>
+{% endblock %}
+
+{% block list_title %}Edit Project{% endblock %}
+
+{% block task_select %}
+  <div id="task-select" class="form-group mb-2">
+  {% with field=form.tasks %}
+  {% for task in field.initial %}
+    <div class="form-check">
+       <input class="form-check-input" type="checkbox"
+          value="{{ task.pk }}" id="{{ task.pk }}"
+          name="tasks" checked="checked">
+       <label class="form-check-label" for="{{ task.pk }}">
+         <span class="text-muted">{{ task.completed|date:'D j N Y' }}</span>
+           {{ task.description }}
+       </label>
+    </div>
+  {% endfor %}
+  {% endwith %}
+  </div>
+{% endblock %}

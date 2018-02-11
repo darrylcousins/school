@@ -18,6 +18,7 @@ from .models import Task
 from .models import TaskType
 from .models import Diary
 from .models import Project
+from .models import Photo
 
 FORMFIELD_OVERRIDES = {
     models.CharField: {'widget': TextInput(attrs={'size': '40'})},
@@ -147,3 +148,4 @@ admin.site.register(Task, TaskAdmin)
 admin.site.register(TaskType)
 admin.site.register(Diary)
 admin.site.register(Project)
+admin.site.register(Photo)

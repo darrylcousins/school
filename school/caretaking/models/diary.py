@@ -10,14 +10,16 @@ from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.functions import Centroid
 
 from caretaking.models import Task
+from .mixins import PhotoEnabled
 
-class Diary(models.Model):
+class Diary(PhotoEnabled, models.Model):
     """
     A day to day record of tasks completed.
 
     A diary needs a staff member::
 
         >>> from django.contrib.auth.models import User
+        >>> from caretaking.models import Staff
         >>> darryl, created = User.objects.get_or_create(username='cousinsd', first_name='Darryl',
         ...     last_name='Cousins')
         >>> if created:
@@ -30,6 +32,7 @@ class Diary(models.Model):
     expectation that the staff member will provide his or her comments about the day.::
 
         >>> from datetime import date
+        >>> from caretaking.models import Diary
         >>> diary = Diary.objects.create(day=date(2017, 3, 10), hours=10.5, staff=caretaker, comment=None)
         >>> diary.save()
         >>> print(diary)

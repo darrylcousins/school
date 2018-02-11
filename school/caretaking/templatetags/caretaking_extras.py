@@ -2,6 +2,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import re
 from django import template
+from django.apps import apps
 
 register = template.Library()
 
@@ -29,3 +30,10 @@ def convert_camel_case(name):
     s2 = all_cap_re.sub(r'\1 \2', s1)
     s3 = number_re.sub(r'\1 \2', s2)
     return s3
+
+@register.simple_tag(name='get_object')
+def get_object(model_str, model_pk):
+    model = apps.get_model(model_str)
+    obj = model.objects.get(pk=int(model_pk))
+    return obj
+

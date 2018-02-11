@@ -13,11 +13,18 @@ from caretaking.views.task import TaskAdd
 from caretaking.views.task import TaskEdit
 from caretaking.views.task import TaskEditAjax
 from caretaking.views.task import TaskDelete
+from caretaking.views.task import TaskDetail
 from caretaking.views.project import ProjectAdd
 from caretaking.views.project import ProjectDetail
 from caretaking.views.project import ProjectList
 from caretaking.views.project import ProjectEdit
 from caretaking.views.project import ProjectDelete
+from caretaking.views.project import ProjectConfirmDelete
+from caretaking.views.photo import PhotoAdd
+from caretaking.views.photo import PhotoDetail
+from caretaking.views.photo import PhotoList
+from caretaking.views.photo import PhotoDelete
+from caretaking.views.photo import PhotoConfirmDelete
 
 
 __all__ = [
@@ -33,10 +40,17 @@ __all__ = [
         'TaskEdit',
         'TaskEditAjax',
         'TaskDelete',
+        'TaskDetail',
         'ProjectAdd',
         'ProjectEdit',
         'ProjectDelete',
+        'ProjectConfirmDelete',
         'ProjectDetail',
-        'ProjectList'
+        'ProjectList',
+        'PhotoAdd',
+        'PhotoDetail',
+        'PhotoDelete',
+        'PhotoConfirmDelete',
+        'PhotoList'
         ]
 

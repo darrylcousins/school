@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Project Add{% endblock %}
+
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -12,9 +14,11 @@
       <li class="breadcrumb-item">
           <a href="{% url 'project-list' %}">projects</a>
       </li>
-      <li class="breadcrumb-item active" aria-current="page">
-          add
-      </li>
+      {% block action_type %}
+        <li class="breadcrumb-item active" aria-current="page">
+            add
+        </li>
+      {% endblock %}
   </ol>
 </nav>
 {% endblock %}
@@ -65,15 +69,19 @@
           </div>
         {% endwith %}
         {% endcomment %}
-        <div id="task-select" class="form-group mb-2">
+        {% block task_select %}
+          <div id="task-select" class="form-group mb-2">
+          </div>
+        {% endblock %}
+        <div class="btn-group">
+          <button class="btn btn-info" type="button"
+            data-toggle="modal" data-target="#task-modal">
+            Select tasks
+          </button>
+          <button class="btn btn-success" type="submit">
+            <i class="fa fa-check"></i> Save
+          </button>
         </div>
-        <button class="btn btn-info" type="button"
-          data-toggle="modal" data-target="#task-modal">
-        Select tasks
-        </button>
-        <button class="btn btn-success" type="submit">
-        <i class="fa fa-check"></i> Save
-        </button>
     </form>
 
     <!-- begin modal code -->
@@ -89,14 +97,14 @@
           </div>
           <div class="modal-body">
             <p>Filter tasks by date range and search phrase</p>
-            <form action="" method="get" novalidate id="select-task-form">
+            <form action="" method="get" id="select-task-form">
               <div class="input-group mb-3">
                   <input class="form-control col-md-3" type="date"
                      required name="start-date" id="start-date">
                   <input class="form-control col-md-3" type="date"
                       required name="end-date" id="end-date">
                   <input class="form-control col-md-6" type="text" placeholder="Search phrase"
-                      onclick="$('#clear-button').removeClass('d-none');"
+                      onclick="$('#clear-button').removeClass('d-none');" required
                       id="search-term" name="q" value="{{ search_phrase }}">
                   <div class="input-group-append">
                       <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}
@@ -152,6 +160,13 @@ $(function(){
         type: 'get',
         success: function(data) {
           console.log(data);
+          if (!(data.length)) {
+            console.log('EMPTY');
+            $('#task-check').append('<strong>No results, try expanding ' +
+                'the date range or change the search term</strong>');
+            return;
+          };
+          console.log('HERE');
           var pk, check_el, fields;
           $('#task-check').empty();
           $.each(data, function(key, val) {

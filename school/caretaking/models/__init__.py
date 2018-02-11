@@ -6,6 +6,7 @@ from caretaking.models.task import TaskType
 from caretaking.models.task import Task
 from caretaking.models.diary import Diary
 from caretaking.models.project import Project
+from caretaking.models.photo import Photo
 
 __all__ = [
         'Staff',
@@ -13,5 +14,6 @@ __all__ = [
         'Location',
         'Task',
         'TaskType',
+        'Photo',
         'Project'
         ]

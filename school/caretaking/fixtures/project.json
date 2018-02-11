@@ -1,0 +1,23 @@
+[
+{
+    "model": "caretaking.project",
+    "pk": 1,
+    "fields": {
+        "name": "Picnic table",
+        "description": "Built a picnic table",
+        "created_by": 1,
+        "assigned_to": 1,
+        "comment": null,
+        "tasks": [
+            4528,
+            4566,
+            4611,
+            4636,
+            4641,
+            4690,
+            4696,
+            4721
+        ]
+    }
+}
+]

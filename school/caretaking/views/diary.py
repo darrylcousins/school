@@ -212,7 +212,7 @@ class DiaryDetail(DateDetailView):
 
         >>> diary = Diary.objects.get(day=thisday)
         >>> print(diary.get_absolute_url())
-        /caretaking/diary/2017/Mar/10/1/
+        /caretaking/cousinsd/diary/2017/Mar/10/1/
         >>> response = client.get(diary.get_absolute_url())
         >>> print(response.status_code)
         200

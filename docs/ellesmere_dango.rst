@@ -51,6 +51,14 @@ queries to work with modified ``pyodbc_gis`` I have decided to move to using `Po
 same application (because Metrel database is only usable with `Metrel PatLink` with prebuilt `MSSql`
 database. Any notes regarding `MSSql` installation have been moved to ``ellesmere_mssql.rst``.
 
+Data Visualisation
+------------------
+
+Went with these packages::
+
+        (ellesmere)$ pip install pandas
+        (ellesmere)$ pip install plotly
+    
 I used `https://docs.djangoproject.com/en/2.0/ref/contrib/gis/install/#windows` to install
 `Postgres`, `PostGIS`, `GDAL` and `GEOS` libraries. Briefly `OSGeo4W` installed the required packages.
 

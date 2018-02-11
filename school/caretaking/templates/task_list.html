@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load caretaking_extras %}
 
+{% block title %}Task List ({{ staff.user.username }}){% endblock %}
+
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -39,48 +41,33 @@
         <strong>{{ start_date|date:"j N Y" }}</strong> and 
         <strong>{{ end_date|date:"j N Y" }}</strong>.
         <br>
+        <hr>
         <p>
         Use the form below to change
         the date range.
         </p>
 
       <form action="." method="get">
-        <!-- date range options -->
-        {% comment %}
-        <div class="input-group" style="width: 75%">
-            <input class="form-control" type="date" required name="start-date"
-                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
-                min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control" type="date" required name="end-date"
-                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
-                min="" max="{{ today|date:"Y-m-d" }}">
-            <div class="input-group-append">
-                <button class="btn btn-secondary" type="submit">Go</button>
-            </div>
+        <hr>
+        <div class="row">
+          <div class="col-sm-3">
+            <label for="start-date">Start date:</label>
+          </div>
+          <div class="col-sm-3">
+            <label for="end-date">End date:</label>
+          </div>
+          <div class="col-sm-6">
+            <label for="search-term">Search term:</label>
+          </div>
         </div>
-        <br>
-            <label for="search-term">Search in the selected range:</label>
-            <div class="input-group" style="width: 75%">
-                <input class="form-control" type="text" placeholder="Search"
-                    onclick="$('#clear-button').removeClass('d-none');"
-                    id="search-term" name="q" value="{{ search_phrase }}">
-                <div class="input-group-append">
-                    <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
-                        type="button" id="clear-button"
-                        onclick="$('#search-term').val('');"
-                        >Clear</button>
-                    <button class="btn btn-secondary" type="submit">Go</button>
-                </div>
-            </div>
-        {% endcomment %}
         <div class="input-group">
-            <input class="form-control col-md-3 my-1" type="date" required name="start-date"
+            <input class="form-control col-sm-3 my-1" type="date" required name="start-date"
                 value="{{ start_date|date:"Y-m-d"}}" id="start-date"
                 min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control col-md-3 my-1" type="date" required name="end-date"
+            <input class="form-control col-sm-3 my-1" type="date" required name="end-date"
                 value="{{ end_date|date:"Y-m-d"}}" id="end-date"
                 min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control col-md-6 my-1" type="text" placeholder="Search"
+            <input class="form-control col-sm-6 my-1" type="text" placeholder="Search"
                 onclick="$('#clear-button').removeClass('d-none');"
                 id="search-term" name="q" value="{{ search_phrase }}">
             <div class="input-group-append">
@@ -93,22 +80,46 @@
                   Go</button>
             </div>
         </div>
-        <br>
-        <label for="location-select">Filter by location:</label>
+        <div class="row mt-3">
+          <div class="col-sm-6">
+            <label for="location-select">Filter by location:</label>
+          </div>
+          <div class="col-sm-6">
+            <label for="tasktype-select">Filter by task type:</label>
+          </div>
+        </div>
         <div class="input-group">
-            <select class="form-control" multiple size="8"
+            <select class="form-control col-sm-6" multiple size="3"
                 id="location-select" name="loc">
-        <option value="24"{% if not selected_location_pks or 24 in selected_location_pks %} selected{% endif %}>
-                    All
-                </option>
                 {% for loc in locations %}
                     <option value="{{ loc.pk }}"{% if loc.pk in selected_location_pks %} selected{% endif %}>
                         {{ loc.name|convert_camel_case }}
                     </option>
                 {% endfor %}
             </select>
+            <select class="form-control col-sm-6" multiple size="3"
+                id="tasktype-select" name="tasktype">
+                {% for type in tasktypes %}
+                    <option value="{{ type.pk }}"{% if type.pk in selected_tasktype_pks %} selected{% endif %}>
+                        {{ type.name }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
+        {% if selected_tasktype_pks or selected_location_pks %}
+          <div class="btn-toolbar justify-content-end mt-4">
+              <div class="btn-group" role="group">
+                  <button class="btn btn-outline"
+                      type="button" id="clear-filters-button"
+                      >Clear Filters</button>
+                  <button class="btn btn-secondary" type="submit">
+                  <i class="fa fa-search"></i>
+                    Go</button>
+              </div>
+          </div>
+        {% else %}
         <br>
+        {% endif %}
         {% if search_count %}
             <p>
                 <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
@@ -121,11 +132,15 @@
 
     {% include 'snippet_pagination.html' %}
 
-    <table class="table">
+    <table class="table table-sm table-striped table-hover">
+      {% comment %}
         <tr>
               <th></th>
             <th>Date</th><th>Description</th>
             <th>Locations</th>
+            <th>Task Types</th>
+        </tr>
+      {% endcomment %}
         {% for task in object_list %}
             <tr>
                 <td nowrap>
@@ -140,7 +155,11 @@
                     </a>
                   {% endif %}
                 </td>
-                <td class="task-date" nowrap>{{ task.completed|date:"j N Y" }}</td>
+                <td class="task-date" nowrap>
+                  <a href="{{ task.get_diary_url }}" title="View diary entry">
+                  {{ task.completed|date:"j N Y" }}
+                  </a>
+                </td>
                 <td class="task-description">
                     {{ task.description }}
                     {% if task.comment %}
@@ -148,11 +167,25 @@
                     {% endif %}
                 </td>
                 <td class="task-locations">
-                    <ul class="list-unstyled">
+                    <ul class="list-unstyled no-margin">
                     {% for loc in task.locations %}
                     <li class="small">{{ loc}}</li>
                     {% endfor %} 
                     </ul>
+                </td>
+                <td class="task-types">
+                    <ul class="list-unstyled no-margin">
+                    {% for type in task.tasktype.all %}
+                    <li class="small">{{ type}}</li>
+                    {% endfor %} 
+                    </ul>
+                </td>
+                <td class="task-photos">
+                    {% for photo in  task.get_photos %}
+                      <a href="{{ photo.get_detail_url }}">
+                        <img src="{{ photo.get_image_url }}" width="50">
+                      </a>
+                    {% endfor %}
                 </td>
             </tr>
         {% endfor %}
@@ -168,15 +201,20 @@
             var search_terms = "{{ search_words }}".split(' ');
             console.log(search_terms);
             search_terms.forEach(function(search_term) {
-                $('td.task-description').each(function() {
-                    t = $(this).html();
-                    console.log(t + 'term: ' + search_term);
-                    if (t.indexOf(search_term) > -1) {
-                        res = t.replace(search_term, 
-                                '<strong class="bg-warning">' + search_term + '</strong>');
-                        $(this).html(res);
-                    }
-                });
+              $('td.task-description').each(function() {
+                t = $(this).html();
+                console.log(t + 'term: ' + search_term);
+                if (t.indexOf(search_term) > -1) {
+                  res = t.replace(search_term, 
+                          '<strong class="bg-warning">' + search_term + '</strong>');
+                  $(this).html(res);
+                }
+              });
+            });
+            $('button#clear-filters-button').click(function() {
+              $('#location-select option:selected').remove();
+              $('#tasktype-select option:selected').remove();
+              $('#search-term').val('');
             });
         });
     </script>

@@ -2,7 +2,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import json
 
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -70,8 +70,15 @@ class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         
         For all edit views the authenticated user must be the staff member being edited or also
         allow administrators. 
+
+        TODO rase unauthorised!!!!
         """
-        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        try:
+            user = get_object_or_404(User, username=self.kwargs.get('username'))
+        except Http404:
+            user = self.request.user
+            if not user.is_staff:
+                raise Http404
 
         self.staff = user.staff
 

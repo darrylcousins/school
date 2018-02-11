@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Diary Confirm Delete: {{ diary }}{% endblock %}
+{% block title %}Photo Confirm Delete {{ object }}{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
@@ -12,36 +12,32 @@
           <a href="{% url 'staff-list' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item">
-          <a href="{% url 'staff-detail' object.staff.user.username %}">{{ object.staff.user.username }}</a>
-      </li>
-      <li class="breadcrumb-item">
-          <a href="{% url 'diary-list' object.staff.user.username %}">diary</a>
+          <a href="{% url 'photo-list' %}">photos</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
           <a href="{{ object.get_absolute_url }}">
-          {{ diary.day|date:"D j N Y" }}
+          {{ object.name}}
           </a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
-          {{ object.day|date:"D j N Y" }}
+          delete
       </li>
   </ol>
 </nav>
 {% endblock %}
 
 {% block content %}
-    <h2>Delete {{ object }}</h2>
+    <h2>Delete {{ object.name }}</h2>
 
     <p>
-    Are you sure you wish to permanently delete the diary entry <strong>{{ object }}?
+    Are you sure you wish to permanently delete the photo <strong>{{ object.name }}?
     </p>
     <form action="" method="post">{% csrf_token %}
             <button type="submit" class="btn btn-primary btn-block"
                 value="confirm">
                 <i class="fa fa-trash-alt"></i>
-                Delete diary entry
+                Delete photo
                 </button>
 </form>
 {% endblock %}
-
 

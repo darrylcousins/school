@@ -1,29 +1,56 @@
 [
 {
-  "model": "auth.user",
-  "pk": 1,
-  "fields": {
-    "password": "pbkdf2_sha256$100000$Q5cm2v34J81S$YnWXlhHgHHPbgnBMHD62AVAkJ857zXGY123FaUwKwbY=",
-    "last_login": "2018-01-20T05:26:02Z",
-    "is_superuser": true,
-    "username": "cousinsd",
-    "first_name": "Darryl",
-    "last_name": "Cousins",
-    "email": "cousinsd@ellesmere.school.nz",
-    "is_staff": true,
-    "is_active": true,
-    "date_joined": "2018-01-20T05:25:39Z",
-    "groups": [],
-    "user_permissions": []
-  }
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$100000$Q5cm2v34J81S$YnWXlhHgHHPbgnBMHD62AVAkJ857zXGY123FaUwKwbY=",
+        "last_login": "2018-01-31T09:06:44.749Z",
+        "is_superuser": true,
+        "username": "cousinsd",
+        "first_name": "Darryl",
+        "last_name": "Cousins",
+        "email": "cousinsd@ellesmere.school.nz",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2018-01-20T05:25:39Z",
+        "groups": [],
+        "user_permissions": []
+    }
 },
 {
-  "model": "caretaking.staff",
-  "pk": 1,
-  "fields": {
-    "title": "Caretaker",
-    "comment": "",
-    "user": 1
-  }
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$100000$wjp33xa7TiA3$SjbTpdp/zbsp/Fk0Gpb0xGil90EdErZxZnGsdVP43G0=",
+        "last_login": "2018-01-28T10:30:24.263Z",
+        "is_superuser": false,
+        "username": "halloumism",
+        "first_name": "Maria",
+        "last_name": "Halloumis",
+        "email": "halloumism@ellesmere.school.nz",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2018-01-25T07:52:08Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "caretaking.staff",
+    "pk": 1,
+    "fields": {
+        "title": "Caretaker",
+        "comment": "",
+        "user": 1
+    }
+},
+{
+    "model": "caretaking.staff",
+    "pk": 2,
+    "fields": {
+        "title": "Assistant Caretaker",
+        "comment": "",
+        "user": 2
+    }
 }
 ]

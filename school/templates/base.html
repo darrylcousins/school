@@ -10,6 +10,7 @@
 
     <!-- fonts -->
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Slab" rel="stylesheet">
     <!-- styles -->
     <link href="{% static 'css/jquery-ui/jquery-ui.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
@@ -55,13 +56,26 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarText">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link"
-                href="{% url 'staff-list' %}">Caretaking</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link"
-                href="{% url 'project-list' %}">Projects</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle"
+                 href="{% url 'staff-list' %}"
+                id="navbarDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">Caretaking</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% if staff %}
+                  <a class="dropdown-item"
+                     href="{% url 'diary-list' user.username %}">{{ 'diary'|title }}</a>
+                  <a class="dropdown-item"
+                        href="{% url 'task-list' user.username %}">{{ 'tasks'|title }}</a>
+                  <div class="dropdown-divider"></div>
+                {% endif %}
+                <a class="dropdown-item"
+                      href="{% url 'staff-list' %}">Caretaking</a>
+                <a class="dropdown-item"
+                      href="{% url 'project-list' %}">Projects</a>
+                <a class="dropdown-item"
+                      href="{% url 'photo-list' %}">Photos</a>
+              </div>
             </li>
           </ul>
         </div>

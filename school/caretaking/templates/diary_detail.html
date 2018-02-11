@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Diary: {{ diary }}{% endblock %}
+
 {% block extra_css %}
     <link href="https://openlayers.org/en/v4.1.0/css/ol.css" rel="stylesheet">
     <style type="text/css">
@@ -46,14 +48,18 @@
 
   {% if user.is_authenticated and user.staff == staff or user.is_staff %}
     <div class="float-right">
-        <a href="{{ diary.get_edit_url}}" class="action">
+      <a href="{{ diary.get_edit_url}}" class="action">
         <i class="fa fa-pencil-alt"></i>
         <span class="sr-only">Edit diary entry<span>
-        </a>
-        <a href="{{ diary.get_confirm_delete_url}}" class="action">
+      </a>
+      <a href="{{ diary.get_confirm_delete_url}}" class="action">
         <i class="fa fa-trash-alt"></i>
         <span class="sr-only">Delete diary entry<span>
-        </a>
+      </a>
+      <a href="{% url 'photo-add' %}?{{ diary.urlencode_ct }}" class="action">
+        <i class="fa fa-camera-retro"></i>
+        <span class="sr-only">Add photo<span>
+      </a>
     </div>
   {% endif %}
 
@@ -87,13 +93,41 @@
 
 
 <div class="task-list">
-    <ul class="task-list">
+    <table class="task-list table table-sm">
     {% for task in diary.tasks %}
-        <li>
-            {{ task.description }}
-        </li>
+      <tr>
+        <td class="task-description">
+          {{ task.description }}
+        </td>
+        <td class="text-muted small task-tasktype">
+          {% for type in task.tasktype.all %}
+          {{ type }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+        <td class="text-muted small task-locations">
+          {% for loc in task.locations %}
+          {{ loc }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+        <td class="task-photos">
+          {% for photo in  task.get_photos %}
+            <a href="{{ photo.get_detail_url }}">
+              <img src="{{ photo.get_image_url }}" width="50">
+            </a>
+          {% endfor %}
+        </td>
+        <td>
+          {% if task.project_set.count %}
+            <a href="{{ task.project_set.first.get_absolute_url }}"
+                class="action small mt-2">
+            <i class="fa fa-cogs"></i>
+            <span class="sr-only">View project<span>
+            </a>
+          {% endif %}
+        </td>
+      </tr>
     {% endfor %}
-    </ul>
+    </table>
 </div>
 
 <span id="diary_span_map">

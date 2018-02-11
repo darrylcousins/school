@@ -4,8 +4,9 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from .mixins import PhotoEnabled
 
-class Project(models.Model):
+class Project(PhotoEnabled, models.Model):
     """
     A project. Will be made up of a number of tasks.
 
@@ -42,3 +43,4 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse('project-detail', kwargs={'pk': self.pk})
+

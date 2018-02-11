@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Photo Add{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-list' %}">caretaking</a>
+      </li>
+      {% block action_type %}
+        <li class="breadcrumb-item active" aria-current="page">
+            add
+        </li>
+      {% endblock %}
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h2>{% block list_title %}Add Photo to {{ object }}{% endblock %}</h2>
+
+    <form action="" enctype="multipart/form-data" method="post"
+      novalidate id="photo-add-form">
+        {% include 'snippet_form_start.html' %}
+        {% comment %}
+        {% for field in form.visible_fields %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endfor %}
+        {% endcomment %}
+        <div class="form-row">
+            <div class="col-md-8 mb-3">
+                {% with field=form.title %}
+                    {% include 'snippet_form_field.html' %}
+                {% endwith %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {% with field=form.image %}
+                    {% include 'snippet_form_field.html' %}
+                {% endwith %}
+            </div>
+        </div>
+        {% with field=form.description %}
+          <div class="form-group">
+            {% include 'snippet_form_field.html' %}
+          </div>
+        {% endwith %}
+
+        <input type="hidden" name="created_by"
+          value="{{ form.created_by.initial.pk }}" id="created_by">
+        <input type="hidden" name="model"
+          value="{{ form.model.initial }}" id="model">
+        <input type="hidden" name="model_pk"
+          value="{{ form.model_pk.initial }}" id="model_pk">
+
+        {% for error in field.created_by.errors %}
+          <div class="invalid-feedback">
+            {{ error }}
+          </div>
+        {% endfor %}
+        {% for error in field.model.errors %}
+          <div class="invalid-feedback">
+            {{ error }}
+          </div>
+        {% endfor %}
+        {% for error in field.model_pk.errors %}
+          <div class="invalid-feedback">
+            {{ error }}
+          </div>
+        {% endfor %}
+
+        <button class="btn btn-success" type="submit">
+        <i class="fa fa-check"></i> Save
+        </button>
+    </form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+</script>
+{% endblock %}
+
+

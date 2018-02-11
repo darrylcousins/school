@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Project List{% endblock %}
+{% block title %}Photo List{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
@@ -12,70 +12,61 @@
           <a href="{% url 'staff-list' %}">caretaking</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
-          projects
+          photos
       </li>
   </ol>
 </nav>
 {% endblock %}
 
 {% block content %}
-    {% if request.user.is_staff %}
-    <div class="float-right mt-2 mr-1">
-        <a href="{% url 'project-add' %}" class="action">
-        <i class="fa fa-plus-circle"></i>
-        <span class="sr-only">Add project<span>
-        </a>
-    </div>
-    {% endif %}
+    <h2 id="edit-photo-header">{% block list_title %}Photos{% endblock %}</h2>
 
-    <h2 id="edit-project-header">{% block list_title %}Projects{% endblock %}</h2>
-
-    <table class="project-list table table-sm">
-        {% for project in object_list %}
-        <tr id="project_{{ project.pk }}" data-delete-url="{% url 'project-delete' project.pk %}">
+    <table class="photo-list table table-sm">
+        {% for photo in object_list %}
+        <tr id="photo_{{ photo.pk }}" data-delete-url="{% url 'photo-delete' photo.pk %}">
           {% if request.user.is_staff %}
             <td nowrap>
-              <a data-toggle="modal" data-target="#project-delete-modal"
+              <a data-toggle="modal" data-target="#photo-delete-modal"
                   class="action small mt-2">
               <i class="fa fa-trash-alt"></i>
-              <i class="sr-only">Delete project</i>
+              <i class="sr-only">Delete photo</i>
               </a>
-              <a href="{% url 'project-edit' project.pk %}" class="action small">
+              <a href="{% url 'photo-edit' photo.pk %}" class="action small">
               <i class="fa fa-pencil-alt"></i>
-              <span class="sr-only">Edit project<span>
+              <span class="sr-only">Edit photo<span>
               </a>
             </td>
           {% endif %}
           <td>
-            <a class="project-name" 
-               data-pk="{{ project.pk }}"
-               href="{{ project.get_absolute_url }}">
-              {{ project.name }}
+            <a class="photo-name" 
+               data-pk="{{ photo.pk }}"
+               href="{% url 'photo-detail' photo.pk %}">
+              {{ photo.title }}
             </a>
           </td>
           <td>
             <span class="small text-muted">
-              {{ project.description }}
+              {{ photo.description }}
             </span>
           </td>
-          </tr>
-        {% endfor %}
+        </tr>
+      {% endfor %}
     </table>
 
-    <!-- begin project delete confirm modal code -->
-    <div class="modal fade" id="project-delete-modal" tabindex="-1"
-        role="dialog" aria-labelledby="project-delete-modal-label" aria-hidden="true">
+    <!-- begin photo delete confirm modal code -->
+    <div class="modal fade" id="photo-delete-modal" tabindex="-1"
+        role="dialog" aria-labelledby="photo-delete-modal-label" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="project-delete-modal-label">Delete project</h5>
+            <h5 class="modal-title" id="photo-delete-modal-label">Delete photo</h5>
             {% csrf_token %}
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-              <p>Permanently delete this project?:<br>
+              <p>Permanently delete this photo?:<br>
                 <strong class="modal-description">description</strong>
               </p>
           </div>
@@ -84,7 +75,7 @@
             <button type="button" class="btn btn-primary delete-button"
                 onclick="deleteProject();">
                 <i class="fa fa-trash-alt"></i>
-                Delete project
+                Delete photo
                 </button>
           </div>
         </div>
@@ -99,16 +90,16 @@
 $(function(){
 
     /* start delete projct modal algorithm */
-    $("#project-delete-modal").on("show.bs.modal", function (event) {
+    $("#photo-delete-modal").on("show.bs.modal", function (event) {
       var button = $(event.relatedTarget),
           modal = $(this),
-          a_el = button.parent().parent().find("a.project-name"),
+          a_el = button.parent().parent().find("a.photo-name"),
           name = a_el.html(),
           pk = a_el.data("pk");
       modal.find(".modal-description").text(name);
       modal.find(".modal-footer").find(".delete-button").data("pk", pk);
     });
-    /* end delete project modal algorithm */
+    /* end delete photo modal algorithm */
 
     /* set notify defaults */
     $.notify.defaults({
@@ -119,22 +110,24 @@ $(function(){
     });
 });
 
-/* start delete Project method */
+/* start delete Photo method */
 var deleteProject = function() {
-    var pk = $("#project-delete-modal").find(".modal-footer").find(".delete-button").data("pk"),
-        url = $("tr#project_" + pk).data("delete-url"),
+    var pk = $("#photo-delete-modal").find(".modal-footer").find(".delete-button").data("pk"),
+        url = $("tr#photo_" + pk).data("delete-url"),
         data = {"pk": pk};
         data["csrfmiddlewaretoken"] = $("input[name='csrfmiddlewaretoken']").val();
+    console.log('data ' + data);
+    console.log('url ' + url);
     $.ajax({
         url: url,
         data: data,
         type: 'post',
         success: function(data) {
           console.log(data);
-          console.log($("li#project_" + data["pk"]));
-          $("tr#project_" + data["pk"]).remove();
-          $("#project-delete-modal").modal("hide");
-          $("#edit-project-header").notify("Project deleted", {position: "top center"});
+          console.log($("li#photo_" + data["pk"]));
+          $("tr#photo_" + data["pk"]).remove();
+          $("#photo-delete-modal").modal("hide");
+          $("#edit-photo-header").notify("Photo deleted", {position: "top center"});
         },
         error: function(e) {
           console.log(e);
@@ -143,3 +136,4 @@ var deleteProject = function() {
 };
 </script>
 {% endblock extra_js %}
+
