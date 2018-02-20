@@ -218,13 +218,13 @@ $(function(){
           tr_el.append(td_button_el);
           tr_el.append(td_desc_el);
           tr_el.append(td_type_el);
-          //span_el.parent().append("<strong class='ml-3 text-danger'>new</strong>");
           $("tr#task_" + data["pk"] + " > span.task-description").notify(
                   "Task created");
+          
           hideForm();
         },
         error: function(e) {
-          var desc = $("#task_description"),
+          var desc = $("#id_description"),
               res = $.parseJSON(e.responseText);
           desc.addClass('is-invalid').parent();
           desc.parent().append("<div class='invalid-feedback'>" + res["description"] + "</div>");
@@ -281,17 +281,19 @@ var deleteTask = function() {
 /* start add task form methods */
 var showForm = function() {
     $("#add-task-link").removeClass("d-inline").addClass("d-none");
-    $("#task-add").removeClass("d-none").addClass("d-inline");$("#task_description").val("");
+    $("#task-add").removeClass("d-none").addClass("d-inline");
     $("html, body").animate({
         scrollTop: ($("div[class='task-list']").offset().top)
     },500);
-    $("#task_description").focus();
+    $("#id_description").focus();
     return;
 };
 
 var hideForm = function() {
     $("#add-task-link").removeClass("d-none").addClass("d-inline");
-    $("#task-add").removeClass("d-inline").addClass("d-none");$("#task_description").val("");
+    $("#task-add").removeClass("d-inline").addClass("d-none");
+    $("#id_description").val("");
+    $("#id_tasktype > option").removeAttr("selected");
 };
 /* end add task form methods */
 

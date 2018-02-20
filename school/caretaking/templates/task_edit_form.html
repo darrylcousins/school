@@ -1,5 +1,9 @@
 {% extends "task_add_form.html" %}
 
+{% block form_media %}
+{{ form.media }}
+{% endblock form_media %}
+
 {% block title %}Task Edit ({{ staff.user.username }}){% endblock %}
 
 {% block breadcrumbs %}

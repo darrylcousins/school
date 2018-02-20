@@ -131,7 +131,8 @@ class DiaryList(ListView):
         context['days'] = self.queryset.count()
         context['days_worked'] = self.queryset.filter(hours__gt=0.0).count()
         context['total_hours'] = self.queryset.aggregate(total_hours=Sum('hours'))['total_hours']
-        task_qs = Task.objects.filter(completed__in=self.queryset.values_list('day', flat=True))
+        task_qs = Task.objects.filter(staff=self.user.staff).filter(
+                completed__in=self.queryset.values_list('day', flat=True))
         context['total_tasks'] = task_qs.count()
 
         # filter for search term
@@ -224,12 +225,24 @@ class DiaryDetail(DateDetailView):
 
     """
     date_field = 'day'
-    queryset = Diary.objects.all()
     template_name = 'diary_detail.html'
     context_object_name = 'diary'
     points = []
     targets = [t*0.00001 for t in (0, 1, 2, -1, -2)]
     allow_future = True
+
+    def get_queryset(self):
+        """Collect diary entries for this user.
+
+        Show particular date ranges: past week, past month, past year.
+
+        Also filter by a search term which will highlight tasks containing the search term.
+        """
+        self.user = get_object_or_404(User, username=self.kwargs.get('username'))
+
+        # filter by the staff member
+        qs = Diary.objects.filter(staff=self.user.staff)
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super(DiaryDetail, self).get_context_data(**kwargs)
@@ -244,6 +257,7 @@ class DiaryDetail(DateDetailView):
 
         # initialize value
         value = None
+        print(self.object, type(self.object));
         for point in self.object.points():
             if value is None:
                 # initialize geosgeometry object
@@ -269,11 +283,11 @@ class DiaryDetail(DateDetailView):
                 wkt = value.wkt
         context['diary_wkt'] = wkt
         try:
-            context['next'] = self.object.get_next_by_day()
+            context['next'] = self.object.get_next_by_day(staff=self.object.staff)
         except Diary.DoesNotExist:
             context['next'] = None
         try:
-            context['previous'] = self.object.get_previous_by_day()
+            context['previous'] = self.object.get_previous_by_day(staff=self.object.staff)
         except Diary.DoesNotExist:
             context['previous'] = None
 

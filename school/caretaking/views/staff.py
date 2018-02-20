@@ -63,7 +63,7 @@ class StaffDetail(DetailView):
             d = {}
             d['days_worked'] = qs.filter(hours__gt=0.0).count()
             d['total_hours'] = qs.aggregate(total_hours=Sum('hours'))['total_hours']
-            d['total_tasks'] = Task.objects.filter(
+            d['total_tasks'] = Task.objects.filter(staff=self.object).filter(
                     completed__in=qs.values_list('day', flat=True)).count()
             d['year'] = year
             context['years'].append(d)

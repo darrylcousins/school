@@ -16,32 +16,83 @@ var object_style = new ol.style.Style({
 {% endblock object_style %}
 
 {% block editing %}
-      var features = new ol.Collection();
-      features.extend([feature]);
-      var featureOverlay = new ol.layer.Vector({
-        source: new ol.source.Vector({features: features}),
-        style: object_style,
-      });
-      featureOverlay.setMap(map);
 
-      var modify = new ol.interaction.Modify({
-        features: features,
-        deleteCondition: function(event) {
-          return ol.events.condition.shiftKeyOnly(event) &&
-              ol.events.condition.singleClick(event);
-        }
-      });
-      map.addInteraction(modify);
+var sourceonchange = function(source) {
+  // the text area we want to update
+  var point = document.getElementById("id_point");
 
-      var draw; // global so we can remove it later
+  // all features?
+  var collection = source.getFeaturesCollection();
+  var format = new ol.format.WKT();
+  var wkt = format.writeFeatures(collection.getArray());
+  point.value = wkt;
+}
+var source = new ol.source.Vector({features: features});
+source.on('addfeature', function(evt){
+  sourceonchange(this);
+});
 
-      function addInteraction() {
-        draw = new ol.interaction.Draw({
-          features: features,
-          type: ('Point')
-        });
-        map.addInteraction(draw);
+source.on('changefeature', function(evt){
+  sourceonchange(this);
+});
+
+var featureOverlay = new ol.layer.Vector({
+  source: source,
+  style: object_style,
+});
+
+featureOverlay.setMap(map);
+
+var modify = new ol.interaction.Modify({
+  features: features,
+});
+modify.on('modifyend', function(evt) {
+});
+map.addInteraction(modify);
+
+var draw; // global so we can remove it later
+var select;
+
+function addDraw() {
+  draw = new ol.interaction.Draw({
+    //features: features,
+    source: source,
+    type: ('Point')
+  });
+  map.addInteraction(draw);
+};
+
+function addSelect() {
+  select = new ol.interaction.Select({
+    layer: featureOverlay,
+    condition: function(mapBrowserEvent) {
+      return ol.events.condition.click(mapBrowserEvent) &&
+              ol.events.condition.altKeyOnly(mapBrowserEvent);
       }
+  });
+  map.addInteraction(select);
+};
 
-      addInteraction();
+addSelect();
+addDraw();
+
+document.addEventListener("keydown", function (event) {
+  var del = event.which == 46 || event.which == 8,
+      el = event.target;
+  if (del){
+    var selected = select.getFeatures();
+    if (selected) {
+      selected.forEach(function(feature){
+        var coords = feature.getGeometry().getCoordinates();
+        source.forEachFeature(function(f) {
+          var fc = f.getGeometry().getCoordinates();
+          if (fc[0] == coords[0] && fc[1] == coords[1]) {
+            source.removeFeature(f);
+          };
+        });
+      });
+      sourceonchange(source);
+    }
+  };
+});
 {% endblock editing %}

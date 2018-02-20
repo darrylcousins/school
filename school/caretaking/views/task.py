@@ -5,6 +5,7 @@ import json
 
 from django.db.models import Q
 from django.urls import reverse
+from django.forms import ModelForm
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.http.request import QueryDict
@@ -25,6 +26,7 @@ from caretaking.views.mixins import AjaxResponseMixin
 from caretaking.views.mixins import AjaxDeletionMixin
 from caretaking.views.mixins import StaffRequiredMixin
 from caretaking.utils import QueryBuilder
+from caretaking.admin import PointWidget
 
 
 ### Task views
@@ -62,6 +64,7 @@ class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
 
     def form_valid(self, form):
         description = form.cleaned_data['description']
+        # assign point if user did not provide a location
         form.instance.point = LocateTask(description).points()
         return super().form_valid(form)
 
@@ -78,10 +81,19 @@ class TaskAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
                     'pk': self.object.pk})
 
 
+class TaskForm(ModelForm):
+    class Meta: 
+        model = Task
+        fields = ['completed', 'urgency', 'staff', 'description', 'tasktype', 'point']
+        widgets = {
+            'point': PointWidget()
+            }
+
+
 class TaskEdit(StaffRequiredMixin, UpdateView):
     model = Task
+    form_class = TaskForm
     template_name = 'task_edit_form.html'
-    fields = ['completed', 'urgency', 'staff', 'description', 'tasktype']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -90,6 +102,7 @@ class TaskEdit(StaffRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return self.object.get_diary_entry().get_edit_url()
+
 
 class TaskListBase:
 
@@ -124,7 +137,6 @@ class TaskListBase:
         # filter by selected locations using constructed OR query
         locations = self.request.GET.getlist('loc', [])
         self.locations = Location.objects.filter(pk__in=locations)
-        print(self.locations)
         if self.locations:
             queries = [Q(point__intersects=loc.polygon) for loc in self.locations]
             query = queries.pop()
@@ -167,7 +179,6 @@ class TaskListAjax(TaskListBase, BaseListView):
         data = json.loads(serializers.serialize('json', 
                 queryset,
                 fields=['completed', 'description']))
-        print(data)
         return JsonResponse(data, safe=False)
 
 

@@ -7,6 +7,7 @@ from django.forms import ModelForm
 from django.utils import translation, six
 from django.contrib.gis import gdal, geos
 from django.contrib.gis.admin.options import GeoModelAdmin
+from django.contrib.gis.geos import MultiPoint, GeometryCollection, fromstr
 from django.template import loader
 
 from floppyforms.gis import BaseGeometryWidget
@@ -95,9 +96,29 @@ class PointWidget(BaseGeometryWidget):
     def __init__(self, *args, **kwargs):
         super(PointWidget, self).__init__(*args, **kwargs)
 
+    def value_from_datadict(self, data, files, name):
+        """
+        Given a dictionary of data and this widget's name, return the value
+        of this widget or None if it's not provided.
+        """
+        geos_obj = fromstr(data.get(name).strip())
+        if isinstance(geos_obj, GeometryCollection):
+            geos_obj = MultiPoint([p for p in geos_obj])
+        return geos_obj.wkt
+
     def get_context(self, name, value, attrs=None, extra_context={}, renderer=None):
         """Get for display the college polygon"""
         context = super(PointWidget, self).get_context(name, value, attrs, extra_context)
+
+        # convert multipoint to geometry collection
+        geos_obj = fromstr(context['value'])
+        if isinstance(geos_obj, MultiPoint):
+            context['value'] = GeometryCollection([p for p in geos_obj]).wkt
+        elif isinstance(geos_obj, GeometryCollection):
+            context['value'] = geos_obj.wkt
+        else:
+            context['value'] = GeometryCollection(geos_obj).wkt
+
         try:
             value = Location.objects.get(name="CollegePlan").polygon
             value = geos.GEOSGeometry(value)

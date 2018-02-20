@@ -45,13 +45,13 @@
         <form action="." method="get">
         <!-- date range options -->
         <div class="input-group">
-            <input class="form-control col-md-3" type="date" required name="start-date"
+            <input class="form-control col-sm-3" type="date" required name="start-date"
                 value="{{ start_date|date:"Y-m-d"}}" id="start-date"
                 min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control col-md-3" type="date" required name="end-date"
+            <input class="form-control col-sm-3" type="date" required name="end-date"
                 value="{{ end_date|date:"Y-m-d"}}" id="end-date"
                 min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control col-md-6" type="text" placeholder="Search"
+            <input class="form-control col-sm-6" type="text" placeholder="Search"
                 onclick="$('#clear-button').removeClass('d-none');"
                 id="search-term" name="q" value="{{ search_phrase }}">
             <div class="input-group-append">

@@ -102,7 +102,7 @@ class Diary(PhotoEnabled, models.Model):
         """Return iterable of tasks completed on this day by this staff
         """
         return Task.objects.filter(completed=self.day).filter(
-            staff__in=[self.staff]).order_by('pk')
+            staff=self.staff).order_by('pk')
 
     def points(self, spread=True):
         """Return iterable of points of work on this day using points from tasks

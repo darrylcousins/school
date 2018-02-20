@@ -136,7 +136,10 @@ SECRET_KEY = r"m*4qr2d#!5tt0&v+i!=qm_6ss3iq21vb)9k$t-n1zl!pdj!hu#"
 ########## SITE CONFIGURATION
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+        '127.0.0.1',
+        '192.168.1.67'
+        ]
 ########## END SITE CONFIGURATION
 
 
@@ -213,6 +216,7 @@ DJANGO_APPS = (
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'widget_tweaks',
+    'floppyforms',
 
     # ellesmere.school apps
     'caretaking',

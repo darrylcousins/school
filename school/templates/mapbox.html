@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Mapbox{% endblock %}
+
+{% block page_title %}Mapbox{% endblock page_title %}
+
+{% block mapbox %}
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
+{% endblock mapbox %}
+
+{% block content %}
+<div id='map' style='width: 400px; height: 300px;'></div>
+<script>
+
+  mapboxgl.accessToken = 'pk.eyJ1IjoiY291c2luc2QiLCJhIjoiY2pkcGsxY2o2MGdvbjJybzQ4Y2JkeXN5diJ9.wrUsIr11r8UcVCNuO1aoAA';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v10'
+  });
+
+</script>
+{% endblock content %}
+

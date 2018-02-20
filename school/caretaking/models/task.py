@@ -171,7 +171,7 @@ class Task(PhotoEnabled, models.Model):
 
     def get_diary_entry(self):
         from caretaking.models.diary import Diary
-        diary = Diary.objects.get(day=self.completed)
+        diary = Diary.objects.filter(staff=self.staff).get(day=self.completed)
         return diary
 
     def get_diary_url(self):

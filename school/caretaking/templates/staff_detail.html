@@ -33,7 +33,7 @@
     </p>
 
     <h3>Summary</h3>
-    <table class="table">
+    <table class="table table-sm">
         <tr>
             <th>Year</th>
             <th>Days worked</th>
@@ -59,6 +59,10 @@
             <a href="{% url 'task-list' object.user.username %}">Tasks</a> 
         </li>
     </ul>
+    {% if user.is_staff and user.username == "cousinsd" %}
+    <iframe width="100%" height="600" frameborder="0" scrolling="no"
+           src="//plot.ly/~cousinsd/0.embed?link=false&logo=false&modebar=false"></iframe>
+    {% endif %}
 {% endblock %}
 
 
