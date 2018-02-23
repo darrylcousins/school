@@ -1,3 +1,5 @@
+__author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
+
 import csv
 from datetime import datetime
 

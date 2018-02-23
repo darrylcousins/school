@@ -14,7 +14,6 @@ Open ``conemu`` with 'Powershell'. Run `vi :Proj` and find code and docs.
 To run the server and tests open ``cmd`` shell and move to conda env.::
 
         $ chdir C:\Users\cousinsd\AppData\Local\Continuum\Miniconda3\envs\ellesmere\school\school
-        $ chdir schoool\school
 
 Activate the environment::
 
