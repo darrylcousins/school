@@ -66,15 +66,21 @@
                 id="navbarDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">Caretaking</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% if staff %}
+                {% if user.is_authenticated and user.staff %}
                   <a class="dropdown-item"
-                     href="{% url 'diary-list' staff.user.username %}">{{ 'diary'|title }}</a>
+                     href="{% url 'diary-list' user.staff.user.username %}">
+                    {{ 'diary'|title }} ({{user.username }})
+                  </a>
                   <a class="dropdown-item"
-                        href="{% url 'task-list' staff.user.username %}">{{ 'tasks'|title }}</a>
+                        href="{% url 'task-list' user.staff.user.username %}">
+                    {{ 'tasks'|title }} ({{user.username }})
+                  </a>
                   <div class="dropdown-divider"></div>
                 {% endif %}
                 <a class="dropdown-item"
                       href="{% url 'staff-list' %}">Caretaking</a>
+                <a class="dropdown-item"
+                      href="{% url 'todo-list' %}">Todos</a>
                 <a class="dropdown-item"
                       href="{% url 'project-list' %}">Projects</a>
                 <a class="dropdown-item"
@@ -129,6 +135,18 @@
       {% endblock content %}
 
     </div> <!-- /container -->
+    
+      <!--Footer-->
+      <footer class="page-footer font-small pt-4 mt-4">
+          <!--Copyright-->
+          <div class="footer-copyright py-3 text-center">
+              <div class="container-fluid">
+                  @2018 Copyright: <a href="mailto:cousinsd@ellesmere.school.nz">Darryl Cousins</a>
+              </div>
+          </div>
+          <!--/.Copyright-->
+      </footer>
+      <!--/.Footer-->
 
   </body>
 </html>

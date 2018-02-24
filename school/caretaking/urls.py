@@ -8,12 +8,18 @@ from .views import DiaryList, DiaryDetail, DiaryAdd
 from .views import DiaryEdit, DiaryDelete
 from .views import TaskList, TaskAdd, TaskEdit, TaskDelete
 from .views import TaskDetail, TaskEditAjax, TaskListAjax
+from .views import TodoList
 from .views import ProjectList, ProjectAdd, ProjectDetail
 from .views import ProjectEdit, ProjectDelete, ProjectConfirmDelete
 from .views import PhotoAdd, PhotoList, PhotoDetail, PhotoDelete, PhotoConfirmDelete
 
 urlpatterns = (
     path('', StaffList.as_view(), name="staff-list"),
+
+    # todos
+    path('todos/',
+        TodoList.as_view(),
+        name="todo-list"),
 
     # projects
     path('projects/',

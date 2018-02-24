@@ -101,7 +101,10 @@ class TaskEdit(StaffRequiredMixin, UpdateView):
         return context
 
     def get_success_url(self):
-        return self.object.get_diary_entry().get_edit_url()
+        if self.object.completed:
+            return self.object.get_diary_entry().get_edit_url()
+        else:
+            return reverse('todo-list')
 
 
 class TaskListBase:
@@ -220,3 +223,14 @@ class TaskList(TaskListBase, ListView):
             pass
         context['query_string'] = '?' + qd.urlencode() + '&' if qd else '?'
         return context
+
+
+class TodoList(ListView):
+    model = Task
+    template_name = 'todo_list.html'
+    paginate_by = 30
+
+    def get_queryset(self):
+        # uncompleted tasks
+        qs = Task.objects.filter(completed=None)
+        return qs

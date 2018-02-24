@@ -167,7 +167,10 @@ class Task(PhotoEnabled, models.Model):
             return '{:.100}'.format(self.description)
 
     def get_absolute_url(self):
-        return self.get_diary_url()
+        if self.completed:
+            return self.get_diary_url()
+        else:
+            return(reverse('todo-list'))
 
     def get_diary_entry(self):
         from caretaking.models.diary import Diary

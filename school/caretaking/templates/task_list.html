@@ -166,19 +166,15 @@
                     <br><span class="small text-muted">{{ task.comment }}</span>
                     {% endif %}
                 </td>
-                <td class="task-locations">
-                    <ul class="list-unstyled no-margin">
-                    {% for loc in task.locations %}
-                    <li class="small">{{ loc}}</li>
-                    {% endfor %} 
-                    </ul>
+                <td class="text-muted small task-tasktype" width="20%">
+                  {% for type in task.tasktype.all %}
+                    {{ type }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
                 </td>
-                <td class="task-types">
-                    <ul class="list-unstyled no-margin">
-                    {% for type in task.tasktype.all %}
-                    <li class="small">{{ type}}</li>
-                    {% endfor %} 
-                    </ul>
+                <td class="text-muted small task-locations">
+                  {% for loc in task.locations %}
+                  {{ loc }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
                 </td>
                 <td class="task-photos">
                     {% for photo in  task.get_photos %}

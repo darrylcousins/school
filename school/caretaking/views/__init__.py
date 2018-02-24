@@ -14,6 +14,7 @@ from caretaking.views.task import TaskEdit
 from caretaking.views.task import TaskEditAjax
 from caretaking.views.task import TaskDelete
 from caretaking.views.task import TaskDetail
+from caretaking.views.task import TodoList
 from caretaking.views.project import ProjectAdd
 from caretaking.views.project import ProjectDetail
 from caretaking.views.project import ProjectList
@@ -41,6 +42,7 @@ __all__ = [
         'TaskEditAjax',
         'TaskDelete',
         'TaskDetail',
+        'TodoList',
         'ProjectAdd',
         'ProjectEdit',
         'ProjectDelete',
