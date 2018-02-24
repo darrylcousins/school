@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load caretaking_extras %}
+
+{% block title %}Todo List{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+          <a href="/">home</a>
+      </li>
+      <li class="breadcrumb-item">
+          <a href="{% url 'staff-list' %}">caretaking</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+          todos
+      </li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated and user.is_staff %}
+      <div class="float-right">
+          <a href="{% url 'task-add' user.staff.user.username %}?came_from=todo" class="action">
+          <i class="fa fa-plus-circle"></i>
+          <span class="sr-only">Add a task<span>
+          </a>
+      </div>
+    {% endif %}
+
+    <h2>Todos</h2>
+
+    {% include 'snippet_pagination.html' %}
+
+    <table class="table table-sm table-striped table-hover">
+        {% for task in object_list %}
+            <tr>
+                <td nowrap>
+                  {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'task-edit' user.staff.user.username task.pk %}" class="action small">
+                    <i class="fa fa-pencil-alt"></i>
+                    <span class="sr-only">Edit todo<span>
+                    </a>
+                  {% endif %}
+                </td>
+                <td class="task-description">
+                    {{ task.description }}
+                    {% if task.comment %}
+                    <br><span class="small text-muted">{{ task.comment }}</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted small task-tasktype" width="20%">
+                  {% for type in task.tasktype.all %}
+                    {{ type }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td class="text-muted small task-locations">
+                  {% for loc in task.locations %}
+                  {{ loc }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td class="task-photos">
+                    {% for photo in  task.get_photos %}
+                      <a href="{{ photo.get_detail_url }}">
+                        <img src="{{ photo.get_image_url }}" width="50">
+                      </a>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tr>
+    </table>
+
+    {% include 'snippet_pagination.html' %}
+
+    {% block extra_js %}
+    {% endblock extra_js %}
+
+{% endblock %}
+
+
