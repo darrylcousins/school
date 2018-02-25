@@ -15,7 +15,6 @@ django-braces==1.4.0
 django-floppyforms==1.7.0
 django-model-utils==2.0.3
 django-widget-tweaks==1.4.1
-gunicorn==18.0
 idna==2.6
 ipython-genutils==0.2.0
 jsonschema==2.6.0
