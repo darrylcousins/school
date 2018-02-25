@@ -12,6 +12,7 @@ __pycache__/
 # data
 *.csv
 *.ics
+assets/
 
 # windows
 Include/             

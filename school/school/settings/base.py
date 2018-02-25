@@ -5,7 +5,10 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
+from os import environ
 
+GEOS_LIBRARY_PATH = environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = environ.get('GDAL_LIBRARY_PATH')
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
