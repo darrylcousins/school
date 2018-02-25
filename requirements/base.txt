@@ -1,9 +1,3 @@
-Django
-bpython
-django-braces
-django-model-utils
-logutils
-matplotlib
 bpython==0.13
 certifi==2018.1.18
 chardet==3.0.4
