@@ -13,9 +13,17 @@ __pycache__/
 *.csv
 *.ics
 
+# windows
+Include/             
+Scripts/             
+pip-selfcheck.json   
+share/               
+tcl/
+
 # vi swp
 *.swp
 media/
+
 # Distribution / packaging
 .Python
 env/
