@@ -136,8 +136,6 @@ SECRET_KEY = r"m*4qr2d#!5tt0&v+i!=qm_6ss3iq21vb)9k$t-n1zl!pdj!hu#"
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = [
-        '127.0.0.1',
-        '192.168.1.67'
         ]
 ########## END SITE CONFIGURATION
 
