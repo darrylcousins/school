@@ -21,3 +21,5 @@ ALLOWED_HOSTS = [
 ########## STATIC FILE CONFIGURATION
 STATIC_ROOT = normpath(join(SITE_ROOT, 'staticfiles'))
 ########## END STATIC FILE CONFIGURATION
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
