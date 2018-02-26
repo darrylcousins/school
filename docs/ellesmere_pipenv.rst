@@ -12,9 +12,9 @@ Have a go with pipenv to create environment::
     (school) $ pip install pipenv
     (school) $ 
 
-Heroku::
+Heroku (not cyberdelia!)::
 
-    (school) $ heroku create --buildpack https://github.com/cyberdelia/heroku-geo-buildpack.git ellesmere
+    (school) $ heroku create --buildpack https://github.com/dschet/heroku-geo-buildpack.git ellesmere
     (school) $ heroku buildpacks:set heroku/python
     (school) $ heroku git:remote -a ellesmere
     (school) $ git push heroku master
