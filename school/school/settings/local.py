@@ -6,8 +6,6 @@ from os.path import join, normpath
 
 from .base import *
 
-GDAL_LIBRARY_PATH = 'C:\\OSGeo4W\\bin\\gdal201.dll'
-
 ########## DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
