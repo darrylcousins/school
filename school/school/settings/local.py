@@ -6,6 +6,8 @@ from os.path import join, normpath
 
 from .base import *
 
+GDAL_LIBRARY_PATH = 'C:\\OSGeo4W\\bin\\gdal201.dll'
+
 ########## DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
@@ -19,6 +21,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
+
+# Created postgresql-clean-63911 as DATABASE_URL
+
 ########## END DATABASE CONFIGURATION
 
 
