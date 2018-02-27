@@ -23,3 +23,15 @@ STATIC_ROOT = normpath(join(SITE_ROOT, 'staticfiles'))
 ########## END STATIC FILE CONFIGURATION
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+########## CACHE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    }
+}
+########## END CACHE CONFIGURATION
+
+
