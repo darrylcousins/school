@@ -2,10 +2,12 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 """Heroku settings and globals."""
 
+import dj_database_url
 from .production import *
 
 import os
 
+# os.environ variables set by heroku fail - is $HOME set correctly on server?
 GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so'
 GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so'
 
@@ -33,5 +35,11 @@ CACHES = {
     }
 }
 ########## END CACHE CONFIGURATION
+
+
+########## DATABASE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
+DATABASES['default'] =  dj_database_url.config()
+########## END DATABASE CONFIGURATION
 
 

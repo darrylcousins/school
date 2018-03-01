@@ -28,24 +28,6 @@ DEBUG = True
 ########## END DEBUG CONFIGURATION
 
 
-########## DATABASE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-# Assign to variable to make it easier to comment out during development
-DEFAULT_DB = {
-    'ENGINE': 'django.contrib.gis.db.backends.postgis',
-    'NAME': 'ellesmere',
-    'USER': 'ellesmere',
-    'PASSWORD': 'ellesmere',
-    'HOST':'127.0.0.1',
-    'PORT': 5432,
-}
-DATABASES = {
-    'default': DEFAULT_DB,
-}
-
-########## END DATABASE CONFIGURATION
-
-
 ########## MANAGER CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = (
