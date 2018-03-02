@@ -11,8 +11,12 @@ import os
 #GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so'
 #GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos_c.so'
 # trying with my own fork of buildpack
-GDAL_LIBRARY_PATH = os.environ['GDAL_LIBRARY_PATH']
-GEOS_LIBRARY_PATH = os.environ['GEOS_LIBRARY_PATH']
+GDAL_LIBRARY_PATH = os.getenv(
+        'GDAL_LIBRARY_PATH',
+        '/app/.heroku/vendor/lib/libgdal.so')
+GEOS_LIBRARY_PATH = os.getenv(
+        'GEOS_LIBRARY_PATH',
+        '/app/.heroku/vendor/lib/libgeos_c.so')
 
 ########## SITE CONFIGURATION
 # Hosts/domain names that are valid for this site
