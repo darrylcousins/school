@@ -18,3 +18,13 @@ Heroku (not cyberdelia!)::
     (school) $ heroku buildpacks:set heroku/python
     (school) $ heroku git:remote -a ellesmere
     (school) $ git push heroku master
+
+Push from local database, this failed for me on windows so I created a local dump::
+
+    $ PGUSER=ellesmere PGPASSWORD=ellesmere pg_dump  -Fc --no-acl --no-owner ellesmere > ellesmere.dump
+
+And uploaded to S3 and then restored on heroku::
+
+    $ heroku pg:backups:restore "https://s3-us-west-1.amazonaws.com/.../ellesmere.dump" DATABASE_URL
+
+Which worked.

@@ -26,6 +26,8 @@ from caretaking.utils import QueryBuilder
 from caretaking.views.mixins import StaffRequiredMixin
 from caretaking.views.utils import color_func, FONT_PATH
 
+import matplotlib
+matplotlib.use('Agg')
 
 ### Diary views
 class DiaryAdd(StaffRequiredMixin, CreateView):
