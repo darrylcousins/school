@@ -26,9 +26,6 @@ from caretaking.utils import QueryBuilder
 from caretaking.views.mixins import StaffRequiredMixin
 from caretaking.views.utils import color_func, FONT_PATH
 
-import matplotlib
-matplotlib.use('Agg')
-
 ### Diary views
 class DiaryAdd(StaffRequiredMixin, CreateView):
     model = Diary
@@ -147,7 +144,7 @@ class DiaryList(ListView):
 
         # create word cloud from task descriptions
         words = ' '.join(task_qs.values_list('description', flat=True)).lower()
-        if words:
+        if words and False: # TODO: get tkinter working on heroku to make matplotlib work
             stopwords = set(STOPWORDS)
             stopwords.add('block')
 
