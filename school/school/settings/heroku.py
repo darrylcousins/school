@@ -18,6 +18,16 @@ GEOS_LIBRARY_PATH = os.getenv(
         'GEOS_LIBRARY_PATH',
         '/app/.heroku/vendor/lib/libgeos_c.so')
 
+
+########## DEBUG CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
+DEBUG = False
+
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
+STATIC_URL = 'https://s3.us-east-2.amazonaws.com/cousinsd-ellesmere-static/assets/'
+
+
 ########## SITE CONFIGURATION
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
