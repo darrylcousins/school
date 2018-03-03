@@ -47,10 +47,6 @@
       <p>{{ object.comment }}</p>
     {% endif %}
 
-    {% for photo in  object.get_photos %}
-      <img src="{{ photo.get_image_url }}" width="200">
-    {% endfor %}
-
     <table class="table table-sm">
     {% for task in object.tasks.all %}
     <tr>
@@ -70,6 +66,10 @@
     </tr>
     {% endfor %}
     </table>
+
+    {% for photo in  object.get_photos %}
+      <img src="{{ photo.get_image_url }}" width="512">
+    {% endfor %}
 
 {% endblock %}
 
