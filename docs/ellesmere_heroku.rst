@@ -25,6 +25,6 @@ Push from local database, this failed for me on windows so I created a local dum
 
 And uploaded to S3 and then restored on heroku::
 
-    $ heroku pg:backups:restore "https://s3-us-west-1.amazonaws.com/.../ellesmere.dump" DATABASE_URL
+    $ heroku pg:backups:restore "https://s3-us-west-1.amazonaws.com/cousinsd-ellesmere-dbbackup/ellesmere.dump" DATABASE_URL
 
 Which worked.
