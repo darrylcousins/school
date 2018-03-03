@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.apps import apps
 from django.utils.translation import gettext as _
 
+from school.files.storage import S3Storage
 
 class Photo(models.Model):
     """

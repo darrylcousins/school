@@ -77,13 +77,15 @@ USE_L10N = True
 USE_TZ = True
 ########## END GENERAL CONFIGURATION
 
+#DEFAULT_FILE_STORAGE = 'school.files.storage.S3Storage'
 
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = normpath(join(SITE_ROOT, 'media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/'
+MEDIA_URL = 'https://s3.us-east-2.amazonaws.com/cousinsd-ellesmere-static/media/'
 ########## END MEDIA CONFIGURATION
 
 
