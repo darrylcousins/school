@@ -179,7 +179,8 @@
             var search_terms = "{{ search_words }}".split(' ');
             console.log(search_terms);
             search_terms.forEach(function(search_term) {
-              $('table.task-list > tr > td.decription').each(function() {
+              console.log(search_term);
+              $('td.description').each(function() {
                     t = $(this).html();
                     console.log(t + 'term: ' + search_term);
                     if (t.indexOf(search_term) > -1) {
