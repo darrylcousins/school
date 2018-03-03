@@ -42,37 +42,62 @@
         Select a date range.
         </p>
 
-        <form action="." method="get">
-        <!-- date range options -->
+  <form action="." method="get">
+    <!--
+    <div class="row">
+      <div class="col-lg-12">
         <div class="input-group">
-            <input class="form-control col-sm-3" type="date" required name="start-date"
-                value="{{ start_date|date:"Y-m-d"}}" id="start-date"
-                min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control col-sm-3" type="date" required name="end-date"
-                value="{{ end_date|date:"Y-m-d"}}" id="end-date"
-                min="" max="{{ today|date:"Y-m-d" }}">
-            <input class="form-control col-sm-6" type="text" placeholder="Search"
-                onclick="$('#clear-button').removeClass('d-none');"
-                id="search-term" name="q" value="{{ search_phrase }}">
-            <div class="input-group-append">
-                <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
-                    type="button" id="clear-button"
-                    onclick="$('#search-term').val('');"
-                    >Clear</button>
-                <button class="btn btn-secondary" type="submit">
-                <i class="fa fa-search"></i>
-                  Go</button>
-            </div>
+          <input class="form-control" type="date" required name="start-date"
+              value="{{ start_date|date:"Y-m-d"}}" id="start-date"
+              min="" max="{{ today|date:"Y-m-d" }}">
+          <input class="form-control" type="date" required name="end-date"
+              value="{{ end_date|date:"Y-m-d"}}" id="end-date"
+              min="" max="{{ today|date:"Y-m-d" }}">
+          <input class="form-control" type="text" placeholder="Search"
+              onclick="$('#clear-button').removeClass('d-none');"
+              id="search-term" name="q" value="{{ search_phrase }}">
+          <div class="input-group-append">
+            <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
+                type="button" id="clear-button"
+                onclick="$('#search-term').val('');"
+                >Clear</button>
+            <button class="btn btn-secondary" type="submit">
+            <i class="fa fa-search"></i>
+              Go</button>
+          </div>
         </div>
+      </div>
+    </div>
+    -->
+    <div class="input-group">
+      <input class="form-control col-sm-3 my-1" type="date" required name="start-date"
+          value="{{ start_date|date:"Y-m-d"}}" id="start-date"
+          min="" max="{{ today|date:"Y-m-d" }}">
+      <input class="form-control col-sm-3 my-1" type="date" required name="end-date"
+          value="{{ end_date|date:"Y-m-d"}}" id="end-date"
+          min="" max="{{ today|date:"Y-m-d" }}">
+      <input class="form-control col-sm-6 my-1" type="text" placeholder="Search"
+          onclick="$('#clear-button').removeClass('d-none');"
+          id="search-term" name="q" value="{{ search_phrase }}">
+      <div class="input-group-append">
+        <button class="btn btn-outline{% if not search_phrase %} d-none{% endif %}"
+            type="button" id="clear-button"
+            onclick="$('#search-term').val('');"
+            >Clear</button>
+        <button class="btn btn-secondary" type="submit">
+        <i class="fa fa-search"></i>
+          Go</button>
+      </div>
+    </div>
 
-        {% if search_count %}
-            <p class="mt-2">
-                <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
-            phrase <strong>{{ search_phrase }}</strong>.
-            </p>
-        {% endif %}
-            
-        </form>
+    {% if search_count %}
+        <p class="mt-2">
+            <strong>{{ search_count }}</strong> task{{ search_count|pluralize }} found matching search 
+        phrase <strong>{{ search_phrase }}</strong>.
+        </p>
+    {% endif %}
+        
+  </form>
 
         <p class="mb-0 mt-3"><strong>{{ days_worked }} days</strong> (<strong>{{ total_hours }} hours</strong>) worked
         and <strong>{{ total_tasks }} tasks</strong> completed.
