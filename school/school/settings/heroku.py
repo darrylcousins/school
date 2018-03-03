@@ -38,19 +38,19 @@ ALLOWED_HOSTS = [
 ########## END SITE CONFIGURATION
 
 ########## STATIC FILE CONFIGURATION
-STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
+#STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
 ########## END STATIC FILE CONFIGURATION
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
-    }
-}
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+#        'LOCATION': '/var/tmp/django_cache',
+#    }
+#}
 ########## END CACHE CONFIGURATION
 
 
