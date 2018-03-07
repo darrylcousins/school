@@ -11,7 +11,8 @@ from .views import TaskDetail, TaskEditAjax, TaskListAjax
 from .views import TodoList
 from .views import ProjectList, ProjectAdd, ProjectDetail
 from .views import ProjectEdit, ProjectDelete, ProjectConfirmDelete
-from .views import PhotoAdd, PhotoList, PhotoDetail, PhotoDelete, PhotoConfirmDelete
+from .views import PhotoAdd, PhotoList, PhotoDetail
+from .views import PhotoDelete, PhotoConfirmDelete, PhotoUpload
 
 urlpatterns = (
     path('', StaffList.as_view(), name="staff-list"),
@@ -42,12 +43,15 @@ urlpatterns = (
         name="project-confirm-delete"),
 
     # photos
-    path('photos/add',
-        PhotoAdd.as_view(),
-        name="photo-add"),
     path('photos',
         PhotoList.as_view(),
         name="photo-list"),
+    path('photos/add',
+        PhotoAdd.as_view(),
+        name="photo-add"),
+    path('photos/upload',
+        PhotoUpload.as_view(),
+        name="photo-upload"),
     path('photos/<int:pk>',
         PhotoDetail.as_view(),
         name="photo-detail"),

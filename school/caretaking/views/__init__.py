@@ -26,6 +26,7 @@ from caretaking.views.photo import PhotoDetail
 from caretaking.views.photo import PhotoList
 from caretaking.views.photo import PhotoDelete
 from caretaking.views.photo import PhotoConfirmDelete
+from caretaking.views.photo import PhotoUpload
 
 
 __all__ = [
@@ -53,6 +54,7 @@ __all__ = [
         'PhotoDetail',
         'PhotoDelete',
         'PhotoConfirmDelete',
-        'PhotoList'
+        'PhotoList',
+        'PhotoUpload',
         ]
 

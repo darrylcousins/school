@@ -2,10 +2,12 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 from django.urls import reverse
 from django.apps import apps
+from django.http import Http404
 from django.http.request import QueryDict
-from django.views.generic.edit import CreateView
+from django.views.generic import TemplateView
 from django.views.generic import ListView
 from django.views.generic import DetailView
+from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import BaseDetailView
 
@@ -24,6 +26,10 @@ class PhotoList(ListView):
 class PhotoDetail(DetailView):
     model = Photo
     template_name = 'photo_detail.html'
+
+
+class PhotoUpload(TemplateView):
+    template_name = 'photo_upload.html'
 
 
 class PhotoDelete(StaffRequiredMixin, BaseDetailView, AjaxDeletionMixin):
@@ -58,5 +64,8 @@ class PhotoAdd(StaffRequiredMixin, AjaxResponseMixin, CreateView):
         qd = QueryDict(self.request.GET.urlencode())
         if qd:
             initial.update(qd.dict())
+        else:
+            # not model nor model.pk then raise 404
+            raise Http404
         return initial
 

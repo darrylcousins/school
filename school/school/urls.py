@@ -10,8 +10,11 @@ from django.contrib import admin
 admin.autodiscover() # this may be obsolete in Django-2
 admin.site.site_header = 'caretaking@ellesmere'
 
+from school.views.sign_s3 import SignS3View
+
 urlpatterns = [
     path('', TemplateView.as_view(template_name='base.html'), name='index'),
+    path('sign_s3', SignS3View.as_view(), name='sign_s3'),
     path('caretaking/', include('caretaking.urls')),
 
     path('admin/', admin.site.urls),
