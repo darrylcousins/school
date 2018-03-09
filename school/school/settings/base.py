@@ -77,7 +77,7 @@ USE_L10N = True
 USE_TZ = True
 ########## END GENERAL CONFIGURATION
 
-#DEFAULT_FILE_STORAGE = 'school.files.storage.S3Storage'
+DEFAULT_FILE_STORAGE = 'school.files.storage.S3Storage'
 
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root

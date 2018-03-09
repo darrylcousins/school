@@ -4,4 +4,14 @@ from django.core.files.storage import Storage
 from django.core.files.storage import FileSystemStorage
 
 class S3Storage(FileSystemStorage):
-    pass
+
+    def save(self, name, content, max_length=None):
+        """
+        Save new content to the file specified by name. The content should be
+        a proper File object or any python file-like object, ready to be read
+        from the beginning.
+
+        Don't save anything.
+        """
+        print('pretend saving', name)
+        return name
