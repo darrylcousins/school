@@ -10,8 +10,9 @@ class PhotoEnabled:
 
     def get_photos(self):
         model= ContentType.objects.get_for_model(self)
-        model_str = '.'.join((model.app_label, model.name))
+        model_str = '.'.join((model.app_label, model.name.lower()))
         photos = Photo.objects.filter(model=model_str, model_pk=self.pk)
+        print(model_str, self.pk)
         return photos
 
     def urlencode_ct(self):

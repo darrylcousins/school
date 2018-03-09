@@ -39,6 +39,7 @@ class SignS3View(View):
         upload_to = Photo._meta.get_field('image').upload_to
         dirname = datetime.datetime.now().strftime(upload_to)
         filename = posixpath.join(dirname, filename)
+        filename = 'media/' + filename
 
         presigned_post = client.generate_presigned_post(
             Bucket = bucket,
@@ -54,8 +55,6 @@ class SignS3View(View):
             ExpiresIn = 3600
         )
 
-        print(filename)
-        filename = 'media/' + filename
         data = {
             'data': presigned_post,
             'url': 'https://%s.s3.amazonaws.com/%s' % (bucket, filename)
