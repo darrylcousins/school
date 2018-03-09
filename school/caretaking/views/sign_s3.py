@@ -54,6 +54,8 @@ class SignS3View(View):
             ExpiresIn = 3600
         )
 
+        print(filename)
+        filename = 'media/' + filename
         data = {
             'data': presigned_post,
             'url': 'https://%s.s3.amazonaws.com/%s' % (bucket, filename)
