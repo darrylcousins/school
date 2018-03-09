@@ -282,7 +282,8 @@
         if(xhr.readyState === 4) {
           if(xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
-            if (document.location.pathname.indexOf("heroku") != -1) {
+            if (document.location.hostname.indexOf("heroku") != -1) {
+              $("#id_image").val(response.url);
               uploadFile(file, response.data, response.url);
             } else {
               fakeUploadFile(file, response.data, response.url);
@@ -323,12 +324,7 @@
       xhr.onreadystatechange = function() {
         if(xhr.readyState === 4){
           if(xhr.status === 200 || xhr.status === 204){
-            $("#preview").attr("src", url);
-            $("#id_image").removeClass("d-none");
-            $("#file_input_text").addClass("d-none");
-            $("#id_image").val(url);
-            $("#save_button").removeClass("d-none");
-            updateStatus("File uploaded successfully", "success");
+            $("#photo_add_form").submit();
           }
           else{
             updateStatus("Could not upload file", "danger");
