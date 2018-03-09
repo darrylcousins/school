@@ -277,7 +277,7 @@
       */
     function getSignedRequest(file){
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", "/sign_s3?filename="+file.name+"&filetype="+file.type);
+      xhr.open("GET", "/caretaking/sign_s3?filename="+file.name+"&filetype="+file.type);
       xhr.onreadystatechange = function(){
         if(xhr.readyState === 4) {
           if(xhr.status === 200) {
