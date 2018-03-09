@@ -280,11 +280,13 @@
         if(xhr.readyState === 4) {
           if(xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
+            console.log(response.url);
+            console.log(response.data);
             if (document.location.hostname.indexOf("heroku") != -1) {
               $("#id_image").val(response.url);
-              uploadFile(file, response.data, response.url);
+              //uploadFile(file, response.data, response.url);
             } else {
-              fakeUploadFile(file, response.data, response.url);
+              //fakeUploadFile(file, response.data, response.url);
             }
           }
           else{

@@ -23,12 +23,11 @@ class SignS3View(View):
         aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
         aws_region = os.getenv('AWS_REGION')
-        bucket = os.getenv('AWS_BUCKET')
+        aws_bucket = os.getenv('AWS_BUCKET')
         extra_args = {
                 'ACL': 'public-read',
                 'ContentType': 'jpg',
                 }
-        bucket = 'cousinsd-ellesmere-static'
 
         boto3.setup_default_session(
                 aws_access_key_id=aws_access_key_id,
@@ -42,7 +41,7 @@ class SignS3View(View):
         filename = 'media/' + filename
 
         presigned_post = client.generate_presigned_post(
-            Bucket = bucket,
+            Bucket = aws_bucket,
             Key = filename,
             Fields = {
                 "acl": "public-read",
@@ -57,7 +56,7 @@ class SignS3View(View):
 
         data = {
             'data': presigned_post,
-            'url': 'https://%s.s3.amazonaws.com/%s' % (bucket, filename)
+            'url': 'https://%s.s3.amazonaws.com/%s' % (aws_bucket, filename)
         }
         return JsonResponse(data)
 
