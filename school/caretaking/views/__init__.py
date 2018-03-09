@@ -27,6 +27,7 @@ from caretaking.views.photo import PhotoList
 from caretaking.views.photo import PhotoDelete
 from caretaking.views.photo import PhotoConfirmDelete
 from caretaking.views.photo import PhotoUpload
+from caretaking.views.sign_s3 import SignS3View
 
 
 __all__ = [
@@ -56,5 +57,6 @@ __all__ = [
         'PhotoConfirmDelete',
         'PhotoList',
         'PhotoUpload',
+        'SignS3View',
         ]
 

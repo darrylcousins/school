@@ -13,9 +13,13 @@ from .views import ProjectList, ProjectAdd, ProjectDetail
 from .views import ProjectEdit, ProjectDelete, ProjectConfirmDelete
 from .views import PhotoAdd, PhotoList, PhotoDetail
 from .views import PhotoDelete, PhotoConfirmDelete, PhotoUpload
+from .views import SignS3View
+
 
 urlpatterns = (
     path('', StaffList.as_view(), name="staff-list"),
+
+    path('sign_s3', SignS3View.as_view(), name='sign_s3'),
 
     # todos
     path('todos/',

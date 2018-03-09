@@ -9,6 +9,8 @@ from django.views.generic import View
 
 import boto3
 
+from caretaking.models import Photo
+
 class SignS3View(View):
 
     def get(self, request, *args, **kwargs):
@@ -34,7 +36,7 @@ class SignS3View(View):
                 )
         client = boto3.client('s3', aws_region)
 
-        upload_to='images/%Y/%m/%d'
+        upload_to = Photo._meta.get_field('image').upload_to
         dirname = datetime.datetime.now().strftime(upload_to)
         filename = posixpath.join(dirname, filename)
 
