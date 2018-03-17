@@ -4,7 +4,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 from .local import *
 
-GDAL_LIBRARY_PATH = 'C:\\OSGeo4W\\bin\\gdal201.dll'
+# GDAL_LIBRARY_PATH = 'C:\\OSGeo4W\\bin\\gdal201.dll'
 
 ########## SITE CONFIGURATION
 # Hosts/domain names that are valid for this site

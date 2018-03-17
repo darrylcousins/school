@@ -146,8 +146,6 @@
         var parts = path.split("/");
 
         // send an almost arbitary file to get past the form and to field storage
-        // var image_blob = new Blob([path],  {type : "image/jpeg"});
-
         var canvas = document.getElementById("canvas");
         canvas.toBlob(function(blob) {
 

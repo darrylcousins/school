@@ -30,6 +30,10 @@ Packages
 
 Install packages::
 
+        (ellesmere)$ pip install -r requirements/base.txt
+
+This installs all the packages listed below.  ::
+
         (ellesmere)$ pip install -U django
         (ellesmere)$ pip install -U matplotlib
         (ellesmere)$ pip install -U palettable
@@ -41,6 +45,13 @@ Note that packages can also be installed using conda e.g.::
 Note: I had a fair bit of trouble installing ``wordcloud`` because win32/python3.6 conda package
 not available. Finally managed with a pip install which then meant installing C++ build tools and
 copying files to make it all come together.
+
+Note: On fedora I also needed::
+
+        $ sudo dnf install gcc
+        $ sudo dnf install redhat-rpm-config
+        $ sudo dnf install python3-devel
+        $ sudo dnf install python3-lxml
 
 GeoDjango
 ---------
@@ -62,14 +73,24 @@ Went with these packages::
 I used `https://docs.djangoproject.com/en/2.0/ref/contrib/gis/install/#windows` to install
 `Postgres`, `PostGIS`, `GDAL` and `GEOS` libraries. Briefly `OSGeo4W` installed the required packages.
 
-Django supports PostgreSQL 10 with Psycopg 2.7.3.2 but I struggled with the installer when installing `PostGIS` extensions so instead I went of `9.6` and was able to install the extension.
+Django supports PostgreSQL 10 with Psycopg 2.7.3.2 but I struggled with the installer when installing `PostGIS` extensions so instead I went of `9.6` and was able to install the extension. Later with Fedora27 it defaulted in any case to 9.6.8 at time of installation. I followed `https://fedoraproject.org/wiki/PostgreSQL` for postgres install and setup on Fedora27.
+
+And then on fedora::
+
+        $ sudo dnf install postgres
+        $ sudo dnf install postgis
+
+The later nicely install all gdal and gis packages. Stop and start postgres with::
+
+        $ sudo systemctl start postgresql
 
 Create Database
 ---------------
 
 Create the database and user using `postgres` superuser and set some defaults::
 
-        $ psql -U postgres -W 'password'
+        $ sudo su - postgres
+        $ psql
         postgres=# CREATE USER ellesmere PASSWORD 'ellesmere';
         postgres=# CREATE DATABASE ellesmere OWNER ellesmere;
         postgres=# ALTER ROLE ellesmere SET client_encoding TO 'utf8';
@@ -80,12 +101,10 @@ Create the database and user using `postgres` superuser and set some defaults::
 Superuser status is required to run `CREATE EXTENSION`::
 
         postgres=# ALTER ROLE ellesmere WITH SUPERUSER;
+        postgres=# \c ellesmere
+        ellesmere=# CREATE EXTENSION postgis;
         postgres=# \q
 
-Log in to psql with the new user and geo enable the new database::
-
-        $ psql -U ellesmere -W 'password'
-        ellesmere=# CREATE EXTENSION postgis;
 
 Create Project
 --------------
