@@ -5,4 +5,5 @@ lib64
 pip-selfcheck.json
 __pycache__/
 share/
+assets/
 

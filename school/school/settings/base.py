@@ -115,8 +115,8 @@ FIXTURE_DIRS = (
 ########## TEMPLATE CONFIGURATION
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
-TEMPLATES = [     
-    {         
+TEMPLATES = [
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
         'DIRS': (
@@ -138,11 +138,13 @@ TEMPLATES = [
 ########## MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     # Default Django middleware.
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # clearly this needs to be sorted
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -179,10 +181,17 @@ DJANGO_APPS = (
 LOCAL_APPS = (
     'widget_tweaks',
     'floppyforms',
+    'graphene_django',
+    'corsheaders',
 
     # ellesmere.school apps
     'caretaking',
 )
+
+# I choose to be specific in urls.py
+#GRAPHENE = {
+#    'SCHEMA': 'school.schema.schema'
+#}
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

@@ -69,23 +69,45 @@ Went with these packages::
 
         (ellesmere)$ pip install pandas
         (ellesmere)$ pip install plotly
-    
+
 I used `https://docs.djangoproject.com/en/2.0/ref/contrib/gis/install/#windows` to install
 `Postgres`, `PostGIS`, `GDAL` and `GEOS` libraries. Briefly `OSGeo4W` installed the required packages.
 
 Django supports PostgreSQL 10 with Psycopg 2.7.3.2 but I struggled with the installer when installing `PostGIS` extensions so instead I went of `9.6` and was able to install the extension. Later with Fedora27 it defaulted in any case to 9.6.8 at time of installation. I followed `https://fedoraproject.org/wiki/PostgreSQL` for postgres install and setup on Fedora27.
 
-And then on fedora::
+And then on fedora things got a little complicated when I found the heroku is postgresql10 and fedora at postgresql9. I followed `https://www.if-not-true-then-false.com/2012/install-postgresql-on-fedora-centos-red-hat-rhel/` to get a repository with postgresql10 and then could::
 
-        $ sudo dnf install postgres
-        $ sudo dnf install postgis
+        $ sudo dnf install postgres10
+        $ sudo dnf install postgis24_10 # version matched in same repository
+
+Not to forget initialisation::
+
+        $ sudo /usr/pgsql-10/bin/postgresql-10-setup initdb
 
 The later nicely install all gdal and gis packages. Stop and start postgres with::
 
-        $ sudo systemctl start postgresql
+        $ sudo systemctl enable postgresql-10.service
+        $ sudo systemctl start postgresql-10.service
 
 Create Database
 ---------------
+
+Install Heroku
+``````````````
+
+        ::
+        $ npm install heroku
+
+Get Current Database
+````````````````````
+
+If we are still on heroku and that is the most recent database then do::
+
+        $ su - postgres
+        $ heroku pg:pull HEROKU_POSTGRESQL_AMBER ellesmere --app ellesmere
+
+Otherwise
+`````````
 
 Create the database and user using `postgres` superuser and set some defaults::
 

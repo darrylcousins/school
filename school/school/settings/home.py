@@ -11,7 +11,8 @@ from .local import *
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = [
         '127.0.0.1',
-        '192.168.1.67'
+        '192.168.1.67',
+        'localhost',
         ]
 ########## END SITE CONFIGURATION
 
@@ -30,3 +31,5 @@ DATABASES = {
     'default': DEFAULT_DB,
 }
 
+# need to work out a better way for heroku
+CORS_ORIGIN_ALLOW_ALL = True

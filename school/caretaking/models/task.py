@@ -101,7 +101,7 @@ class Task(PhotoEnabled, models.Model):
 
         >>> Task.objects.filter(staff=caretaker).count()
         11
-    
+ 
     Accordingly we expect none from the assistant::
 
         >>> maria, created = User.objects.get_or_create(username='halloumism', first_name='Maria',
