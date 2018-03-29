@@ -1,12 +1,12 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
-from caretaking.models.staff import Staff
-from caretaking.models.location import Location
-from caretaking.models.task import TaskType
-from caretaking.models.task import Task
-from caretaking.models.diary import Diary
-from caretaking.models.project import Project
-from caretaking.models.photo import Photo
+from .staff import Staff
+from .location import Location
+from .task import TaskType
+from .task import Task
+from .diary import Diary
+from .project import Project
+from .photo import Photo
 
 __all__ = [
         'Staff',

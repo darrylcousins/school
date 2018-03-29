@@ -16,15 +16,6 @@ DEBUG = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ########## END EMAIL CONFIGURATION
 
-
-########## DATABASE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-
-# Created postgresql-clean-63911 as DATABASE_URL
-
-########## END DATABASE CONFIGURATION
-
-
 ########## STATIC FILE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
 STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
@@ -53,18 +44,6 @@ CACHES = {
     }
 }
 ########## END CACHE CONFIGURATION
-
-
-########## TOOLBAR CONFIGURATION
-# See: http://django-debug-toolbar.readthedocs.org/en/latest/installation.html#explicit-setup
-# XXX debug_toolbar not installed
-#INSTALLED_APPS += (
-#    'debug_toolbar',
-#)
-
-#MIDDLEWARE_CLASSES += (
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
-#)
 
 #DEBUG_TOOLBAR_PATCH_SETTINGS = False
 

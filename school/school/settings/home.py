@@ -31,5 +31,3 @@ DATABASES = {
     'default': DEFAULT_DB,
 }
 
-# need to work out a better way for heroku
-CORS_ORIGIN_ALLOW_ALL = True

@@ -134,17 +134,33 @@ TEMPLATES = [
 ]
 ########## END TEMPLATE CONFIGURATION
 
+# need to work out a better way for heroku
+CORS_ORIGIN_ALLOW_ALL = True
+
+# jwt rest framework configuration for frontend
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+# never expires - fix for production
+JWT_VERIFY_EXPIRATION = False
 
 ########## MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    # Default Django middleware.
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'school.middleware.JWTMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # clearly this needs to be sorted
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -181,6 +197,7 @@ DJANGO_APPS = (
 LOCAL_APPS = (
     'widget_tweaks',
     'floppyforms',
+    'rest_framework',
     'graphene_django',
     'corsheaders',
 

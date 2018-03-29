@@ -12,6 +12,10 @@ class S3Storage(FileSystemStorage):
         from the beginning.
 
         Don't save anything.
+
+        Clearly this should be more comprehensive, calling other methods on
+        this storage will either produce and error or at least something
+        untoward. But it does for now.
         """
         print('pretend saving', name)
         return name
