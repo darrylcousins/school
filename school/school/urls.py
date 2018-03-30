@@ -23,7 +23,7 @@ urlpatterns = [
     path('caretaking/', include('caretaking.urls')),
 
     path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
-    path('gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
+#    path('gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
     path('api-token-auth/', obtain_jwt_token),
     path('api-token-refresh/', refresh_jwt_token),
     path('api-token-verify/', verify_jwt_token),

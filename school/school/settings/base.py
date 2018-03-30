@@ -205,10 +205,13 @@ LOCAL_APPS = (
     'caretaking',
 )
 
-# I choose to be specific in urls.py
-#GRAPHENE = {
-#    'SCHEMA': 'school.schema.schema'
-#}
+GRAPHENE = {
+    # I choose to be specific in urls.py
+    'SCHEMA': 'school.graphql.schema',
+    'MIDDLEWARE': [
+        'graphene_django.debug.DjangoDebugMiddleware',
+    ],
+}
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

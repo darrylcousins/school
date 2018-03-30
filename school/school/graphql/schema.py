@@ -3,22 +3,31 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 import graphene
 from graphene import relay
 
+from graphene_django.debug import DjangoDebug
+
+
 from caretaking.graphql.schema import Query as CaretakingQuery
 
-from .auth import Query as AuthQuery
+from .auth import Mutation as TokenAuthMutation
 from .user import Query as UserQuery
 
 """
 Module to gather all graphql query objects as the application endpoint.
 """
 
-class Query(
-        CaretakingQuery,
-        AuthQuery,
-        UserQuery,
-        graphene.ObjectType
-    ):
+class Mutations(
+    TokenAuthMutation,
+    graphene.ObjectType,
+):
     pass
 
 
-schema = graphene.Schema(query=Query)
+class Query(
+        CaretakingQuery,
+        UserQuery,
+        graphene.ObjectType
+    ):
+    debug = graphene.Field(DjangoDebug, name='__debug')
+
+
+schema = graphene.Schema(query=Query, mutation=Mutations)
