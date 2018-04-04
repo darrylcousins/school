@@ -41,6 +41,30 @@ class TokenAuthInput(graphene.InputObjectType):
     password = graphene.String(required=True)
 
 
+class ValidateAuth(graphene.Mutation):
+    class Arguments:
+        data = TokenAuthInput(required=True)
+
+    status = graphene.Int()
+    token_auth = graphene.Field(TokenAuth)
+    form_errors = graphene.String()
+
+    @staticmethod
+    def mutate(root, info, data=None):
+        form = AuthenticationForm(data=data)
+        if not form.is_valid():
+            return CreateTokenAuth(
+                    status=400,
+                    form_errors=json.dumps(form.errors),
+                    token_auth=None)
+
+        return CreateTokenAuth(
+                status=200,
+                form_errors=None,
+                token_auth=None)
+
+
+
 class CreateTokenAuth(graphene.Mutation):
     class Arguments:
         data = TokenAuthInput(required=True)
@@ -77,6 +101,7 @@ class CreateTokenAuth(graphene.Mutation):
 
 class Mutation(object):
     create_token_auth = CreateTokenAuth.Field()
+    validate_auth = ValidateAuth.Field()
 
 #
 #class Query(object):

@@ -5,6 +5,7 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
+import datetime
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
@@ -150,18 +151,20 @@ REST_FRAMEWORK = {
 }
 
 # never expires - fix for production
-JWT_VERIFY_EXPIRATION = False
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=3),
+}
 
 ########## MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'school.middleware.JWTMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'school.middleware.JWTMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
