@@ -29,6 +29,7 @@ class UserNode(DjangoObjectType):
                 'first_name',
                 'last_name',
                 'email',
+                'staff',
                 ]
         interfaces = (relay.Node, )
 
