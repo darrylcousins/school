@@ -6,7 +6,7 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
 from caretaking.models.task import Task
-from caretaking.models.task import TaskType as MTaskType
+from caretaking.models.task import TaskType as TaskTypeModel
 
 
 class TaskType(DjangoObjectType):
@@ -19,7 +19,7 @@ class TaskType(DjangoObjectType):
 
 class TaskTypeType(DjangoObjectType):
     class Meta:
-        model = MTaskType
+        model = TaskTypeModel
 
 
 class Query(object):

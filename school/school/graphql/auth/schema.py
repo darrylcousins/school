@@ -26,6 +26,8 @@ class TokenAuth(graphene.ObjectType):
         interfaces = (relay.Node,)
 
     token = graphene.String(description="TWS authentication token")
+    username = graphene.String(description="Username for user")
+    uid = graphene.String(description="Id for user")
 
 
 class TokenAuthInput(graphene.InputObjectType):
@@ -72,6 +74,8 @@ class CreateTokenAuth(graphene.Mutation):
     status = graphene.Int()
     token_auth = graphene.Field(TokenAuth)
     form_errors = graphene.String()
+    username = graphene.String()
+    uid = graphene.Int()
 
     @staticmethod
     def mutate(root, info, data=None):
@@ -96,30 +100,11 @@ class CreateTokenAuth(graphene.Mutation):
         token_auth = TokenAuth(token=token)
         return CreateTokenAuth(
                 status=200,
+                username=user.username,
+                uid=user.id,
                 token_auth=token_auth)
 
 
 class Mutation(object):
     create_token_auth = CreateTokenAuth.Field()
     validate_auth = ValidateAuth.Field()
-
-#
-#class Query(object):
-#
-#    auth = graphene.Field(TokenAuth)
-#
-#    def resolve_auth(self, info, **kwargs):
-#
-#        print(dir(info))
-#        print(kwargs)
-#        data = dict(username='cousinsd', password='car3tak3')
-#
-#        serializer = JSONWebTokenSerializer(data=data)
-#
-#        token = 'fuckup'
-#        if serializer.is_valid():
-#            user = serializer.object.get('user') or info.context.user
-#            token = serializer.object.get('token')
-#
-#        auth = TokenAuth(token=token)
-#        return auth

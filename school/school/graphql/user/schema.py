@@ -41,12 +41,15 @@ class UserType(DjangoObjectType):
 
 class Query(object):
 
-    #user = relay.Node.Field(UserNode)
+    user = relay.Node.Field(UserNode)
+
+    def resolve_user(self, info, **kwargs):
+        return User.objects.all().order_by('id')
 
     all_users = DjangoFilterConnectionField(UserNode)
 
     def resolve_all_users(self, info, **kwargs):
-        return User.objects.all()
+        return User.objects.all().order_by('id')
 
     current_user = graphene.Field(UserType)
 

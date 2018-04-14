@@ -20,5 +20,5 @@ class JWTMiddleware(MiddlewareMixin):
             return
 
         request.user = auth[0]
-        print("authenticated user: ", request.user)
-        print(request)
+        #print("authenticated user: ", request.user)
+        #print(request)
