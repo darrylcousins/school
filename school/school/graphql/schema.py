@@ -10,6 +10,7 @@ from caretaking.graphql.schema import Query as CaretakingQuery
 
 from .auth import Mutation as TokenAuthMutation
 from .user import Query as UserQuery
+from .user import Mutation as UserMutation
 
 """
 Module to gather all graphql query objects as the application endpoint.
@@ -17,6 +18,7 @@ Module to gather all graphql query objects as the application endpoint.
 
 class Mutations(
     TokenAuthMutation,
+    UserMutation,
     graphene.ObjectType,
 ):
     pass
