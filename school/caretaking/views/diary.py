@@ -256,7 +256,7 @@ class DiaryDetail(DateDetailView):
 
         # initialize value
         value = None
-        print(self.object, type(self.object));
+        #print(self.object, type(self.object));
         for point in self.object.points():
             if value is None:
                 # initialize geosgeometry object

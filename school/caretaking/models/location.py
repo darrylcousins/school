@@ -20,7 +20,7 @@ class Location(models.Model):
     Locate the centre of the polygon using ``STCentroid()``.
 
         >>> print(library.polygon.centroid)
-        SRID=4326;POINT (2.333333333333334 1.666666666666667)
+        SRID=4326;POINT (2.33333... 1.66666...)
 
     """
     locationid = models.AutoField(primary_key=True)

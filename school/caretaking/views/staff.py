@@ -35,7 +35,7 @@ class StaffDetail(DetailView):
         >>> url = reverse('staff-detail', kwargs={'username':staff.user.username})
         >>> response = client.get(url)
         >>> print(response.status_code)
-        302
+        200
 
     Redirected to login.
 

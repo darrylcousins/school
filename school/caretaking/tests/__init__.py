@@ -24,6 +24,7 @@ DOCTESTS = [
         'caretaking.views.task',
         'caretaking.utils',
         'caretaking.templatetags.caretaking_extras',
+        'caretaking.forms.staff',
     ]
 
 def setUp(test):

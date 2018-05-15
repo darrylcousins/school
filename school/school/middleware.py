@@ -8,7 +8,7 @@ class JWTMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         token = request.META.get('HTTP_AUTHORIZATION', '')
-        print("HTTP TOKEN: ", token)
+        #print("HTTP TOKEN: ", token)
         if not token.startswith('JWT'):
             return
         jwt_auth = JSONWebTokenAuthentication()

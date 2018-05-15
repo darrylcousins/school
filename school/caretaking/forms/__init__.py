@@ -1,7 +1,7 @@
 __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
-from .staff import StaffCreationForm
+from .staff import StaffEditForm
 
 __all__ = [
-        'StaffCreationForm',
+        'StaffEditForm',
         ]
