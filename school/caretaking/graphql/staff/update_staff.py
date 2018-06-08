@@ -2,31 +2,38 @@ __author__ = 'Darryl Cousins <darryljcousins@gmail.com>'
 
 import json
 
-from django.contrib.auth.forms import UserCreationForm
-
 import graphene
 
+from caretaking.forms import StaffUpdateForm
+
+
 # input definitions
-class UserInput(graphene.InputObjectType):
+class StaffInput(graphene.InputObjectType):
     """
     Specifies the structure of a user.
     """
     username = graphene.String(required=True)
-    password1 = graphene.String(required=True)
-    password2 = graphene.String(required=True)
+    title = graphene.String(required=True)
+    first_name = graphene.String(required=True)
+    last_name = graphene.String(required=True)
+    email = graphene.String(required=True)
+    comment = graphene.String(required=False)
 
 
 # mutation definitions
-class CreateUser(graphene.Mutation):
+class UpdateStaff(graphene.Mutation):
     """react-apollo:
 
         const M = gql`
           mutation {
-              createUser(
+              updateStaff(
                 data: {
                   username: "${ data["username"] }",
-                  password1: "${ data["password1"] }",
-                  password2: "${ data["password2"] }",
+                  title: "${ data["title"] }",
+                  first_name: "${ data["first_name"] }",
+                  last_name: "${ data["last_name"] }",
+                  email: "${ data["email"] }",
+                  comment: "${ data["comment"] }",
                   }
                 )
               {
@@ -41,7 +48,7 @@ class CreateUser(graphene.Mutation):
 
     # the input
     class Arguments:
-        data = UserInput(required=True)
+        data = StaffInput(required=True)
 
     # what gets returned
     status = graphene.Int()
@@ -51,15 +58,15 @@ class CreateUser(graphene.Mutation):
 
     @staticmethod
     def mutate(root, info, data=None):
-        form = UserCreationForm(data=data)
+        form = StaffUpdateForm(data=data)
         if not form.is_valid():
-            return CreateUser(
+            return UpdateStaff(
                     status=400,
                     form_errors=json.dumps(form.errors),
                     )
-        user = form.save()
-        return CreateUser(
+        staff = form.save()
+        return UpdateStaff(
                 status=200,
-                username=user.username,
-                uid=user.id,
+                username=staff.user.username,
+                uid=staff.id,
                 )

@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UsernameField
 from caretaking.models import Staff
 
 # Staff: first_name, last_name, title, username(hidden)
-class StaffEditForm(forms.Form):
+class StaffUpdateForm(forms.Form):
     """
         >>> data = {
         ...     'username': 'bleh',
@@ -15,14 +15,14 @@ class StaffEditForm(forms.Form):
         ...     'last_name': 'Doh',
         ...     'title': 'Rocker',
         ...    }
-        >>> scf = StaffEditForm(data)
+        >>> scf = StaffUpdateForm(data)
         >>> scf.is_valid()
         False
         >>> scf.errors
         {'username': ['User does not exist']}
 
         >>> data['username'] = 'cousinsd'
-        >>> scf = StaffEditForm(data)
+        >>> scf = StaffUpdateForm(data)
         >>> scf.is_valid()
         True
         >>> scf.save()
