@@ -68,5 +68,5 @@ class UpdateStaff(graphene.Mutation):
         return UpdateStaff(
                 status=200,
                 username=staff.user.username,
-                uid=staff.id,
+                uid=staff.pk,
                 )

@@ -6,7 +6,8 @@ from graphene import relay
 from graphene_django.debug import DjangoDebug
 
 
-from caretaking.graphql.schema import Query as CaretakingQuery
+from caretaking.graphql import Query as CaretakingQuery
+from caretaking.graphql import Mutation as StaffMutation
 
 from .auth import Mutation as TokenAuthMutation
 from .user import Query as UserQuery
@@ -19,6 +20,7 @@ Module to gather all graphql query objects as the application endpoint.
 class Mutations(
     TokenAuthMutation,
     UserMutation,
+    StaffMutation,
     graphene.ObjectType,
 ):
     pass

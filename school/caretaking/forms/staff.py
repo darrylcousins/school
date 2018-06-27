@@ -33,6 +33,10 @@ class StaffUpdateForm(forms.Form):
         max_length=254,
         widget=forms.HiddenInput(),
     )
+    email = forms.EmailField(
+        label="Email",
+        max_length=254
+        )
     first_name = forms.CharField(
         label='First name',
         required=True,
@@ -70,6 +74,7 @@ class StaffUpdateForm(forms.Form):
 
         self.user.first_name = self.cleaned_data['first_name']
         self.user.last_name = self.cleaned_data['last_name']
+        self.user.email = self.cleaned_data['email']
 
         try:
             staff = Staff.objects.get(user=self.user)
@@ -77,7 +82,7 @@ class StaffUpdateForm(forms.Form):
             staff.comment = self.cleaned_data['comment']
         except Staff.DoesNotExist:
             staff = Staff(
-                user=self.user_instance,
+                user=self.user,
                 title=self.cleaned_data['title'],
                 comment=self.cleaned_data['comment'],
             )
@@ -91,10 +96,28 @@ class StaffUpdateForm(forms.Form):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         try:
-            self.user= User.objects.get(username=username)
+            self.user = User.objects.get(username=username)
         except:
             raise forms.ValidationError(
                 'User does not exist',
                 code='user_does_not_exist',
             )
         return username
+
+    def clean(self):
+        super().clean()
+        if not self.user:
+            return self.cleaned_data
+        email = self.cleaned_data.get('email')
+        try:
+            user = User.objects.get(email=email)
+        except:
+            return self.cleaned_data
+
+        if user != self.user:
+            self.add_error('email', forms.ValidationError(
+                'That email is already taken.',
+                code='email_already_taken',
+            ))
+
+        return self.cleaned_data
